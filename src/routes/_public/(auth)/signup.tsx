@@ -24,7 +24,13 @@ function RouteComponent() {
   return (
     <>
       <div className="mb-8">
-        <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} />
+        <Logo
+          link="/"
+          type="streamline"
+          mode={mode}
+          imgClass="mx-auto"
+          logoWidth={60}
+        />
       </div>
       <div className="mb-8">
         <h3 className="mb-1">Sign Up</h3>

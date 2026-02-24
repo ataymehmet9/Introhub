@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import Button from '@/components/ui/Button'
 import { useState, useEffect } from 'react'
+import ModeSwitcher from '../template/ThemeConfigurator/ModeSwitcher'
 
 export default function PublicHeader() {
   const navigate = useNavigate()
@@ -59,6 +60,7 @@ export default function PublicHeader() {
 
           {/* Auth Buttons */}
           <div className="flex items-center gap-3">
+            <ModeSwitcher />
             <Button
               variant="plain"
               onClick={() => navigate({ to: '/login' })}
