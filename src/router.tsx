@@ -24,9 +24,12 @@ export const getRouter = () => {
       </TanstackQuery.Provider>
     ),
     defaultPreload: 'intent',
+    defaultPreloadDelay: 100,
     scrollRestoration: true,
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
+    defaultPendingMs: 150,
+    defaultPendingMinMs: 300,
   })
 
   setupRouterSsrQueryIntegration({ router, queryClient: rqContext.queryClient })
