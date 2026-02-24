@@ -7,7 +7,6 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Theme from '@/components/template/Theme'
-import Layout from '@/components/layouts'
 import { RouteTransition } from '@/components/shared/RouteTransition'
 
 import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
@@ -68,7 +67,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <Theme>
           <RouteTransition />
-          <Layout>{children}</Layout>
+          {children}
         </Theme>
         <TanStackDevtools
           config={{

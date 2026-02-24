@@ -12,7 +12,13 @@ import { generateFileCloudUrl } from '@/utils/fileUtils'
 const UserDropdown = () => {
   const { user = {} } = useSessionUser()
   const navigate = useNavigate()
-  const mainUser: User = user as User
+  const mainUser: User | null = user as User | null
+
+  // Handle null user during SSR or before session loads
+  if (!mainUser) {
+    return null
+  }
+
   const { image: avatar, name: userName, email } = mainUser
 
   const handleSignOut = () => {

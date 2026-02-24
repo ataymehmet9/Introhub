@@ -130,6 +130,29 @@
   position: relative;
 }
 
+/* Layout stability - prevent jumping between layouts */
+.layout-stable {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure layouts maintain their structure during transitions */
+[data-layout] {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: none; /* Disable transitions on layout container itself */
+}
+
+/* Prevent content shift during layout changes */
+.page-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  will-change: contents;
+}
+
 /* Pending state overlay */
 .route-pending-overlay {
   position: fixed;

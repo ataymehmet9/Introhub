@@ -15,7 +15,7 @@ After deployment, page transitions were janky due to:
 
 ## Solution
 
-A comprehensive page transition system with multiple layers:
+A comprehensive page transition system with proper route-level layout handling:
 
 ### 1. CSS Animations (`src/assets/styles/others/_page-transitions.css`)
 
@@ -35,7 +35,92 @@ A comprehensive page transition system with multiple layers:
 - `shimmer`: Loading skeleton effect
 - `progress-bar`: Top progress indicator
 
-### 2. Router Configuration (`src/router.tsx`)
+### 2. Layout Route Structure (CRITICAL FIX)
+
+**Problem:** The original implementation had layout selection in `Layouts.tsx` based on session state, causing:
+
+- Client-side layout switching
+- Layout jumping when navigating between authenticated/public routes
+- SSR mismatch issues
+
+**Solution:** Move layout rendering to route level:
+
+#### `_authenticated.tsx` - Authenticated Layout Route
+
+```typescript
+export const Route = createFileRoute('/_authenticated')({
+  component: RouteComponent,
+  pendingComponent: PendingComponent,
+  server: {
+    middleware: [authMiddleware],
+  },
+})
+
+function RouteComponent() {
+  const layoutType = useThemeStore((state) => state.layout.type)
+
+  return (
+    <Suspense fallback={<PendingComponent />}>
+      <PostLoginLayout layoutType={layoutType}>
+        <PageContainer>
+          <Outlet />
+        </PageContainer>
+      </PostLoginLayout>
+    </Suspense>
+  )
+}
+```
+
+#### `_public.tsx` - Public Layout Route
+
+```typescript
+export const Route = createFileRoute('/_public')({
+  component: RouteComponent,
+  pendingComponent: PendingComponent,
+  server: {
+    middleware: [publicMiddleware],
+  },
+})
+
+function RouteComponent() {
+  return (
+    <Suspense fallback={<PendingComponent />}>
+      <PreLoginLayout>
+        <Outlet />
+      </PreLoginLayout>
+    </Suspense>
+  )
+}
+```
+
+#### `_help.tsx` - Help Layout Route
+
+```typescript
+export const Route = createFileRoute('/_help')({
+  component: RouteComponent,
+  pendingComponent: PendingComponent,
+})
+
+function RouteComponent() {
+  return (
+    <Suspense fallback={<PendingComponent />}>
+      <HelpContentProvider>
+        <HelpLayout />
+      </HelpContentProvider>
+    </Suspense>
+  )
+}
+```
+
+**Benefits:**
+
+- Layouts render on the server (SSR)
+- No client-side layout switching
+- Proper pending states during layout transitions
+- No layout jumping between routes
+- Better SEO and initial load performance
+
+### 3. Router Configuration (`src/router.tsx`)
 
 **Enhanced Settings:**
 
@@ -55,7 +140,7 @@ A comprehensive page transition system with multiple layers:
 - Ensures smooth minimum transition duration
 - Preloads routes on user intent (hover/focus)
 
-### 3. Route Transition Component (`src/components/shared/RouteTransition.tsx`)
+### 4. Route Transition Component (`src/components/shared/RouteTransition.tsx`)
 
 **Components:**
 
@@ -78,7 +163,7 @@ A comprehensive page transition system with multiple layers:
 <RouteTransition />
 ```
 
-### 4. View Transitions API Utilities (`src/utils/view-transitions.ts`)
+### 5. View Transitions API Utilities (`src/utils/view-transitions.ts`)
 
 **Functions:**
 
@@ -104,7 +189,7 @@ Applies view transition name to element for targeted transitions.
 
 Prepares document for smooth page transitions.
 
-### 5. Page Wrapper Component (`src/components/shared/PageWrapper.tsx`)
+### 6. Page Wrapper Component (`src/components/shared/PageWrapper.tsx`)
 
 **Purpose:**
 
@@ -121,6 +206,33 @@ function MyPage() {
   return <PageWrapper>{/* Your page content */}</PageWrapper>
 }
 ```
+
+### 7. Layout Stability CSS
+
+Added CSS classes to prevent layout shifts:
+
+```css
+/* Layout stability - prevent jumping between layouts */
+.layout-stable {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure layouts maintain their structure during transitions */
+[data-layout] {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: none;
+}
+```
+
+Applied to:
+
+- `LayoutBase` component (all post-login layouts)
+- `PreLoginLayout` component
+- Ensures consistent height and prevents jumping
 
 ## Browser Support
 
@@ -164,6 +276,32 @@ function MyPage() {
    - Minimal animations for accessibility
    - Maintains functionality without motion
 
+## Architecture
+
+### Route Structure
+
+```
+__root.tsx (Shell)
+├── _authenticated.tsx (PostLoginLayout + PageContainer)
+│   ├── dashboard.tsx
+│   ├── contacts.tsx
+│   └── requests.tsx
+├── _public.tsx (PreLoginLayout)
+│   ├── login.tsx
+│   ├── signup.tsx
+│   └── forgot-password.tsx
+└── _help.tsx (HelpLayout)
+    └── [slug].tsx
+```
+
+### Key Principles
+
+1. **Layout at Route Level**: Each layout route (`_authenticated`, `_public`, `_help`) renders its own layout
+2. **Server-Side Rendering**: Layouts render on the server, not client-side
+3. **Pending Components**: Each layout route has a `pendingComponent` for smooth transitions
+4. **No Client-Side Switching**: The root `Layouts.tsx` is now just a passthrough
+5. **Suspense Boundaries**: Each layout has its own Suspense boundary
+
 ## Implementation Details
 
 ### Root Integration
@@ -182,6 +320,34 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </Theme>
       </body>
     </html>
+  )
+}
+```
+
+### Layout Routes
+
+Each layout route follows this pattern:
+
+```typescript
+export const Route = createFileRoute('/_layoutName')({
+  component: RouteComponent,
+  pendingComponent: PendingComponent, // Shows during SSR/loading
+  server: {
+    middleware: [/* auth middleware */],
+  },
+})
+
+function PendingComponent() {
+  return <Loading loading={true} />
+}
+
+function RouteComponent() {
+  return (
+    <Suspense fallback={<PendingComponent />}>
+      <LayoutComponent>
+        <Outlet />
+      </LayoutComponent>
+    </Suspense>
   )
 }
 ```
