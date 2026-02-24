@@ -8,7 +8,9 @@ type OauthSignInProps = {
 }
 
 const OauthSignIn = (_props: OauthSignInProps) => {
-  const handleSocialSignIn = async (provider: 'linkedin' | 'microsoft') => {
+  const handleSocialSignIn = async (
+    provider: 'linkedin' | 'microsoft' | 'google',
+  ) => {
     await signIn.social({
       provider,
       callbackURL: appConfig.authenticatedEntryPath,
@@ -20,6 +22,19 @@ const OauthSignIn = (_props: OauthSignInProps) => {
       <Button
         className="flex-1"
         type="button"
+        onClick={() => handleSocialSignIn('google')}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <img
+            className="h-[25px] w-[25px]"
+            src="/img/others/google.png"
+            alt="Google sign in"
+          />
+        </div>
+      </Button>
+      <Button
+        className="flex-1"
+        type="button"
         onClick={() => handleSocialSignIn('microsoft')}
       >
         <div className="flex items-center justify-center gap-2">
@@ -28,7 +43,6 @@ const OauthSignIn = (_props: OauthSignInProps) => {
             src="/img/others/microsoft.png"
             alt="Microsoft sign in"
           />
-          <span>Microsoft</span>
         </div>
       </Button>
       <Button
@@ -42,7 +56,6 @@ const OauthSignIn = (_props: OauthSignInProps) => {
             src="/img/others/linkedin.png"
             alt="LinkedIn sign in"
           />
-          <span>LinkedIn</span>
         </div>
       </Button>
     </div>
