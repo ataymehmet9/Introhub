@@ -34,12 +34,17 @@ RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+# Install ALL dependencies (including devDependencies for drizzle-kit)
+RUN pnpm install --frozen-lockfile
 
 # Copy built application from builder stage
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/instrument.server.mjs ./instrument.server.mjs
+
+# Copy drizzle configuration and migration files
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/src/db ./src/db
 
 # Expose the application port
 EXPOSE 3000
@@ -48,5 +53,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start the application
-CMD ["pnpm", "start"]
+# Start the application with migrations
+CMD ["pnpm", "start:prod"]
