@@ -175,7 +175,7 @@ function RouteComponent() {
 
               {viewingContact.linkedinUrl && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 block">
                     LinkedIn
                   </label>
                   <a
