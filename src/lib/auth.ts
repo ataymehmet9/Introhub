@@ -54,10 +54,7 @@ export const auth = betterAuth({
   hooks: {
     after: async (ctx: any) => {
       // Check if this is a signup request
-      if (
-        ctx.request?.url.includes('/sign-up/email') &&
-        ctx.request?.method === 'POST'
-      ) {
+      if (ctx.path.startsWith('/sign-up')) {
         const user = ctx.returned?.user
         if (user) {
           // Send welcome email to new user
