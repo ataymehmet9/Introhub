@@ -95,7 +95,7 @@ export const sendIntroductionRequestEmail = createServerFn({ method: 'POST' })
       const plainText = toPlainText(emailHtml)
 
       const { data: emailData, error } = await resend.emails.send({
-        from: from ?? 'IntroHub <delivered@resend.dev>',
+        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
         to: [to],
         subject: `Introduction Request: ${contactName}`,
         html: emailHtml,
@@ -200,7 +200,7 @@ export const sendIntroductionResponseEmail = createServerFn({ method: 'POST' })
           : `Introduction Request Update: ${contactName}`
 
       const { data: emailData, error } = await resend.emails.send({
-        from: from ?? 'IntroHub <delivered@resend.dev>',
+        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
         to: [to],
         subject,
         html: emailHtml,
@@ -294,7 +294,7 @@ export const sendIntroductionEmail = createServerFn({ method: 'POST' })
       const plainText = toPlainText(emailHtml)
 
       const { data: emailData, error } = await resend.emails.send({
-        from: from ?? 'IntroHub <delivered@resend.dev>',
+        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
         to: [to], // Contact's email
         cc: [cc], // Requester's email
         subject: `Introduction: ${requesterName} <> ${contactName}`,
@@ -370,7 +370,7 @@ export const sendWelcomeEmail = createServerFn({ method: 'POST' })
       const plainText = toPlainText(emailHtml)
 
       const { data: emailData, error } = await resend.emails.send({
-        from: from ?? 'IntroHub <delivered@resend.dev>',
+        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
         to: [to],
         subject: 'Welcome to IntroHub! 🎉',
         html: emailHtml,
