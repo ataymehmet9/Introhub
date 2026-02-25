@@ -11,7 +11,8 @@ import { RouteTransition } from '@/components/shared/RouteTransition'
 
 import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
 
-import appCss from '../index.css?url'
+// Import CSS directly so Vite can inline it during SSR to prevent FOUC
+import '../index.css'
 
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -45,12 +46,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           'Manage your professional network and introductions efficiently',
       },
     ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
+    // CSS is now imported directly above, no need for links array
   }),
 
   errorComponent: DefaultCatchBoundary,

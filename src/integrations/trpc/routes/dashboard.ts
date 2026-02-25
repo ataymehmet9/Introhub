@@ -394,11 +394,11 @@ export const dashboardRouter = {
             ),
           )
           .groupBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})`,
+            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
             introductionRequests.status,
           )
           .orderBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})`,
+            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
           ),
         // Get requests received trend
         db
@@ -417,11 +417,11 @@ export const dashboardRouter = {
             ),
           )
           .groupBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})`,
+            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
             introductionRequests.status,
           )
           .orderBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})`,
+            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
           ),
       ])
 
