@@ -81,3 +81,17 @@ export const introductionEmailSchema = z.object({
 })
 
 export type IntroductionEmail = z.infer<typeof introductionEmailSchema>
+
+/**
+ * Welcome Email Schema
+ * Email sent to new users when they successfully sign up
+ */
+export const welcomeEmailSchema = z.object({
+  to: z.email({ message: 'Valid email address required' }),
+  userName: z.string().min(1, { message: 'User name is required' }),
+  userEmail: z.email({ message: 'Valid user email required' }),
+  dashboardUrl: z.string().url({ message: 'Valid dashboard URL required' }),
+  from: z.email().optional(),
+})
+
+export type WelcomeEmail = z.infer<typeof welcomeEmailSchema>

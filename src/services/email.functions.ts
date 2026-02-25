@@ -6,12 +6,14 @@ import {
   IntroductionRequestApprovedEmail,
   IntroductionRequestDeclinedEmail,
   IntroductionEmail,
+  WelcomeEmail,
 } from '@/components/template/email'
 import {
   forgotPasswordEmailSchema,
   introductionRequestEmailSchema,
   introductionResponseEmailSchema,
   introductionEmailSchema,
+  welcomeEmailSchema,
 } from '@/schemas'
 import { getResendInstance } from '@/integrations/resend'
 
@@ -334,6 +336,75 @@ export const sendIntroductionEmail = createServerFn({ method: 'POST' })
         cc,
         contactName,
         requesterName,
+        timestamp: new Date().toISOString(),
+      })
+
+      return {
+        success: false,
+        message: 'Unknown error sending email',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  })
+
+/**
+ * Send welcome email to new users after successful signup
+ */
+export const sendWelcomeEmail = createServerFn({ method: 'POST' })
+  .inputValidator(welcomeEmailSchema)
+  .handler(async ({ data }) => {
+    const { to, userName, userEmail, dashboardUrl, from } = data
+
+    const resend = getResendInstance()
+
+    try {
+      const emailHtml = await pretty(
+        await render(
+          WelcomeEmail({
+            userName,
+            userEmail,
+            dashboardUrl,
+          }),
+        ),
+      )
+      const plainText = toPlainText(emailHtml)
+
+      const { data: emailData, error } = await resend.emails.send({
+        from: from ?? 'IntroHub <delivered@resend.dev>',
+        to: [to],
+        subject: 'Welcome to IntroHub! 🎉',
+        html: emailHtml,
+        text: plainText,
+      })
+
+      if (error) {
+        console.error('Error sending welcome email:', {
+          error,
+          to,
+          userName,
+          timestamp: new Date().toISOString(),
+        })
+
+        return { success: false, message: 'Failed to send email', error }
+      }
+
+      console.log('Welcome email sent successfully:', {
+        emailId: emailData.id,
+        to,
+        userName,
+        timestamp: new Date().toISOString(),
+      })
+
+      return {
+        success: true,
+        message: 'Email sent successfully',
+        emailId: emailData.id,
+      }
+    } catch (error) {
+      console.error('Error sending welcome email:', {
+        error,
+        to,
+        userName,
         timestamp: new Date().toISOString(),
       })
 

@@ -86,10 +86,12 @@ export {
   introductionRequestEmailSchema,
   introductionResponseEmailSchema,
   introductionEmailSchema,
+  welcomeEmailSchema,
   type ForgotPasswordEmail,
   type IntroductionRequestEmail,
   type IntroductionResponseEmail,
   type IntroductionEmail,
+  type WelcomeEmail,
 } from './email.schema'
 
 // Search schemas
