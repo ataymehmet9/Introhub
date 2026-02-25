@@ -27,7 +27,7 @@ export const sendForgotPasswordEmail = createServerFn({ method: 'POST' })
 
     try {
       const { data: emailData, error } = await resend.emails.send({
-        from: from ?? 'Intro Hub <delivered@resend.dev>',
+        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
         to: [to],
         subject: 'Reset your password',
         html: emailHtml,
