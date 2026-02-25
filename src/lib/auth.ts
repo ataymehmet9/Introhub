@@ -51,22 +51,33 @@ export const auth = betterAuth({
     },
   },
   plugins: [tanstackStartCookies()],
-  onAfterSignUp: async (user: { email: string; name: string }) => {
-    // Send welcome email to new user
-    try {
-      const dashboardUrl = `${process.env.APP_URL || 'http://localhost:3000'}/dashboard`
-      await sendWelcomeEmail({
-        data: {
-          to: user.email,
-          userName: user.name,
-          userEmail: user.email,
-          dashboardUrl,
-        },
-      })
-      console.log('Welcome email sent to:', user.email)
-    } catch (error) {
-      console.error('Failed to send welcome email:', error)
-      // Don't throw error to prevent signup failure
-    }
+  hooks: {
+    after: async (ctx: any) => {
+      // Check if this is a signup request
+      if (
+        ctx.request?.url.includes('/sign-up/email') &&
+        ctx.request?.method === 'POST'
+      ) {
+        const user = ctx.returned?.user
+        if (user) {
+          // Send welcome email to new user
+          try {
+            const dashboardUrl = `${process.env.APP_URL || 'http://localhost:3000'}/dashboard`
+            await sendWelcomeEmail({
+              data: {
+                to: user.email,
+                userName: user.name,
+                userEmail: user.email,
+                dashboardUrl,
+              },
+            })
+            console.log('Welcome email sent to:', user.email)
+          } catch (error) {
+            console.error('Failed to send welcome email:', error)
+            // Don't throw error to prevent signup failure
+          }
+        }
+      }
+    },
   },
 })
