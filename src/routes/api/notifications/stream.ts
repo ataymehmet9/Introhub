@@ -29,10 +29,131 @@ async function handler({ request }: { request: Request }) {
 
   const userId = session.user.id
 
+  // Hoist mutable state so both start() and cancel() share the same references
+  let cleanedUp = false
+  let heartbeatInterval: ReturnType<typeof setInterval> | null = null
+  let streamController: ReadableStreamDefaultController | null = null
+
+  // Notification event handlers — defined here so cleanup() can reference them
+  const handleNotificationCreated = (data: {
+    userId: string
+    notification: any
+  }) => {
+    if (data.userId !== userId) return
+    try {
+      const event: NotificationSSEEvent = {
+        type: 'notification',
+        data: { action: 'created', notification: data.notification },
+      }
+      streamController?.enqueue(
+        `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
+      )
+    } catch (error) {
+      console.error(
+        `[SSE] Error sending notification:created to user ${userId}:`,
+        error,
+      )
+    }
+  }
+
+  const handleNotificationRead = (data: {
+    userId: string
+    notificationId: number
+  }) => {
+    if (data.userId !== userId) return
+    try {
+      const event: NotificationSSEEvent = {
+        type: 'notification',
+        data: { action: 'read', notificationId: data.notificationId },
+      }
+      streamController?.enqueue(
+        `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
+      )
+    } catch (error) {
+      console.error(
+        `[SSE] Error sending notification:read to user ${userId}:`,
+        error,
+      )
+    }
+  }
+
+  const handleNotificationDeleted = (data: {
+    userId: string
+    notificationId: number
+  }) => {
+    if (data.userId !== userId) return
+    try {
+      const event: NotificationSSEEvent = {
+        type: 'notification',
+        data: { action: 'deleted', notificationId: data.notificationId },
+      }
+      streamController?.enqueue(
+        `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
+      )
+    } catch (error) {
+      console.error(
+        `[SSE] Error sending notification:deleted to user ${userId}:`,
+        error,
+      )
+    }
+  }
+
+  const handleAllRead = (data: { userId: string }) => {
+    if (data.userId !== userId) return
+    try {
+      const event: NotificationSSEEvent = {
+        type: 'notification',
+        data: { action: 'all-read' },
+      }
+      streamController?.enqueue(
+        `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
+      )
+    } catch (error) {
+      console.error(
+        `[SSE] Error sending notification:all-read to user ${userId}:`,
+        error,
+      )
+    }
+  }
+
+  /**
+   * Centralised cleanup — idempotent, safe to call from both abort and cancel.
+   * Removes all event listeners, clears the heartbeat timer,
+   * deregisters the connection from the manager, and closes the controller.
+   */
+  function cleanup(reason: string) {
+    if (cleanedUp) return
+    cleanedUp = true
+
+    console.log(`[SSE] Cleaning up stream for user ${userId} (${reason})`)
+
+    if (heartbeatInterval !== null) {
+      clearInterval(heartbeatInterval)
+      heartbeatInterval = null
+    }
+
+    notificationEmitter.off('notification:created', handleNotificationCreated)
+    notificationEmitter.off('notification:read', handleNotificationRead)
+    notificationEmitter.off('notification:deleted', handleNotificationDeleted)
+    notificationEmitter.off('notification:all-read', handleAllRead)
+
+    if (streamController !== null) {
+      sseManager.removeConnection(userId, streamController)
+      try {
+        streamController.close()
+      } catch {
+        // Controller may already be closed — safe to ignore
+      }
+      streamController = null
+    }
+  }
+
   // Create a ReadableStream for SSE
   const stream = new ReadableStream({
     start(controller) {
       console.log(`[SSE] Starting stream for user ${userId}`)
+
+      streamController = controller
 
       // Register this connection with the SSE manager
       sseManager.addConnection(userId, controller)
@@ -50,152 +171,39 @@ async function handler({ request }: { request: Request }) {
       )
 
       // Set up heartbeat to keep connection alive (every 30 seconds)
-      const heartbeatInterval = setInterval(() => {
+      heartbeatInterval = setInterval(() => {
         try {
           const heartbeatEvent: HeartbeatSSEEvent = {
             type: 'heartbeat',
-            data: {
-              timestamp: Date.now(),
-            },
+            data: { timestamp: Date.now() },
           }
           controller.enqueue(
             `event: ${heartbeatEvent.type}\ndata: ${JSON.stringify(heartbeatEvent.data)}\n\n`,
           )
         } catch (error) {
           console.error(`[SSE] Heartbeat error for user ${userId}:`, error)
-          clearInterval(heartbeatInterval)
-          sseManager.removeConnection(userId, controller)
+          cleanup('heartbeat-error')
         }
-      }, 30000) // 30 seconds
+      }, 30000)
 
-      // Listen for notification events
-      const handleNotificationCreated = (data: {
-        userId: string
-        notification: any
-      }) => {
-        if (data.userId === userId) {
-          try {
-            const event: NotificationSSEEvent = {
-              type: 'notification',
-              data: {
-                action: 'created',
-                notification: data.notification,
-              },
-            }
-            controller.enqueue(
-              `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
-            )
-          } catch (error) {
-            console.error(
-              `[SSE] Error sending notification:created to user ${userId}:`,
-              error,
-            )
-          }
-        }
-      }
-
-      const handleNotificationRead = (data: {
-        userId: string
-        notificationId: number
-      }) => {
-        if (data.userId === userId) {
-          try {
-            const event: NotificationSSEEvent = {
-              type: 'notification',
-              data: {
-                action: 'read',
-                notificationId: data.notificationId,
-              },
-            }
-            controller.enqueue(
-              `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
-            )
-          } catch (error) {
-            console.error(
-              `[SSE] Error sending notification:read to user ${userId}:`,
-              error,
-            )
-          }
-        }
-      }
-
-      const handleNotificationDeleted = (data: {
-        userId: string
-        notificationId: number
-      }) => {
-        if (data.userId === userId) {
-          try {
-            const event: NotificationSSEEvent = {
-              type: 'notification',
-              data: {
-                action: 'deleted',
-                notificationId: data.notificationId,
-              },
-            }
-            controller.enqueue(
-              `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
-            )
-          } catch (error) {
-            console.error(
-              `[SSE] Error sending notification:deleted to user ${userId}:`,
-              error,
-            )
-          }
-        }
-      }
-
-      const handleAllRead = (data: { userId: string }) => {
-        if (data.userId === userId) {
-          try {
-            const event: NotificationSSEEvent = {
-              type: 'notification',
-              data: {
-                action: 'all-read',
-              },
-            }
-            controller.enqueue(
-              `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`,
-            )
-          } catch (error) {
-            console.error(
-              `[SSE] Error sending notification:all-read to user ${userId}:`,
-              error,
-            )
-          }
-        }
-      }
-
-      // Register event listeners
+      // Register notification event listeners
       notificationEmitter.on('notification:created', handleNotificationCreated)
       notificationEmitter.on('notification:read', handleNotificationRead)
       notificationEmitter.on('notification:deleted', handleNotificationDeleted)
       notificationEmitter.on('notification:all-read', handleAllRead)
 
-      // Handle connection close
+      // Handle connection close — fires when the client disconnects or the
+      // request is aborted (e.g. browser tab closed, navigation away)
       request.signal.addEventListener('abort', () => {
-        console.log(`[SSE] Connection aborted for user ${userId}`)
-        clearInterval(heartbeatInterval)
-        notificationEmitter.off(
-          'notification:created',
-          handleNotificationCreated,
-        )
-        notificationEmitter.off('notification:read', handleNotificationRead)
-        notificationEmitter.off(
-          'notification:deleted',
-          handleNotificationDeleted,
-        )
-        notificationEmitter.off('notification:all-read', handleAllRead)
-        sseManager.removeConnection(userId, controller)
-        try {
-          controller.close()
-        } catch (error) {
-          // Controller might already be closed
-        }
+        cleanup('abort')
       })
     },
 
-    cancel() {
-      console.log(`[SSE] Stream cancelled for user ${userId}`)
+    // cancel() is called by the runtime when the consumer stops reading
+    // (e.g. the response is dropped without the abort signal firing).
+    // The cleanedUp guard makes this idempotent with the abort path.
+    cancel(reason) {
+      cleanup(`cancel:${reason ?? 'unknown'}`)
     },
   })
 
@@ -217,3 +225,5 @@ export const Route = createFileRoute('/api/notifications/stream')({
     },
   },
 })
+
+// Made with Bob
