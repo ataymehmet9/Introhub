@@ -1,0 +1,8 @@
+<svg width="24" height="24" viewBox="0 0 52 52" fill="none">
+  <circle cx="26" cy="8" r="5" fill="#4F9EFF"></circle>
+  <circle cx="8" cy="40" r="5" fill="#4F9EFF" opacity="0.5"></circle>
+  <circle cx="44" cy="40" r="5" fill="#4F9EFF" opacity="0.5"></circle>
+  <line x1="26" y1="13" x2="8" y2="35" stroke="#4F9EFF" stroke-width="1.5" stroke-opacity="0.4"></line>
+  <line x1="26" y1="13" x2="44" y2="35" stroke="#4F9EFF" stroke-width="1.5" stroke-opacity="0.4"></line>
+  <line x1="13" y1="40" x2="39" y2="40" stroke="#4F9EFF" stroke-width="1.5" stroke-opacity="0.4"></line>
+</svg>
