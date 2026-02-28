@@ -36,7 +36,7 @@ const RequesterColumn = ({
   filterType?: 'sent' | 'received' | 'all'
 }) => {
   // For "Requests Made" (sent), show the approver (recipient)
-  // For "Requests Sent" (received), show the requester
+  // For "Requests Received" (received), show the requester
   const displayName =
     filterType === 'sent' ? row.approverName : row.requesterName
   const displayCompany =

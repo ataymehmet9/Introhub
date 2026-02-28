@@ -115,7 +115,7 @@ function RouteComponent() {
             {/* Tabs Navigation */}
             <Tabs value={tab} onChange={handleTabChange}>
               <Tabs.TabList>
-                <Tabs.TabNav value="received">Requests Sent</Tabs.TabNav>
+                <Tabs.TabNav value="received">Requests Received</Tabs.TabNav>
                 <Tabs.TabNav value="sent">Requests Made</Tabs.TabNav>
               </Tabs.TabList>
             </Tabs>
