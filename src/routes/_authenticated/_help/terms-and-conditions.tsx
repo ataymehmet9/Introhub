@@ -73,7 +73,9 @@ const termsConditionsContent: ArticleContent = {
   ],
 }
 
-export const Route = createFileRoute('/_help/terms-and-conditions')({
+export const Route = createFileRoute(
+  '/_authenticated/_help/terms-and-conditions',
+)({
   component: RouteComponent,
 })
 

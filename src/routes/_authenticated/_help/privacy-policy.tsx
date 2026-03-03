@@ -63,7 +63,7 @@ const privacyPolicyContent: ArticleContent = {
   ],
 }
 
-export const Route = createFileRoute('/_help/privacy-policy')({
+export const Route = createFileRoute('/_authenticated/_help/privacy-policy')({
   component: RouteComponent,
 })
 

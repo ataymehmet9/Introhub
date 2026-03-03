@@ -10,15 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
-import { Route as HelpRouteImport } from './routes/_help'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as PublicWhatIsIntrohubRouteImport } from './routes/_public/what-is-introhub'
 import { Route as PublicPricingRouteImport } from './routes/_public/pricing'
 import { Route as PublicGetDemoRouteImport } from './routes/_public/get-demo'
-import { Route as HelpTermsAndConditionsRouteImport } from './routes/_help/terms-and-conditions'
-import { Route as HelpPrivacyPolicyRouteImport } from './routes/_help/privacy-policy'
+import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/_help'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
 import { Route as ApiNotificationsStreamRouteImport } from './routes/api/notifications/stream'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -26,6 +24,8 @@ import { Route as PublicauthSignupRouteImport } from './routes/_public/(auth)/si
 import { Route as PublicauthResetPasswordRouteImport } from './routes/_public/(auth)/reset-password'
 import { Route as PublicauthLoginRouteImport } from './routes/_public/(auth)/login'
 import { Route as PublicauthForgotPasswordRouteImport } from './routes/_public/(auth)/forgot-password'
+import { Route as AuthenticatedHelpTermsAndConditionsRouteImport } from './routes/_authenticated/_help/terms-and-conditions'
+import { Route as AuthenticatedHelpPrivacyPolicyRouteImport } from './routes/_authenticated/_help/privacy-policy'
 import { Route as AuthenticateduserMeRouteImport } from './routes/_authenticated/(user)/me'
 import { Route as AuthenticatedsearchSearchRouteImport } from './routes/_authenticated/(search)/search'
 import { Route as AuthenticatedrequestsRequestsRouteImport } from './routes/_authenticated/(requests)/requests'
@@ -37,10 +37,6 @@ import { Route as AuthenticateduserMeNotificationsRouteImport } from './routes/_
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/_help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -72,15 +68,9 @@ const PublicGetDemoRoute = PublicGetDemoRouteImport.update({
   path: '/get-demo',
   getParentRoute: () => PublicRoute,
 } as any)
-const HelpTermsAndConditionsRoute = HelpTermsAndConditionsRouteImport.update({
-  id: '/terms-and-conditions',
-  path: '/terms-and-conditions',
-  getParentRoute: () => HelpRoute,
-} as any)
-const HelpPrivacyPolicyRoute = HelpPrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
-  getParentRoute: () => HelpRoute,
+const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
+  id: '/_help',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
@@ -117,6 +107,18 @@ const PublicauthForgotPasswordRoute =
     id: '/(auth)/forgot-password',
     path: '/forgot-password',
     getParentRoute: () => PublicRoute,
+  } as any)
+const AuthenticatedHelpTermsAndConditionsRoute =
+  AuthenticatedHelpTermsAndConditionsRouteImport.update({
+    id: '/terms-and-conditions',
+    path: '/terms-and-conditions',
+    getParentRoute: () => AuthenticatedHelpRoute,
+  } as any)
+const AuthenticatedHelpPrivacyPolicyRoute =
+  AuthenticatedHelpPrivacyPolicyRouteImport.update({
+    id: '/privacy-policy',
+    path: '/privacy-policy',
+    getParentRoute: () => AuthenticatedHelpRoute,
   } as any)
 const AuthenticateduserMeRoute = AuthenticateduserMeRouteImport.update({
   id: '/(user)/me',
@@ -168,8 +170,6 @@ const AuthenticateduserMeNotificationsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
-  '/privacy-policy': typeof HelpPrivacyPolicyRoute
-  '/terms-and-conditions': typeof HelpTermsAndConditionsRoute
   '/get-demo': typeof PublicGetDemoRoute
   '/pricing': typeof PublicPricingRoute
   '/what-is-introhub': typeof PublicWhatIsIntrohubRoute
@@ -179,6 +179,8 @@ export interface FileRoutesByFullPath {
   '/requests': typeof AuthenticatedrequestsRequestsRoute
   '/search': typeof AuthenticatedsearchSearchRoute
   '/me': typeof AuthenticateduserMeRouteWithChildren
+  '/privacy-policy': typeof AuthenticatedHelpPrivacyPolicyRoute
+  '/terms-and-conditions': typeof AuthenticatedHelpTermsAndConditionsRoute
   '/forgot-password': typeof PublicauthForgotPasswordRoute
   '/login': typeof PublicauthLoginRoute
   '/reset-password': typeof PublicauthResetPasswordRoute
@@ -192,8 +194,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
-  '/privacy-policy': typeof HelpPrivacyPolicyRoute
-  '/terms-and-conditions': typeof HelpTermsAndConditionsRoute
   '/get-demo': typeof PublicGetDemoRoute
   '/pricing': typeof PublicPricingRoute
   '/what-is-introhub': typeof PublicWhatIsIntrohubRoute
@@ -202,6 +202,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticateddashboardDashboardRoute
   '/requests': typeof AuthenticatedrequestsRequestsRoute
   '/search': typeof AuthenticatedsearchSearchRoute
+  '/privacy-policy': typeof AuthenticatedHelpPrivacyPolicyRoute
+  '/terms-and-conditions': typeof AuthenticatedHelpTermsAndConditionsRoute
   '/forgot-password': typeof PublicauthForgotPasswordRoute
   '/login': typeof PublicauthLoginRoute
   '/reset-password': typeof PublicauthResetPasswordRoute
@@ -216,10 +218,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/_help': typeof HelpRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
-  '/_help/privacy-policy': typeof HelpPrivacyPolicyRoute
-  '/_help/terms-and-conditions': typeof HelpTermsAndConditionsRoute
+  '/_authenticated/_help': typeof AuthenticatedHelpRouteWithChildren
   '/_public/get-demo': typeof PublicGetDemoRoute
   '/_public/pricing': typeof PublicPricingRoute
   '/_public/what-is-introhub': typeof PublicWhatIsIntrohubRoute
@@ -230,6 +230,8 @@ export interface FileRoutesById {
   '/_authenticated/(requests)/requests': typeof AuthenticatedrequestsRequestsRoute
   '/_authenticated/(search)/search': typeof AuthenticatedsearchSearchRoute
   '/_authenticated/(user)/me': typeof AuthenticateduserMeRouteWithChildren
+  '/_authenticated/_help/privacy-policy': typeof AuthenticatedHelpPrivacyPolicyRoute
+  '/_authenticated/_help/terms-and-conditions': typeof AuthenticatedHelpTermsAndConditionsRoute
   '/_public/(auth)/forgot-password': typeof PublicauthForgotPasswordRoute
   '/_public/(auth)/login': typeof PublicauthLoginRoute
   '/_public/(auth)/reset-password': typeof PublicauthResetPasswordRoute
@@ -245,8 +247,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/privacy-policy'
-    | '/terms-and-conditions'
     | '/get-demo'
     | '/pricing'
     | '/what-is-introhub'
@@ -256,6 +256,8 @@ export interface FileRouteTypes {
     | '/requests'
     | '/search'
     | '/me'
+    | '/privacy-policy'
+    | '/terms-and-conditions'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
@@ -269,8 +271,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/privacy-policy'
-    | '/terms-and-conditions'
     | '/get-demo'
     | '/pricing'
     | '/what-is-introhub'
@@ -279,6 +279,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/requests'
     | '/search'
+    | '/privacy-policy'
+    | '/terms-and-conditions'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
@@ -292,10 +294,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
-    | '/_help'
     | '/_public'
-    | '/_help/privacy-policy'
-    | '/_help/terms-and-conditions'
+    | '/_authenticated/_help'
     | '/_public/get-demo'
     | '/_public/pricing'
     | '/_public/what-is-introhub'
@@ -306,6 +306,8 @@ export interface FileRouteTypes {
     | '/_authenticated/(requests)/requests'
     | '/_authenticated/(search)/search'
     | '/_authenticated/(user)/me'
+    | '/_authenticated/_help/privacy-policy'
+    | '/_authenticated/_help/terms-and-conditions'
     | '/_public/(auth)/forgot-password'
     | '/_public/(auth)/login'
     | '/_public/(auth)/reset-password'
@@ -320,7 +322,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  HelpRoute: typeof HelpRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
   ApiUploadRoute: typeof ApiUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -335,13 +336,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PublicRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_help': {
-      id: '/_help'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -386,19 +380,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicGetDemoRouteImport
       parentRoute: typeof PublicRoute
     }
-    '/_help/terms-and-conditions': {
-      id: '/_help/terms-and-conditions'
-      path: '/terms-and-conditions'
-      fullPath: '/terms-and-conditions'
-      preLoaderRoute: typeof HelpTermsAndConditionsRouteImport
-      parentRoute: typeof HelpRoute
-    }
-    '/_help/privacy-policy': {
-      id: '/_help/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof HelpPrivacyPolicyRouteImport
-      parentRoute: typeof HelpRoute
+    '/_authenticated/_help': {
+      id: '/_authenticated/_help'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedHelpRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/api/trpc/$': {
       id: '/api/trpc/$'
@@ -448,6 +435,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/forgot-password'
       preLoaderRoute: typeof PublicauthForgotPasswordRouteImport
       parentRoute: typeof PublicRoute
+    }
+    '/_authenticated/_help/terms-and-conditions': {
+      id: '/_authenticated/_help/terms-and-conditions'
+      path: '/terms-and-conditions'
+      fullPath: '/terms-and-conditions'
+      preLoaderRoute: typeof AuthenticatedHelpTermsAndConditionsRouteImport
+      parentRoute: typeof AuthenticatedHelpRoute
+    }
+    '/_authenticated/_help/privacy-policy': {
+      id: '/_authenticated/_help/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof AuthenticatedHelpPrivacyPolicyRouteImport
+      parentRoute: typeof AuthenticatedHelpRoute
     }
     '/_authenticated/(user)/me': {
       id: '/_authenticated/(user)/me'
@@ -508,6 +509,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedHelpRouteChildren {
+  AuthenticatedHelpPrivacyPolicyRoute: typeof AuthenticatedHelpPrivacyPolicyRoute
+  AuthenticatedHelpTermsAndConditionsRoute: typeof AuthenticatedHelpTermsAndConditionsRoute
+}
+
+const AuthenticatedHelpRouteChildren: AuthenticatedHelpRouteChildren = {
+  AuthenticatedHelpPrivacyPolicyRoute: AuthenticatedHelpPrivacyPolicyRoute,
+  AuthenticatedHelpTermsAndConditionsRoute:
+    AuthenticatedHelpTermsAndConditionsRoute,
+}
+
+const AuthenticatedHelpRouteWithChildren =
+  AuthenticatedHelpRoute._addFileChildren(AuthenticatedHelpRouteChildren)
+
 interface AuthenticateduserMeRouteChildren {
   AuthenticateduserMeNotificationsRoute: typeof AuthenticateduserMeNotificationsRoute
   AuthenticateduserMeSecurityRoute: typeof AuthenticateduserMeSecurityRoute
@@ -524,6 +539,7 @@ const AuthenticateduserMeRouteWithChildren =
   AuthenticateduserMeRoute._addFileChildren(AuthenticateduserMeRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedHelpRoute: typeof AuthenticatedHelpRouteWithChildren
   AuthenticatedcontactsContactsRoute: typeof AuthenticatedcontactsContactsRoute
   AuthenticateddashboardDashboardRoute: typeof AuthenticateddashboardDashboardRoute
   AuthenticatedrequestsRequestsRoute: typeof AuthenticatedrequestsRequestsRoute
@@ -532,6 +548,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedHelpRoute: AuthenticatedHelpRouteWithChildren,
   AuthenticatedcontactsContactsRoute: AuthenticatedcontactsContactsRoute,
   AuthenticateddashboardDashboardRoute: AuthenticateddashboardDashboardRoute,
   AuthenticatedrequestsRequestsRoute: AuthenticatedrequestsRequestsRoute,
@@ -542,18 +559,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
-
-interface HelpRouteChildren {
-  HelpPrivacyPolicyRoute: typeof HelpPrivacyPolicyRoute
-  HelpTermsAndConditionsRoute: typeof HelpTermsAndConditionsRoute
-}
-
-const HelpRouteChildren: HelpRouteChildren = {
-  HelpPrivacyPolicyRoute: HelpPrivacyPolicyRoute,
-  HelpTermsAndConditionsRoute: HelpTermsAndConditionsRoute,
-}
-
-const HelpRouteWithChildren = HelpRoute._addFileChildren(HelpRouteChildren)
 
 interface PublicRouteChildren {
   PublicGetDemoRoute: typeof PublicGetDemoRoute
@@ -582,7 +587,6 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  HelpRoute: HelpRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
   ApiUploadRoute: ApiUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

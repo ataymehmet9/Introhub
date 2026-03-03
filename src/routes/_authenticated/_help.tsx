@@ -3,10 +3,10 @@ import { Suspense } from 'react'
 import { HelpContentProvider } from './_help/-context/HelpContentContext'
 import { useHelpContent } from './_help/-hooks/useHelpContent'
 import { Container } from '@/components/shared'
-import TableOfContents from '@/routes/_help/-components/TableOfContents'
+import TableOfContents from '@/routes/_authenticated/_help/-components/TableOfContents'
 import { RoutePendingComponent } from '@/components/shared/common'
 
-export const Route = createFileRoute('/_help')({
+export const Route = createFileRoute('/_authenticated/_help')({
   component: RouteComponent,
   pendingComponent: RoutePendingComponent,
 })
@@ -35,3 +35,5 @@ function HelpLayout() {
     </Container>
   )
 }
+
+// Made with Bob
