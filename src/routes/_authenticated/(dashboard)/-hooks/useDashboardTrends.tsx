@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { useTRPC } from '@/integrations/trpc/react'
 import { useDashboardStore } from '../-store/dashboardStore'
+import { useTRPC } from '@/integrations/trpc/react'
 
 /**
  * Hook to fetch dashboard trend data (time-series) with caching

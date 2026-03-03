@@ -1,8 +1,9 @@
-import { TRPCRouterRecord, TRPCError } from '@trpc/server'
-import { eq, and, ilike, or, ne, desc } from 'drizzle-orm'
-import { globalSearchInputSchema } from '@/schemas'
-import { contacts, user, introductionRequests } from '@/db/schema'
+import { TRPCError } from '@trpc/server'
+import { and, desc, eq, ilike, ne, or } from 'drizzle-orm'
 import { protectedProcedure } from '../init'
+import type { TRPCRouterRecord} from '@trpc/server';
+import { globalSearchInputSchema } from '@/schemas'
+import { contacts, introductionRequests, user } from '@/db/schema'
 
 export const searchRouter = {
   globalSearch: protectedProcedure

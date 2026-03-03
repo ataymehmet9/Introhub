@@ -1,23 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Droppable, DroppableProps } from '@hello-pangea/dnd'
+import { Droppable } from '@hello-pangea/dnd'
+import type { DroppableProps } from '@hello-pangea/dnd';
 
 const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
-    const [enabled, setEnabled] = useState(false)
+  const [enabled, setEnabled] = useState(false)
 
-    useEffect(() => {
-        const animation = requestAnimationFrame(() => setEnabled(true))
+  useEffect(() => {
+    const animation = requestAnimationFrame(() => setEnabled(true))
 
-        return () => {
-            cancelAnimationFrame(animation)
-            setEnabled(false)
-        }
-    }, [])
-
-    if (!enabled) {
-        return null
+    return () => {
+      cancelAnimationFrame(animation)
+      setEnabled(false)
     }
+  }, [])
 
-    return <Droppable {...props}>{children}</Droppable>
+  if (!enabled) {
+    return null
+  }
+
+  return <Droppable {...props}>{children}</Droppable>
 }
 
 export default StrictModeDroppable

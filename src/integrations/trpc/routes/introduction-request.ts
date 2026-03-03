@@ -1,22 +1,23 @@
 import { z } from 'zod'
-import { TRPCRouterRecord, TRPCError } from '@trpc/server'
-import { eq, and, or, count } from 'drizzle-orm'
+import { TRPCError } from '@trpc/server'
+import { and, count, eq, or } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
+import { protectedProcedure } from '../init'
+import type { TRPCRouterRecord} from '@trpc/server';
 import {
   insertIntroductionRequestSchema,
   updateRequestStatusSchema,
 } from '@/schemas'
 import {
-  introductionRequests,
   contacts,
-  user,
+  introductionRequests,
   notifications,
+  user,
 } from '@/db/schema'
-import { protectedProcedure } from '../init'
 import {
+  sendIntroductionEmail,
   sendIntroductionRequestEmail,
   sendIntroductionResponseEmail,
-  sendIntroductionEmail,
 } from '@/services/email.functions'
 import { notificationEmitter } from '@/lib/notification-emitter'
 import { trackServerEvent } from '@/integrations/posthog'
@@ -230,7 +231,7 @@ export const introductionRequestRouter = {
         or(
           eq(introductionRequests.requesterId, currentUser.id),
           eq(introductionRequests.approverId, currentUser.id),
-        )!,
+        ),
         eq(introductionRequests.deleted, false),
       )
 

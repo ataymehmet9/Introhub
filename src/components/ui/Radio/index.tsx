@@ -1,14 +1,15 @@
-import _Radio, { RadioProps } from './Radio'
+import _Radio from './Radio'
 import Group from './Group'
+import type { RadioProps } from './Radio';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { RadioProps } from './Radio'
 export type { RadioGroupProps } from './Group'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    RadioProps & RefAttributes<HTMLHtmlElement>
+  RadioProps & RefAttributes<HTMLHtmlElement>
 > & {
-    Group: typeof Group
+  Group: typeof Group
 }
 
 const Radio = _Radio as CompoundedComponent

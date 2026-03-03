@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
-import { Card } from '@/components/ui'
 import SearchBar from './-components/SearchBar'
 import SearchResultsTable from './-components/SearchResultsTable'
 import NoSearchResults from './-components/NoSearchResults'
@@ -9,6 +8,7 @@ import IntroductionRequestModal from './-components/IntroductionRequestModal'
 import { useSearch } from './-hooks/useSearch'
 import { useIntroductionRequest } from './-hooks/useIntroductionRequest'
 import type { SearchResult } from '@/schemas'
+import { Card } from '@/components/ui'
 import { Container } from '@/components/shared'
 
 const searchSchema = z.object({

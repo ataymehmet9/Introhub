@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { Link } from '@tanstack/react-router'
-import { APP_NAME } from '@/constants/app.constant'
 import type { CommonProps } from '@/@types/common'
+import { APP_NAME } from '@/constants/app.constant'
 
 interface LogoProps extends CommonProps {
   link?: string

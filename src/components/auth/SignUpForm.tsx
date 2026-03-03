@@ -1,13 +1,14 @@
 import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { usePostHog } from '@posthog/react'
+import type { CommonProps } from '@/@types/common'
+import type { UserSignup } from '@/schemas';
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import { FormItem, Form } from '@/components/ui/Form'
+import { Form, FormItem } from '@/components/ui/Form'
 import { signUp } from '@/lib/auth-client'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import type { CommonProps } from '@/@types/common'
-import { userSignupSchema, UserSignup } from '@/schemas'
-import { usePostHog } from '@posthog/react'
+import { userSignupSchema } from '@/schemas'
 
 interface SignUpFormProps extends CommonProps {
   disableSubmit?: boolean

@@ -1,7 +1,7 @@
+import { useMemo } from 'react'
+import type { StatusBreakdown } from '@/schemas'
 import { Card } from '@/components/ui'
 import Chart from '@/components/shared/Chart'
-import { StatusBreakdown } from '@/schemas'
-import { useMemo } from 'react'
 
 export interface StatusDonutChartProps {
   data: StatusBreakdown | undefined

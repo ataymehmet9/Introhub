@@ -1,17 +1,18 @@
 import { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { HiOutlineUser } from 'react-icons/hi'
 import { TbPlus } from 'react-icons/tb'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useFileUpload } from '../-hooks/useFileUpload'
+import { useUser } from '../-hooks/useUser'
+import type {
+  UpdateUser as ProfileSchema} from '@/schemas/user.schema';
 import { useSessionUser } from '@/store/authStore'
 import {
-  updateUserSchema as validationSchema,
-  UpdateUser as ProfileSchema,
+  updateUserSchema as validationSchema
 } from '@/schemas/user.schema'
 import { Avatar, Button, Form, FormItem, Input, Upload } from '@/components/ui'
 import { generateFileCloudUrl } from '@/utils/fileUtils'
-import { useFileUpload } from '../-hooks/useFileUpload'
-import { useUser } from '../-hooks/useUser'
 
 const SettingsProfile = () => {
   const { user: data } = useSessionUser()

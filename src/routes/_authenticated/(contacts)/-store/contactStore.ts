@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { Contact } from '@/schemas'
 import type { TableQueries } from '@/@types/common'
+import type { Contact } from '@/schemas'
 
 export const initialTableData: TableQueries = {
   pageIndex: 1,
@@ -14,13 +14,13 @@ export const initialTableData: TableQueries = {
 
 type ContactState = {
   tableData: TableQueries
-  selectedContact: Partial<Contact>[]
+  selectedContact: Array<Partial<Contact>>
 }
 
 type ContactAction = {
   setTableData: (payload: TableQueries) => void
   setSelectedContact: (checked: boolean, contact: Contact) => void
-  setSelectAllContact: (contact: Contact[]) => void
+  setSelectAllContact: (contact: Array<Contact>) => void
 }
 
 const initialState: ContactState = {

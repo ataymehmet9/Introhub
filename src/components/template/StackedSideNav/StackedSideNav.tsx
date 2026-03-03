@@ -1,22 +1,23 @@
 import { useState } from 'react'
 import { useLocation } from '@tanstack/react-router'
+import isEmpty from 'lodash/isEmpty'
+import StackedSideNavMini from './StackedSideNavMini'
+import StackedSideNavSecondary from './StackedSideNavSecondary'
+import type { SelectedMenuItem } from './StackedSideNavMini';
+import type { TraslationFn } from '@/@types/common'
 import {
-  SPLITTED_SIDE_NAV_MINI_WIDTH,
-  STACKED_SIDE_NAV_SECONDARY_WIDTH,
   DIR_LTR,
   DIR_RTL,
+  SPLITTED_SIDE_NAV_MINI_WIDTH,
+  STACKED_SIDE_NAV_SECONDARY_WIDTH,
 } from '@/constants/theme.constant'
-import StackedSideNavMini, { SelectedMenuItem } from './StackedSideNavMini'
-import StackedSideNavSecondary from './StackedSideNavSecondary'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { useThemeStore } from '@/store/themeStore'
 import { useSessionUser } from '@/store/authStore'
 import navigationConfig from '@/configs/navigation.config'
 import appConfig from '@/configs/app.config'
-import isEmpty from 'lodash/isEmpty'
 import useTranslation from '@/utils/hooks/useTranslation'
 import getLastPath from '@/utils/getLastPath'
-import type { TraslationFn } from '@/@types/common'
 
 const stackedSideNavDefaultStyle = {
   width: SPLITTED_SIDE_NAV_MINI_WIDTH,
@@ -31,7 +32,7 @@ const StackedSideNav = ({
   const { t } = useTranslation(!translationSetup)
 
   const [selectedMenu, setSelectedMenu] = useState<SelectedMenuItem>({})
-  const [activeKeys, setActiveKeys] = useState<string[]>([])
+  const [activeKeys, setActiveKeys] = useState<Array<string>>([])
 
   const mode = useThemeStore((state) => state.mode)
   const direction = useThemeStore((state) => state.direction)
@@ -55,7 +56,7 @@ const StackedSideNav = ({
     setActiveKeys([])
   }
 
-  const handleSetActiveKey = (key: string[]) => {
+  const handleSetActiveKey = (key: Array<string>) => {
     setActiveKeys(key)
   }
 

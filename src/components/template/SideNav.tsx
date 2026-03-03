@@ -1,4 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router'
+import type { Mode } from '@/@types/theme'
 import classNames from '@/utils/classNames'
 import getLastPath from '@/utils/getLastPath'
 import ScrollBar from '@/components/ui/ScrollBar'
@@ -9,13 +10,12 @@ import { useSessionUser } from '@/store/authStore'
 import navigationConfig from '@/configs/navigation.config'
 import appConfig from '@/configs/app.config'
 import {
-  SIDE_NAV_WIDTH,
-  SIDE_NAV_COLLAPSED_WIDTH,
-  SIDE_NAV_CONTENT_GUTTER,
   HEADER_HEIGHT,
   LOGO_X_GUTTER,
+  SIDE_NAV_COLLAPSED_WIDTH,
+  SIDE_NAV_CONTENT_GUTTER,
+  SIDE_NAV_WIDTH,
 } from '@/constants/theme.constant'
-import type { Mode } from '@/@types/theme'
 
 type SideNavProps = {
   translationSetup?: boolean

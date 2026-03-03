@@ -7,6 +7,9 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { PostHogProvider } from '@posthog/react'
 
+import type { TRPCOptionsProxy } from '@trpc/tanstack-react-query'
+import type { TRPCRouter } from '@/integrations/trpc/router'
+import type { QueryClient } from '@tanstack/react-query'
 import Theme from '@/components/template/Theme'
 import { RouteTransition } from '@/components/shared/RouteTransition'
 
@@ -15,10 +18,7 @@ import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
 // Import CSS directly so Vite can inline it during SSR to prevent FOUC
 import '../index.css'
 
-import type { QueryClient } from '@tanstack/react-query'
 
-import type { TRPCRouter } from '@/integrations/trpc/router'
-import type { TRPCOptionsProxy } from '@trpc/tanstack-react-query'
 import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
 import { NotFound } from '@/components/NotFound'
 

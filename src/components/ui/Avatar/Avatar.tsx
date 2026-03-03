@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
-import useMergedRef from '../hooks/useMergeRef'
+import { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
+import useMergedRef from '../hooks/useMergeRef'
 import type { CommonProps, TypeAttributes } from '../@types/common'
 import type { ReactNode, Ref } from 'react'
 

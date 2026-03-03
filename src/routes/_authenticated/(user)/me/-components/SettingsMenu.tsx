@@ -1,4 +1,4 @@
-import { useLocation, Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { Menu, MenuItem, ScrollBar } from '@/components/ui'
 import { userSettingsMenu as menuList } from '@/configs/navigation.config/user'
 

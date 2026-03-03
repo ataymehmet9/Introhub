@@ -1,9 +1,9 @@
 import type { User } from '@/@types/auth'
 import { useSession } from '@/lib/auth-client'
-import { USER, ADMIN } from '@/constants/roles.constant'
+import { ADMIN, USER } from '@/constants/roles.constant'
 
 type AuthState = {
-  user: (User & { userAuthority: string[] }) | null
+  user: (User & { userAuthority: Array<string> }) | null
 }
 
 export const useSessionUser = (): AuthState => {

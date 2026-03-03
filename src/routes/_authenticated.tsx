@@ -1,6 +1,6 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { authMiddleware } from '@/lib/auth-middleware'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
+import { authMiddleware } from '@/lib/auth-middleware'
 import { RoutePendingComponent } from '@/components/shared/common'
 import PostLoginLayout from '@/components/layouts/PostLoginLayout'
 import PageContainer from '@/components/template/PageContainer'

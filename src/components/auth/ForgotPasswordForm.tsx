@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import Input from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
-import { FormItem, Form } from '@/components/ui/Form'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CommonProps } from '@/@types/common'
+import type { UserEmail } from '@/schemas';
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import { Form, FormItem } from '@/components/ui/Form'
 import { requestPasswordReset } from '@/services/auth.functions'
-import { userEmailSchema, UserEmail } from '@/schemas'
+import { userEmailSchema } from '@/schemas'
 
 interface ForgotPasswordFormProps extends CommonProps {
   emailSent: boolean

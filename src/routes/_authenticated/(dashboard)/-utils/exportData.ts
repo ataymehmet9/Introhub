@@ -1,4 +1,4 @@
-import { DashboardStats, TopContacts, TrendData } from '@/schemas'
+import type { DashboardStats, TopContacts, TrendData } from '@/schemas'
 
 /**
  * Convert dashboard data to CSV format
@@ -10,7 +10,7 @@ export function exportDashboardToCSV(
 ): string {
   if (!stats) return ''
 
-  const lines: string[] = []
+  const lines: Array<string> = []
 
   // Header
   lines.push('IntroHub Dashboard Export')
@@ -97,7 +97,7 @@ export function exportTopContactsToCSV(
     return 'No data to export'
   }
 
-  const lines: string[] = []
+  const lines: Array<string> = []
 
   lines.push('IntroHub Top Contacts Export')
   lines.push(`Generated: ${new Date().toLocaleString()}`)

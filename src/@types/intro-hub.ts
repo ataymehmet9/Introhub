@@ -1,6 +1,6 @@
 // Intro-Hub Type Definitions
 
-import { Contact, InsertContact, IntroductionRequest, User } from '@/schemas'
+import type { Contact, InsertContact, IntroductionRequest, User } from '@/schemas'
 
 export interface AuthTokens {
   access: string
@@ -34,7 +34,7 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginatedResponse<T> {
-  results: T[]
+  results: Array<T>
   count: number
   next?: string
   previous?: string
@@ -53,7 +53,7 @@ export interface AuthContextType {
 }
 
 export interface ContactContextType {
-  contacts: Contact[]
+  contacts: Array<Contact>
   isLoading: boolean
   error: string | null
   fetchContacts: () => Promise<void>
@@ -63,12 +63,12 @@ export interface ContactContextType {
     contactData: Partial<InsertContact>,
   ) => Promise<Contact>
   removeContact: (id: number) => Promise<void>
-  searchContacts: (query: string) => Contact[]
+  searchContacts: (query: string) => Array<Contact>
 }
 
 export interface RequestContextType {
-  sentRequests: IntroductionRequest[]
-  receivedRequests: IntroductionRequest[]
+  sentRequests: Array<IntroductionRequest>
+  receivedRequests: Array<IntroductionRequest>
   isLoading: boolean
   error: string | null
   fetchSentRequests: () => Promise<void>
@@ -145,7 +145,7 @@ export interface RequestFormSchema {
 export interface ApiError {
   message: string
   status: number
-  details?: Record<string, string[]>
+  details?: Record<string, Array<string>>
 }
 
 // Search and filter types

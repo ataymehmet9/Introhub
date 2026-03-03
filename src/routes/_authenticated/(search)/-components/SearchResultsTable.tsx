@@ -1,14 +1,14 @@
 import { useMemo } from 'react'
 import { TbSend } from 'react-icons/tb'
-import { Avatar, Tooltip, Button, Badge } from '@/components/ui'
-import { SearchResult } from '@/schemas'
-import { stringToColor } from '@/utils/colours'
 import type { ColumnDef } from '@/components/shared/DataTable'
+import type { SearchResult } from '@/schemas'
+import { Avatar, Badge, Button, Tooltip } from '@/components/ui'
+import { stringToColor } from '@/utils/colours'
 import DataTable from '@/components/shared/DataTable'
 import { DateFormat } from '@/components/shared/common'
 
 type SearchResultsTableProps = {
-  results: SearchResult[]
+  results: Array<SearchResult>
   isLoading: boolean
   onRequestIntroduction: (result: SearchResult) => void
   total: number
@@ -97,7 +97,7 @@ const SearchResultsTable = ({
   onPageChange,
   onPageSizeChange,
 }: SearchResultsTableProps) => {
-  const columns: ColumnDef<SearchResult>[] = useMemo(
+  const columns: Array<ColumnDef<SearchResult>> = useMemo(
     () => [
       {
         header: 'Name',

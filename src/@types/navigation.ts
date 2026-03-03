@@ -23,8 +23,8 @@ export interface NavigationTree {
   translateKey: string
   icon: string
   type: 'title' | 'collapse' | 'item'
-  authority: string[]
-  subMenu: NavigationTree[]
+  authority: Array<string>
+  subMenu: Array<NavigationTree>
   description?: string
   meta?: {
     horizontalMenu?: HorizontalMenuMeta

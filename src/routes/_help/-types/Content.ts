@@ -12,8 +12,8 @@ type ArticleSection = {
 export type ArticleContent = {
   id: string
   title: string
-  sections: ArticleSection[]
-  tableOfContents: TableOfContent[]
+  sections: Array<ArticleSection>
+  tableOfContents: Array<TableOfContent>
   updateTime?: string
   createdBy?: string
   timeToRead?: number

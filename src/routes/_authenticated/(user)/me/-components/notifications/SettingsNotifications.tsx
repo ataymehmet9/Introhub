@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
 import parse from 'html-react-parser'
-import { Button, Card, Timeline } from '@/components/ui'
-import { NotificationWithMetadata } from '@/schemas'
 import { HiCheckCircle } from 'react-icons/hi'
+import type { NotificationWithMetadata } from '@/schemas'
+import { Button, Card, Timeline } from '@/components/ui'
 import classNames from '@/utils/classNames'
 import NotificationAvatar from '@/components/template/Notification/NotificationAvatar'
 
 type SettingsNotificationsProps = {
-  notifications: NotificationWithMetadata[]
+  notifications: Array<NotificationWithMetadata>
   isLoading: boolean
   loadable: boolean
   onLoadMore: () => void

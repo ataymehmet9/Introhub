@@ -1,5 +1,5 @@
-import Avatar from '@/components/ui/Avatar'
 import type { Notification } from '@/schemas'
+import Avatar from '@/components/ui/Avatar'
 import useDarkMode from '@/utils/hooks/useDarkMode'
 
 const NotificationAvatar = (props: { notification: Notification }) => {

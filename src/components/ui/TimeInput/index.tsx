@@ -1,14 +1,15 @@
-import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import _TimeInput, { TimeInputProps } from './TimeInput'
+import _TimeInput from './TimeInput'
 import TimeInputRange from './TimeInputRange'
+import type { TimeInputProps } from './TimeInput';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { TimeInputProps } from './TimeInput'
 export type { TimeInputRangeProps } from './TimeInputRange'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    TimeInputProps & RefAttributes<HTMLSpanElement>
+  TimeInputProps & RefAttributes<HTMLSpanElement>
 > & {
-    TimeInputRange: typeof TimeInputRange
+  TimeInputRange: typeof TimeInputRange
 }
 
 const TimeInput = _TimeInput as CompoundedComponent

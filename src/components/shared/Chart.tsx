@@ -1,14 +1,14 @@
-import { useRef, useEffect, useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { Direction } from '@/@types/theme'
+import type { ReactNode } from 'react'
 import {
-  apexLineChartDefaultOption,
-  apexBarChartDefaultOption,
   apexAreaChartDefaultOption,
+  apexBarChartDefaultOption,
   apexDonutChartDefaultOption,
+  apexLineChartDefaultOption,
   apexRadarChartDefultOption,
 } from '@/configs/chart.config'
 import { DIR_RTL } from '@/constants/theme.constant'
-import type { Direction } from '@/@types/theme'
-import type { ReactNode } from 'react'
 
 // Use a generic type to avoid importing apexcharts on the server
 type ApexOptions = Record<string, any>
@@ -96,12 +96,12 @@ const Chart = (props: ChartProps) => {
   }, [direction, isMobile])
 
   useEffect(() => {
-    if (notDonut.includes(type as ChartType)) {
+    if (notDonut.includes(type)) {
       setLegendOffset()
     }
   }, [type, setLegendOffset])
 
-  if (notDonut.includes(type as ChartType)) {
+  if (notDonut.includes(type)) {
     options.xaxis.categories = xAxis
   }
 

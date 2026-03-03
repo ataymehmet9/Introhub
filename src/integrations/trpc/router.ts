@@ -1,11 +1,11 @@
 import { createTRPCRouter } from './init'
 import {
   contactRouter,
-  userRouter,
-  searchRouter,
+  dashboardRouter,
   introductionRequestRouter,
   notificationRouter,
-  dashboardRouter,
+  searchRouter,
+  userRouter,
 } from './routes'
 
 export const trpcRouter = createTRPCRouter({

@@ -19,7 +19,7 @@ export const trpcClient = createTRPCClient<TRPCRouter>({
   links: [
     httpBatchStreamLink({
       transformer: superjson,
-      url: getUrl()
+      url: getUrl(),
     }),
   ],
 })

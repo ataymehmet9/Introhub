@@ -1,18 +1,18 @@
 import {
-  Html,
-  Head,
   Body,
   Container,
-  Section,
+  Head,
   Heading,
-  Text,
   Hr,
+  Html,
+  Section,
+  Text,
 } from '@react-email/components'
 import {
-  emailStyles,
   createHeader,
   createMessageBox,
   createMessageText,
+  emailStyles,
   headerColors,
 } from './shared/styles'
 

@@ -3,89 +3,89 @@ import classNames from 'classnames'
 import useMergedRef from '../hooks/useMergeRef'
 import type { CommonProps } from '../@types/common'
 import type {
-    FocusEvent,
-    MouseEvent,
-    KeyboardEvent,
-    ChangeEvent,
-    Ref,
+  ChangeEvent,
+  FocusEvent,
+  KeyboardEvent,
+  MouseEvent,
+  Ref,
 } from 'react'
 
 interface AmPmInputProps extends CommonProps {
-    disabled?: boolean
-    amLabel?: string
-    onChange: (value: string, triggerShift: boolean) => void
-    onFocus?: (e: FocusEvent<HTMLInputElement>) => void
-    ref?: Ref<HTMLInputElement>
-    placeholder?: string
-    pmLabel?: string
-    value: string | number | readonly string[]
+  disabled?: boolean
+  amLabel?: string
+  onChange: (value: string, triggerShift: boolean) => void
+  onFocus?: (e: FocusEvent<HTMLInputElement>) => void
+  ref?: Ref<HTMLInputElement>
+  placeholder?: string
+  pmLabel?: string
+  value: string | number | ReadonlyArray<string>
 }
 
 const AmPmInput = (props: AmPmInputProps) => {
-    const {
-        className,
-        onChange,
-        onFocus,
-        value,
-        amLabel,
-        pmLabel,
-        ref = null,
-        ...rest
-    } = props
+  const {
+    className,
+    onChange,
+    onFocus,
+    value,
+    amLabel,
+    pmLabel,
+    ref = null,
+    ...rest
+  } = props
 
-    const inputRef = useRef<HTMLInputElement>(undefined)
+  const inputRef = useRef<HTMLInputElement>(undefined)
 
-    const handleClick = (event: MouseEvent<HTMLInputElement>) => {
-        event.stopPropagation()
-        inputRef?.current?.select()
+  const handleClick = (event: MouseEvent<HTMLInputElement>) => {
+    event.stopPropagation()
+    inputRef?.current?.select()
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault()
+      onChange(
+        value === amLabel ? (pmLabel as string) : (amLabel as string),
+        true,
+      )
+    }
+  }
+
+  const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
+    typeof onFocus === 'function' && onFocus(event)
+    inputRef?.current?.select()
+  }
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const lastInputVal = event.target.value.slice(-1).toLowerCase()
+
+    if (lastInputVal === 'p') {
+      event.preventDefault()
+      onChange(pmLabel as string, true)
+      return
     }
 
-    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-            event.preventDefault()
-            onChange(
-                value === amLabel ? (pmLabel as string) : (amLabel as string),
-                true,
-            )
-        }
+    if (lastInputVal === 'a') {
+      event.preventDefault()
+      onChange(amLabel as string, true)
+      return
     }
 
-    const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
-        typeof onFocus === 'function' && onFocus(event)
-        inputRef?.current?.select()
-    }
+    onChange(value.toString(), true)
+  }
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const lastInputVal = event.target.value.slice(-1).toLowerCase()
-
-        if (lastInputVal === 'p') {
-            event.preventDefault()
-            onChange(pmLabel as string, true)
-            return
-        }
-
-        if (lastInputVal === 'a') {
-            event.preventDefault()
-            onChange(amLabel as string, true)
-            return
-        }
-
-        onChange(value.toString(), true)
-    }
-
-    return (
-        <input
-            ref={useMergedRef(inputRef as Ref<HTMLInputElement>, ref)}
-            type="text"
-            value={value}
-            className={classNames('time-input-field', 'am-pm-input', className)}
-            onClick={handleClick}
-            onFocus={handleFocus}
-            onKeyDown={handleKeyDown}
-            onChange={handleChange}
-            {...rest}
-        />
-    )
+  return (
+    <input
+      ref={useMergedRef(inputRef as Ref<HTMLInputElement>, ref)}
+      type="text"
+      value={value}
+      className={classNames('time-input-field', 'am-pm-input', className)}
+      onClick={handleClick}
+      onFocus={handleFocus}
+      onKeyDown={handleKeyDown}
+      onChange={handleChange}
+      {...rest}
+    />
+  )
 }
 
 export default AmPmInput

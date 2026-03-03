@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useHelpContent } from './-hooks/useHelpContent'
-import { ArticleContent } from './-types/Content'
 import ArticleBody from './-components/ArticleBody'
+import type { ArticleContent } from './-types/Content'
 
 const privacyPolicyContent: ArticleContent = {
   id: 'privacy-policy',

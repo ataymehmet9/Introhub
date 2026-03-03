@@ -1,9 +1,9 @@
-import appConfig from '@/configs/app.config'
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import i18n from 'i18next'
-import { dateLocales } from '@/locales'
 import dayjs from 'dayjs'
+import { dateLocales } from '@/locales'
+import appConfig from '@/configs/app.config'
 
 type LocaleState = {
   currentLang: string

@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { AdaptiveCard } from '@/components/shared'
-import { useNotifications } from '@/hooks/useNotifications'
 import SettingsNotificationAction from './-components/notifications/SettingsNotificationAction'
 import SettingsNotifications from './-components/notifications/SettingsNotifications'
+import { AdaptiveCard } from '@/components/shared'
+import { useNotifications } from '@/hooks/useNotifications'
 import { notificationSearchSchema } from '@/schemas'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 

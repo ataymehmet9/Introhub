@@ -1,6 +1,6 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { trpcRouter } from '@/integrations/trpc/router'
 import { createFileRoute } from '@tanstack/react-router'
+import { trpcRouter } from '@/integrations/trpc/router'
 import { createContext } from '@/integrations/trpc/init'
 
 function handler({ request }: { request: Request }) {
@@ -13,7 +13,7 @@ function handler({ request }: { request: Request }) {
         ...opts,
         req: request,
         res: undefined,
-      });
+      })
     },
   })
 }

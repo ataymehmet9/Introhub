@@ -1,14 +1,14 @@
 export type YearsRange = {
-    from: number
-    to: number
+  from: number
+  to: number
 }
 
 export function getYearsRange(range: YearsRange) {
-    const years = []
+  const years = []
 
-    for (let year = range.from; year <= range.to; year += 1) {
-        years.push(year)
-    }
+  for (let year = range.from; year <= range.to; year += 1) {
+    years.push(year)
+  }
 
-    return years
+  return years
 }

@@ -5,15 +5,15 @@ import type { BaseToolButtonProps } from './types'
 type ToolButtonBlockquoteProp = BaseToolButtonProps
 
 const ToolButtonBlockquote = ({ editor }: ToolButtonBlockquoteProp) => {
-    return (
-        <ToolButton
-            title="Blockquote"
-            active={editor.isActive('blockquote')}
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        >
-            <TbQuote />
-        </ToolButton>
-    )
+  return (
+    <ToolButton
+      title="Blockquote"
+      active={editor.isActive('blockquote')}
+      onClick={() => editor.chain().focus().toggleBlockquote().run()}
+    >
+      <TbQuote />
+    </ToolButton>
+  )
 }
 
 export default ToolButtonBlockquote

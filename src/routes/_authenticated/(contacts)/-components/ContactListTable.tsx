@@ -1,13 +1,13 @@
 import { TbEye, TbPencil, TbTrash } from 'react-icons/tb'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { Avatar, Tooltip, Dialog, Button } from '@/components/ui'
-import { Contact } from '@/schemas'
-import { stringToColor } from '@/utils/colours'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
-import DataTable from '@/components/shared/DataTable'
 import { useMemo, useState } from 'react'
-import { DateFormat } from '@/components/shared/common'
 import { useContact } from '../-hooks/useContact'
+import type { ColumnDef, OnSortParam, Row } from '@/components/shared/DataTable'
+import type { Contact } from '@/schemas'
+import { Avatar, Button, Dialog, Tooltip } from '@/components/ui'
+import { stringToColor } from '@/utils/colours'
+import DataTable from '@/components/shared/DataTable'
+import { DateFormat } from '@/components/shared/common'
 
 type ContactListTableProps = {
   onSelectEditContact: (contact: Contact) => void
@@ -123,7 +123,7 @@ const ContactListTable = ({
 
   const contactsTotal = filteredContacts.length
 
-  const columns: ColumnDef<Contact>[] = useMemo(
+  const columns: Array<ColumnDef<Contact>> = useMemo(
     () => [
       {
         header: 'Name',
@@ -209,7 +209,7 @@ const ContactListTable = ({
     setSelectedContact(checked, row)
   }
 
-  const handleAllRowSelect = (checked: boolean, rows: Row<Contact>[]) => {
+  const handleAllRowSelect = (checked: boolean, rows: Array<Row<Contact>>) => {
     if (checked) {
       const originalRows = rows.map((row) => row.original)
       setSelectAllContact(originalRows)

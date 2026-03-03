@@ -1,15 +1,16 @@
-import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import _Checkbox, { CheckboxProps } from './Checkbox'
+import _Checkbox from './Checkbox'
 import CheckboxGroup from './Group'
+import type { CheckboxProps } from './Checkbox';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { CheckboxProps } from './Checkbox'
 export type { CheckboxGroupProps } from './Group'
 export type { CheckboxGroupValue, CheckboxValue } from './context'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    CheckboxProps & RefAttributes<HTMLInputElement>
+  CheckboxProps & RefAttributes<HTMLInputElement>
 > & {
-    Group: typeof CheckboxGroup
+  Group: typeof CheckboxGroup
 }
 
 const Checkbox = _Checkbox as CompoundedComponent

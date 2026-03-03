@@ -6,10 +6,10 @@ import { CONTROL_SIZES, SIZES } from '../utils/constants'
 import { Spinner } from '../Spinner'
 import type { CommonProps, TypeAttributes } from '../@types/common'
 import type {
-  ReactNode,
   ComponentPropsWithRef,
-  MouseEvent,
   ElementType,
+  MouseEvent,
+  ReactNode,
 } from 'react'
 
 export interface ButtonProps

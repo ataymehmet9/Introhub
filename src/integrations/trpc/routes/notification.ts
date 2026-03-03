@@ -1,13 +1,14 @@
 import { z } from 'zod'
-import { TRPCRouterRecord, TRPCError } from '@trpc/server'
-import { eq, and, desc, count } from 'drizzle-orm'
+import { TRPCError } from '@trpc/server'
+import { and, count, desc, eq } from 'drizzle-orm'
+import { protectedProcedure } from '../init'
+import type { TRPCRouterRecord} from '@trpc/server';
 import {
+  createNotificationInputSchema,
   getNotificationsSchema,
   markAsReadSchema,
-  createNotificationInputSchema,
 } from '@/schemas'
 import { notifications } from '@/db/schema'
-import { protectedProcedure } from '../init'
 import { notificationEmitter } from '@/lib/notification-emitter'
 
 export const notificationRouter = {

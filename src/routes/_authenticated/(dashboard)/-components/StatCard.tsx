@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { HiTrendingUp, HiTrendingDown } from 'react-icons/hi'
+import { HiTrendingDown, HiTrendingUp } from 'react-icons/hi'
+import type { ReactNode } from 'react'
 import { Card } from '@/components/ui'
 import classNames from '@/utils/classNames'
 

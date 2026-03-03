@@ -1,7 +1,7 @@
+import { usePostHog } from '@posthog/react'
 import Button from '@/components/ui/Button'
 import appConfig from '@/configs/app.config'
 import { signIn } from '@/lib/auth-client'
-import { usePostHog } from '@posthog/react'
 
 type OauthSignInProps = {
   setMessage?: (message: string) => void

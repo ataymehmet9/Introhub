@@ -1,9 +1,9 @@
-import { Container } from '@/components/shared'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import { HelpContentProvider } from './_help/-context/HelpContentContext'
 import { useHelpContent } from './_help/-hooks/useHelpContent'
+import { Container } from '@/components/shared'
 import TableOfContents from '@/routes/_help/-components/TableOfContents'
-import { Suspense } from 'react'
 import { RoutePendingComponent } from '@/components/shared/common'
 
 export const Route = createFileRoute('/_help')({

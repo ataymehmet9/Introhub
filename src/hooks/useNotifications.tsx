@@ -1,14 +1,14 @@
 import { useMemo } from 'react'
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query'
+import type { GetNotifications } from '@/schemas'
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 import { Notification, toast } from '@/components/ui'
-import { GetNotifications } from '@/schemas'
 
 type UseNotificationsProps = Omit<GetNotifications, 'page'> & {
   enabled?: boolean

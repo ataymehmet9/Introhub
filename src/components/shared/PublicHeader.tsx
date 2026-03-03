@@ -1,7 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import Button from '@/components/ui/Button'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ModeSwitcher from '../template/ThemeConfigurator/ModeSwitcher'
+import Button from '@/components/ui/Button'
 
 export default function PublicHeader() {
   const navigate = useNavigate()

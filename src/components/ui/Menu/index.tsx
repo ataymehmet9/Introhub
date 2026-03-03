@@ -1,8 +1,9 @@
-import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import _Menu, { MenuProps } from './Menu'
+import _Menu from './Menu'
 import MenuItem from './MenuItem'
 import MenuCollapse from './MenuCollapse'
 import MenuGroup from './MenuGroup'
+import type { MenuProps } from './Menu';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { MenuProps } from './Menu'
 export type { MenuCollapseProps } from './MenuCollapse'
@@ -10,11 +11,11 @@ export type { MenuGroupProps } from './MenuGroup'
 export type { MenuItemProps } from './MenuItem'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    MenuProps & RefAttributes<HTMLElement>
+  MenuProps & RefAttributes<HTMLElement>
 > & {
-    MenuItem: typeof MenuItem
-    MenuCollapse: typeof MenuCollapse
-    MenuGroup: typeof MenuGroup
+  MenuItem: typeof MenuItem
+  MenuCollapse: typeof MenuCollapse
+  MenuGroup: typeof MenuGroup
 }
 
 const Menu = _Menu as CompoundedComponent

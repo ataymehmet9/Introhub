@@ -1,12 +1,10 @@
 import { createContext, useContext } from 'react'
 import type { ReactNode } from 'react'
-import {
-  PageContainerHeader,
-  PageContainerBody,
+import type { PageContainerBody,
   PageContainerFooter,
-} from '@/components/template/PageContainer'
-import type { PageContainerProps } from '@/components/template/PageContainer'
-import { LayoutType } from '@/@types/theme'
+  PageContainerHeader,
+  PageContainerProps } from '@/components/template/PageContainer'
+import type { LayoutType } from '@/@types/theme'
 import { LAYOUT_COLLAPSIBLE_SIDE } from '@/constants/theme.constant'
 
 export type PageContainerReassembleProps = {

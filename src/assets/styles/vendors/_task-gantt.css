@@ -1,5 +1,5 @@
 ._3_ygE {
-    @apply table border-b border-t border-l border-gray-200 dark:border-gray-700;
+  @apply table border-b border-t border-l border-gray-200 dark:border-gray-700;
 }
 
 ._1nBOt {
@@ -20,7 +20,7 @@
 }
 
 ._3ZbQT {
-    @apply table border-b border-l border-gray-200 dark:border-gray-700;
+  @apply table border-b border-l border-gray-200 dark:border-gray-700;
 }
 
 ._34SS0 {
@@ -44,14 +44,14 @@
 }
 
 ._2QjE6 {
-    @apply cursor-pointer select-none px-2;
+  @apply cursor-pointer select-none px-2;
 }
 ._2TfEi {
-    @apply cursor-pointer select-none pl-1;
+  @apply cursor-pointer select-none pl-1;
 }
 
 ._3T42e {
-    @apply bg-white dark:bg-gray-800 p-3 shadow; 
+  @apply bg-white dark:bg-gray-800 p-3 shadow;
 }
 
 ._29NTg {
@@ -109,7 +109,7 @@
 }
 
 ._RuwuK {
-    @apply stroke-gray-200 dark:stroke-gray-700
+  @apply stroke-gray-200 dark:stroke-gray-700;
 }
 
 ._9w8d5 {
@@ -127,7 +127,7 @@
 }
 
 ._35nLX {
-    @apply fill-gray-100 dark:fill-gray-700 stroke-gray-200 dark:stroke-gray-700 stroke-0;
+  @apply fill-gray-100 dark:fill-gray-700 stroke-gray-200 dark:stroke-gray-700 stroke-0;
 }
 
 ._KxSXS {
@@ -141,14 +141,14 @@
 }
 
 ._3w_5u {
-    @apply invisible opacity-0 cursor-ew-resize fill-black/20;
+  @apply invisible opacity-0 cursor-ew-resize fill-black/20;
 }
 
 ._31ERP {
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   stroke-width: 0;
 }
 
@@ -159,9 +159,9 @@
 
 ._2P2B1 {
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 ._1KJ6x {
@@ -171,17 +171,17 @@
 
 ._2RbVy {
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   opacity: 0.6;
 }
 
 ._2pZMF {
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 ._3zRJQ {
@@ -191,8 +191,8 @@
 }
 
 ._3KcaM {
-    @apply fill-gray-900 dark:fill-gray-100 select-none pointer-events-none;
-    text-anchor: start;
+  @apply fill-gray-900 dark:fill-gray-100 select-none pointer-events-none;
+  text-anchor: start;
 }
 
 ._CZjuD {
@@ -209,7 +209,7 @@
 }
 
 ._3eULf {
-    @apply flex p-0 m-0 list-none outline-none relative border border-gray-200 dark:border-gray-800 rounded-xl;
+  @apply flex p-0 m-0 list-none outline-none relative border border-gray-200 dark:border-gray-800 rounded-xl;
 }
 
 ._2k9Ys {

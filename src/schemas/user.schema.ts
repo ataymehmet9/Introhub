@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { user } from '@/db/schema'
 import {
-  createSelectSchema,
   createInsertSchema,
+  createSelectSchema,
   createUpdateSchema,
 } from 'drizzle-zod'
+import { user } from '@/db/schema'
 
 /**
  * User Schema - Validation for user table

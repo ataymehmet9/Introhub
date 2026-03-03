@@ -6,27 +6,27 @@ import type { CommonProps } from '../@types/common'
 import type { ReactNode } from 'react'
 
 export interface MenuGroupProps extends CommonProps {
-    label: string | ReactNode
+  label: string | ReactNode
 }
 
 const MenuGroup = (props: MenuGroupProps) => {
-    const { label, children, className } = props
+  const { label, children, className } = props
 
-    const { sideCollapsed } = useContext(MenuContext)
+  const { sideCollapsed } = useContext(MenuContext)
 
-    const menuGroupDefaultClass = 'menu-group'
-    const menuGroupClass = classNames(menuGroupDefaultClass, className)
+  const menuGroupDefaultClass = 'menu-group'
+  const menuGroupClass = classNames(menuGroupDefaultClass, className)
 
-    return (
-        <div className={menuGroupClass}>
-            {label && !sideCollapsed && (
-                <div className={classNames('menu-title')}>{label}</div>
-            )}
-            <GroupContextProvider value={null}>
-                <ul>{children}</ul>
-            </GroupContextProvider>
-        </div>
-    )
+  return (
+    <div className={menuGroupClass}>
+      {label && !sideCollapsed && (
+        <div className={classNames('menu-title')}>{label}</div>
+      )}
+      <GroupContextProvider value={null}>
+        <ul>{children}</ul>
+      </GroupContextProvider>
+    </div>
+  )
 }
 
 MenuGroup.displayName = 'MenuGroup'

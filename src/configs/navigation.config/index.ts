@@ -1,8 +1,8 @@
+import type { NavigationTree } from '@/@types/navigation'
 import { NAV_ITEM_TYPE_ITEM } from '@/constants/navigation.constant'
 
-import type { NavigationTree } from '@/@types/navigation'
 
-const navigationConfig: NavigationTree[] = [
+const navigationConfig: Array<NavigationTree> = [
   {
     key: 'dashboard',
     path: '/dashboard',

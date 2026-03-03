@@ -1,6 +1,6 @@
 import classNames from 'classnames'
-import type { ElementType, Ref } from 'react'
 import { PiDotOutlineFill } from 'react-icons/pi'
+import type { ElementType, Ref } from 'react'
 import type { CommonProps } from '../@types/common'
 
 export interface MenuItemProps extends CommonProps {

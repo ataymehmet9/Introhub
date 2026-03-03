@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import Button from '@/components/ui/Button'
-import { FormItem, Form } from '@/components/ui/Form'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { CommonProps } from '@/@types/common'
-import { userResetPasswordSchema, UserResetPassword } from '@/schemas'
-import { authClient } from '@/lib/auth-client'
 import { PasswordInput } from '../shared'
+import type { CommonProps } from '@/@types/common'
+import type { UserResetPassword } from '@/schemas';
+import Button from '@/components/ui/Button'
+import { Form, FormItem } from '@/components/ui/Form'
+import { userResetPasswordSchema } from '@/schemas'
+import { authClient } from '@/lib/auth-client'
 
 interface ResetPasswordFormProps extends CommonProps {
   token: string

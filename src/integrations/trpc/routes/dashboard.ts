@@ -1,18 +1,20 @@
 import { z } from 'zod'
-import { TRPCRouterRecord, TRPCError } from '@trpc/server'
-import { eq, and, gte, lte, sql, or, desc } from 'drizzle-orm'
-import {
-  dashboardQuerySchema,
-  type Granularity,
-  type ResponseTime,
-  type PeriodStats,
-  type StatsComparison,
-  type TrendDataPoint,
-  type StatusBreakdown,
-  type TopContact,
-} from '@/schemas'
-import { introductionRequests, contacts } from '@/db/schema'
+import { TRPCError } from '@trpc/server'
+import { and, desc, eq, gte, lte, or, sql } from 'drizzle-orm'
 import { protectedProcedure } from '../init'
+import type { TRPCRouterRecord} from '@trpc/server';
+import type {Granularity, PeriodStats, ResponseTime, StatsComparison, StatusBreakdown, TopContact, TrendDataPoint} from '@/schemas';
+import {
+  
+  
+  
+  
+  
+  
+  
+  dashboardQuerySchema
+} from '@/schemas'
+import { contacts, introductionRequests } from '@/db/schema'
 
 /**
  * Helper function to format response time
@@ -162,7 +164,7 @@ async function calculatePeriodStats(
           or(
             eq(introductionRequests.status, 'approved'),
             eq(introductionRequests.status, 'declined'),
-          )!,
+          ),
           gte(introductionRequests.createdAt, startDate),
           lte(introductionRequests.createdAt, endDate),
         ),
@@ -180,7 +182,7 @@ async function calculatePeriodStats(
           or(
             eq(introductionRequests.status, 'approved'),
             eq(introductionRequests.status, 'declined'),
-          )!,
+          ),
           gte(introductionRequests.createdAt, startDate),
           lte(introductionRequests.createdAt, endDate),
         ),
@@ -526,7 +528,7 @@ export const dashboardRouter = {
         .orderBy(desc(sql`count(*)`))
         .limit(limit)
 
-      const topContacts: TopContact[] = topContactsResult.map((row) => ({
+      const topContacts: Array<TopContact> = topContactsResult.map((row) => ({
         contactId: row.contactId,
         contactName: row.contactName,
         contactEmail: row.contactEmail,

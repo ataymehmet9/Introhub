@@ -23,12 +23,12 @@ export type IntroductionRequestWithDetails = {
 }
 
 type RequestStore = {
-  selectedRequests: IntroductionRequestWithDetails[]
+  selectedRequests: Array<IntroductionRequestWithDetails>
   setSelectedRequest: (
     checked: boolean,
     request: IntroductionRequestWithDetails,
   ) => void
-  setSelectAllRequests: (requests: IntroductionRequestWithDetails[]) => void
+  setSelectAllRequests: (requests: Array<IntroductionRequestWithDetails>) => void
 }
 
 export const useRequestStore = create<RequestStore>((set) => ({

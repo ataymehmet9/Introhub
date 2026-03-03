@@ -1,18 +1,18 @@
 import { createServerFn } from '@tanstack/react-start'
-import { render, pretty, toPlainText } from '@react-email/render'
+import { pretty, render, toPlainText } from '@react-email/render'
 import {
   ForgotPasswordEmail,
-  IntroductionRequestEmail,
+  IntroductionEmail,
   IntroductionRequestApprovedEmail,
   IntroductionRequestDeclinedEmail,
-  IntroductionEmail,
+  IntroductionRequestEmail,
   WelcomeEmail,
 } from '@/components/template/email'
 import {
   forgotPasswordEmailSchema,
+  introductionEmailSchema,
   introductionRequestEmailSchema,
   introductionResponseEmailSchema,
-  introductionEmailSchema,
   welcomeEmailSchema,
 } from '@/schemas'
 import { getResendInstance } from '@/integrations/resend'

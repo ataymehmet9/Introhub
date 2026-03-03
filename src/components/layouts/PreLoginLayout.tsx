@@ -1,7 +1,7 @@
-import authRoute from '@/configs/routes.config/authRoute'
 import { useLocation } from '@tanstack/react-router'
 import AuthLayout from './AuthLayout'
 import type { CommonProps } from '@/@types/common'
+import authRoute from '@/configs/routes.config/authRoute'
 
 const PreLoginLayout = ({ children }: CommonProps) => {
   const location = useLocation()

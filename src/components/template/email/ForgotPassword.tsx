@@ -1,15 +1,15 @@
 import {
-  Html,
-  Button,
-  Head,
   Body,
+  Button,
   Container,
-  Section,
+  Head,
   Heading,
-  Text,
   Hr,
+  Html,
+  Section,
+  Text,
 } from '@react-email/components'
-import { emailStyles, createHeader, headerColors } from './shared/styles'
+import { createHeader, emailStyles, headerColors } from './shared/styles'
 
 type ForgotPasswordEmailProps = {
   to: string

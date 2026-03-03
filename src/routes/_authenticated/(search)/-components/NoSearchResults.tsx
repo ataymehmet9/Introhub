@@ -1,4 +1,4 @@
-import { TbSearch, TbInfoCircle } from 'react-icons/tb'
+import { TbInfoCircle, TbSearch } from 'react-icons/tb'
 
 interface NoSearchResultsProps {
   query: string

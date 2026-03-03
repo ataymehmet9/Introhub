@@ -1,5 +1,5 @@
+import type { ControlSize, Direction, LayoutType, Mode } from '@/@types/theme'
 import { THEME_ENUM } from '@/constants/theme.constant'
-import { Direction, Mode, ControlSize, LayoutType } from '@/@types/theme'
 
 export type ThemeConfig = {
   themeSchema: string

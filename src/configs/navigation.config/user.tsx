@@ -5,7 +5,7 @@ import type {
   UserSettingsNavigation,
 } from '@/@types/navigation'
 
-export const dropdownItemList: UserSettingsNavigation[] = [
+export const dropdownItemList: Array<UserSettingsNavigation> = [
   {
     label: 'Profile',
     path: '/me',
@@ -13,7 +13,7 @@ export const dropdownItemList: UserSettingsNavigation[] = [
   },
 ]
 
-export const userSettingsMenu: UserMainSettingsNavigation[] = [
+export const userSettingsMenu: Array<UserMainSettingsNavigation> = [
   {
     label: 'Profile',
     value: 'me',

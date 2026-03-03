@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import type { SearchField } from '@/schemas'
 import { useTRPC } from '@/integrations/trpc/react'
-import { SearchField } from '@/schemas'
 
 interface UseSearchOptions {
   query: string
-  fields?: SearchField[]
+  fields?: Array<SearchField>
   page?: number
   pageSize?: number
   enabled?: boolean

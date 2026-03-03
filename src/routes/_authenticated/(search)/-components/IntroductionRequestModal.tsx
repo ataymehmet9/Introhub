@@ -1,16 +1,16 @@
 import { useEffect, useMemo } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { TbSend, TbUser, TbBuilding, TbBriefcase, TbMail } from 'react-icons/tb'
+import { TbBriefcase, TbBuilding, TbMail, TbSend, TbUser } from 'react-icons/tb'
+import type { SearchResult } from '@/schemas'
 import {
-  Dialog,
-  Button,
   Avatar,
-  FormItem,
+  Button,
+  Dialog,
   FormContainer,
+  FormItem,
 } from '@/components/ui'
-import { SearchResult } from '@/schemas'
 import { stringToColor } from '@/utils/colours'
 import { useSessionUser } from '@/store/authStore'
 

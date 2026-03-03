@@ -5,14 +5,14 @@ import type { BaseToolButtonProps } from './types'
 type ToolButtonHardBreakProp = BaseToolButtonProps
 
 const ToolButtonHardBreak = ({ editor }: ToolButtonHardBreakProp) => {
-    return (
-        <ToolButton
-            title="Horizontal Rule"
-            onClick={() => editor.chain().focus().setHardBreak().run()}
-        >
-            <TbSpacingVertical />
-        </ToolButton>
-    )
+  return (
+    <ToolButton
+      title="Horizontal Rule"
+      onClick={() => editor.chain().focus().setHardBreak().run()}
+    >
+      <TbSpacingVertical />
+    </ToolButton>
+  )
 }
 
 export default ToolButtonHardBreak

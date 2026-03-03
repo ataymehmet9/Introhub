@@ -1,18 +1,18 @@
 import ConfigProvider, {
-    ConfigContext,
-    ConfigConsumer,
-    useConfig,
-    defaultConfig,
+  ConfigConsumer,
+  ConfigContext,
+  defaultConfig,
+  useConfig,
 } from './ConfigProvider'
 
 export type { Config } from './ConfigProvider'
 
 export {
-    ConfigProvider,
-    ConfigContext,
-    ConfigConsumer,
-    useConfig,
-    defaultConfig,
+  ConfigProvider,
+  ConfigContext,
+  ConfigConsumer,
+  useConfig,
+  defaultConfig,
 }
 
 export default ConfigProvider

@@ -1,10 +1,9 @@
-import { initTRPC } from '@trpc/server'
+import { TRPCError, initTRPC  } from '@trpc/server'
 import superjson from 'superjson'
-import { auth } from '@/lib/auth'
-import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { TRPCError } from '@trpc/server'
-import { db } from '@/db'
 import { posthogMiddleware } from './middleware/posthog'
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
+import { auth } from '@/lib/auth'
+import { db } from '@/db'
 
 export const createContext = async ({ req }: CreateNextContextOptions) => {
   const { session, user } =

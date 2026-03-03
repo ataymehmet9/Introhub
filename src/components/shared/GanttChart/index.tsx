@@ -1,5 +1,5 @@
-import GanttChart from './GanttChart'
 import { ViewMode } from 'gantt-task-react'
+import GanttChart from './GanttChart'
 
 export type { Task, ExtendedTask } from './GanttChart'
 

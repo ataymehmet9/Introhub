@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useContactStore } from '../-store/contactStore'
+import type { Contact, InsertContact, UpdateContact } from '@/schemas'
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
-import { Contact, InsertContact, UpdateContact } from '@/schemas'
 import { Notification, toast } from '@/components/ui'
-import { useContactStore } from '../-store/contactStore'
 
 interface UseContactOptions {
   company?: string | null
@@ -50,10 +50,10 @@ export function useContact(options: UseContactOptions = {}) {
       await queryClient.cancelQueries({ queryKey })
 
       // Snapshot the previous value
-      const previousContacts = queryClient.getQueryData<Contact[]>(queryKey)
+      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
 
       // Optimistically update to the new value
-      queryClient.setQueryData<Contact[]>(queryKey, (old) => {
+      queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
         return [
           {
@@ -72,7 +72,7 @@ export function useContact(options: UseContactOptions = {}) {
     onError: (error: Error, _newContact, context) => {
       // Rollback on error
       if (context?.previousContacts) {
-        queryClient.setQueryData<Contact[]>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
       }
       toast.push(
         <Notification type="danger" title="Error">
@@ -101,9 +101,9 @@ export function useContact(options: UseContactOptions = {}) {
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey })
 
-      const previousContacts = queryClient.getQueryData<Contact[]>(queryKey)
+      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
 
-      queryClient.setQueryData<Contact[]>(queryKey, (old) => {
+      queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
         return old.map((contact) =>
           contact.id === id
@@ -116,7 +116,7 @@ export function useContact(options: UseContactOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousContacts) {
-        queryClient.setQueryData<Contact[]>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
       }
       toast.push(
         <Notification type="danger" title="Error">
@@ -143,9 +143,9 @@ export function useContact(options: UseContactOptions = {}) {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey })
 
-      const previousContacts = queryClient.getQueryData<Contact[]>(queryKey)
+      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
 
-      queryClient.setQueryData<Contact[]>(queryKey, (old) => {
+      queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
         return old.filter((contact) => contact.id !== id)
       })
@@ -154,7 +154,7 @@ export function useContact(options: UseContactOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousContacts) {
-        queryClient.setQueryData<Contact[]>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
       }
       toast.push(
         <Notification type="danger" title="Error">
@@ -177,14 +177,14 @@ export function useContact(options: UseContactOptions = {}) {
 
   // Batch delete contacts mutation with optimistic updates
   const deleteBatchContactMutation = useMutation({
-    mutationFn: (ids: number[]) =>
+    mutationFn: (ids: Array<number>) =>
       trpcClient.contacts.batchDelete.mutate({ ids }),
     onMutate: async (ids) => {
       await queryClient.cancelQueries({ queryKey })
 
-      const previousContacts = queryClient.getQueryData<Contact[]>(queryKey)
+      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
 
-      queryClient.setQueryData<Contact[]>(queryKey, (old) => {
+      queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
         return old.filter((contact) => !ids.includes(contact.id))
       })
@@ -193,7 +193,7 @@ export function useContact(options: UseContactOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousContacts) {
-        queryClient.setQueryData<Contact[]>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
       }
       toast.push(
         <Notification type="danger" title="Error">

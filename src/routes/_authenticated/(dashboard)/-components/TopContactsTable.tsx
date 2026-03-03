@@ -1,6 +1,6 @@
-import { Card, Button } from '@/components/ui'
-import { TopContacts } from '@/schemas'
 import { HiDownload } from 'react-icons/hi'
+import type { TopContacts } from '@/schemas'
+import { Button, Card } from '@/components/ui'
 
 export interface TopContactsTableProps {
   data: TopContacts | undefined

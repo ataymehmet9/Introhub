@@ -1,15 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
-import { Button, Dialog, Card, Tabs, Alert, Progress } from '@/components/ui'
+import { useEffect, useRef, useState } from 'react'
 import {
+  HiCheckCircle,
   HiCloudArrowUp,
   HiDocumentArrowDown,
-  HiCheckCircle,
   HiXCircle,
 } from 'react-icons/hi2'
-import ContactForm, {
+import type { InsertContact } from '@/schemas'
+import type {
   ContactFormHandle,
-} from '@/components/shared/common/ContactForm'
-import { InsertContact } from '@/schemas'
+} from '@/components/shared/common/ContactForm';
+import { Alert, Button, Card, Dialog, Progress, Tabs } from '@/components/ui'
+import ContactForm from '@/components/shared/common/ContactForm'
 import { validateCSVFile } from '@/utils/fileUtils'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 

@@ -1,14 +1,15 @@
-import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import _Slider, { SliderProps } from './Slider'
+import _Slider from './Slider'
 import RangeSlider from './RangeSlider'
+import type { SliderProps } from './Slider';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { SliderProps } from './Slider'
 export type { RangeSliderProps } from './RangeSlider'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    SliderProps & RefAttributes<HTMLSpanElement>
+  SliderProps & RefAttributes<HTMLSpanElement>
 > & {
-    Range: typeof RangeSlider
+  Range: typeof RangeSlider
 }
 
 const Slider = _Slider as CompoundedComponent

@@ -173,11 +173,11 @@
     @apply bg-transparent opacity-80 [background-size:10px_10px] bg-[repeating-linear-gradient(45deg,_#e5e7eb_0,_#e5e7eb_1px,_transparent_0,_transparent_50%)] dark:bg-[repeating-linear-gradient(45deg,_#19191a_0,_#6d7483_1px,_transparent_0,_transparent_50%)];
 
     .fc-daygrid-day-top {
-      @apply opacity-70
+      @apply opacity-70;
     }
 
     .fc-highlight {
-      @apply -z-10
+      @apply -z-10;
     }
   }
 }

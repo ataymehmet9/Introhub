@@ -1,5 +1,5 @@
 // CSV parsing helper
-export const parseCSV = (csvContent: string): Record<string, string>[] => {
+export const parseCSV = (csvContent: string): Array<Record<string, string>> => {
   const lines = csvContent.trim().split('\n')
   if (lines.length < 2) {
     throw new Error(
@@ -8,7 +8,7 @@ export const parseCSV = (csvContent: string): Record<string, string>[] => {
   }
 
   const headers = lines[0].split(',').map((h) => h.trim())
-  const rows: Record<string, string>[] = []
+  const rows: Array<Record<string, string>> = []
 
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(',').map((v) => v.trim())

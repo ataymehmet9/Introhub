@@ -1,3 +1,4 @@
+import type { CommonProps } from '@/@types/common'
 import Header from '@/components/template/Header'
 import UserProfileDropdown from '@/components//template/UserProfileDropdown'
 import HeaderLogo from '@/components/template/HeaderLogo'
@@ -6,7 +7,6 @@ import HorizontalNav from '@/components/template/HorizontalNav'
 import LayoutBase from '@/components//template/LayoutBase'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { LAYOUT_TOP_BAR_CLASSIC } from '@/constants/theme.constant'
-import type { CommonProps } from '@/@types/common'
 import Notification from '@/components/template/Notification'
 
 const TopBarClassic = ({ children }: CommonProps) => {

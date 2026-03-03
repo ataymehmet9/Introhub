@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Granularity } from '@/schemas'
+import type { Granularity } from '@/schemas'
 
 export type DateRangePreset =
   | 'last7'

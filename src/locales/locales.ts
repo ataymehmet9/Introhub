@@ -5,26 +5,27 @@ import en from './lang/en.json'
 import appConfig from '@/configs/app.config'
 
 const resources = {
-    en: {
-        translation: en,
-    },
+  en: {
+    translation: en,
+  },
 }
 
-i18n.use(LanguageDetector)
-    .use(initReactI18next)
-    .init({
-        resources,
-        fallbackLng: appConfig.locale,
-        lng: appConfig.locale,
-        interpolation: {
-            escapeValue: false,
-        },
-    })
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources,
+    fallbackLng: appConfig.locale,
+    lng: appConfig.locale,
+    interpolation: {
+      escapeValue: false,
+    },
+  })
 
 export const dateLocales: {
-    [key: string]: () => Promise<ILocale>
+  [key: string]: () => Promise<ILocale>
 } = {
-    en: () => import('dayjs/locale/en'),
+  en: () => import('dayjs/locale/en'),
 }
 
 export default i18n

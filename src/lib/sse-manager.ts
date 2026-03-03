@@ -90,7 +90,7 @@ class SSEConnectionManager {
     }
 
     const message = this.formatSSEMessage(event)
-    const deadConnections: ReadableStreamDefaultController[] = []
+    const deadConnections: Array<ReadableStreamDefaultController> = []
 
     userConnections.forEach((controller) => {
       try {
@@ -119,7 +119,7 @@ class SSEConnectionManager {
     let sentCount = 0
 
     this.connections.forEach((userConnections, userId) => {
-      const deadConnections: ReadableStreamDefaultController[] = []
+      const deadConnections: Array<ReadableStreamDefaultController> = []
 
       userConnections.forEach((controller) => {
         try {

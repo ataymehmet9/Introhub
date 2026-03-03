@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
+import type {
+  ConnectedSSEEvent,
+  HeartbeatSSEEvent,
+  NotificationSSEEvent,
+} from '@/lib/sse-manager'
 import { auth } from '@/lib/auth'
 import { sseManager } from '@/lib/sse-manager'
 import { notificationEmitter } from '@/lib/notification-emitter'
-import type {
-  NotificationSSEEvent,
-  HeartbeatSSEEvent,
-  ConnectedSSEEvent,
-} from '@/lib/sse-manager'
 
 /**
  * SSE endpoint for real-time notifications

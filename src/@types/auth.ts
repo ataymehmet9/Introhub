@@ -1,4 +1,4 @@
-import type { Session, User as BetterAuthUser } from 'better-auth/types'
+import type { User as BetterAuthUser, Session } from 'better-auth/types'
 
 // Better Auth sign-in credentials
 export type SignInCredential = {

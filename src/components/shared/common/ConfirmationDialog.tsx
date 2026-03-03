@@ -1,7 +1,7 @@
 import React from 'react'
-import { Dialog, Button } from '@/components/ui'
 import { HiExclamationCircle, HiInformationCircle } from 'react-icons/hi2'
-import { ConfirmationDialogProps } from '@/@types/intro-hub'
+import type { ConfirmationDialogProps } from '@/@types/intro-hub'
+import { Button, Dialog } from '@/components/ui'
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,

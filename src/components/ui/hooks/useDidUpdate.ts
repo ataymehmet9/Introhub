@@ -1,26 +1,26 @@
 import { useEffect, useRef } from 'react'
 
 export default function useDidUpdate(
-    callback: () => void,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dependencies?: any[],
+  callback: () => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dependencies?: Array<any>,
 ) {
-    const mounted = useRef(false)
+  const mounted = useRef(false)
 
-    useEffect(
-        () => () => {
-            mounted.current = false
-        },
-        [],
-    )
+  useEffect(
+    () => () => {
+      mounted.current = false
+    },
+    [],
+  )
 
-    useEffect(() => {
-        if (mounted.current) {
-            return callback()
-        }
+  useEffect(() => {
+    if (mounted.current) {
+      return callback()
+    }
 
-        mounted.current = true
-        return undefined
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, dependencies)
+    mounted.current = true
+    return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, dependencies)
 }

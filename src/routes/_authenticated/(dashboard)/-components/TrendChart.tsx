@@ -1,7 +1,7 @@
+import { useMemo } from 'react'
+import type { TrendData } from '@/schemas'
 import { Card } from '@/components/ui'
 import Chart from '@/components/shared/Chart'
-import { TrendData } from '@/schemas'
-import { useMemo } from 'react'
 
 export interface TrendChartProps {
   data: TrendData | undefined

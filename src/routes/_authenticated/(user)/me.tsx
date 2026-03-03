@@ -1,8 +1,8 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
-import useResponsive from '@/utils/hooks/useResponsive'
-import { AdaptiveCard } from '@/components/shared'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import SettingsMenu from './me/-components/SettingsMenu'
 import SettingMobileMenu from './me/-components/SettingsMobileMenu'
+import useResponsive from '@/utils/hooks/useResponsive'
+import { AdaptiveCard } from '@/components/shared'
 
 export const Route = createFileRoute('/_authenticated/(user)/me')({
   component: RouteComponent,

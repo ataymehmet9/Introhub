@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { useDashboardStore, DateRangePreset } from '../-store/dashboardStore'
+import { useDashboardStore } from '../-store/dashboardStore'
+import type { DateRangePreset } from '../-store/dashboardStore';
 
 export interface DateRangePresetOption {
   value: DateRangePreset
@@ -13,7 +14,7 @@ export interface DateRangePresetOption {
 export function useDateRangePresets() {
   const { preset, setDateRangeWithPreset } = useDashboardStore()
 
-  const presets: DateRangePresetOption[] = useMemo(
+  const presets: Array<DateRangePresetOption> = useMemo(
     () => [
       {
         value: 'last7',

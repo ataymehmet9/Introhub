@@ -1,7 +1,7 @@
 import { createContext } from 'react'
 
 export type DropdownContextProps = {
-    activeKey?: string
+  activeKey?: string
 }
 
 const DropdownContext = createContext<DropdownContextProps>({})

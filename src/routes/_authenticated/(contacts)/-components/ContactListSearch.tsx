@@ -1,5 +1,5 @@
-import { Ref } from 'react'
 import { TbSearch, TbX } from 'react-icons/tb'
+import type { Ref } from 'react'
 import DebounceInput from '@/components/shared/DebouceInput'
 import { Button } from '@/components/ui'
 

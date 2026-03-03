@@ -20,15 +20,15 @@ export type { TdProps } from './Td'
 export type { SorterProps } from './Sorter'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    TableProps & RefAttributes<HTMLElement>
+  TableProps & RefAttributes<HTMLElement>
 > & {
-    THead: typeof THead
-    TBody: typeof TBody
-    TFoot: typeof TFoot
-    Th: typeof Th
-    Tr: typeof Tr
-    Td: typeof Td
-    Sorter: typeof Sorter
+  THead: typeof THead
+  TBody: typeof TBody
+  TFoot: typeof TFoot
+  Th: typeof Th
+  Tr: typeof Tr
+  Td: typeof Td
+  Sorter: typeof Sorter
 }
 
 const Table = _Table as CompoundedComponent

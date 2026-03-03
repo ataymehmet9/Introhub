@@ -1,8 +1,8 @@
 import { Link } from 'react-scroll'
+import type { ArticleContent } from '../-types/Content'
 import useLayoutGap from '@/utils/hooks/useLayoutGap'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { Affix } from '@/components/shared'
-import type { ArticleContent } from '../-types/Content'
 import { Card } from '@/components/ui'
 
 type TableOfContentsProps = {

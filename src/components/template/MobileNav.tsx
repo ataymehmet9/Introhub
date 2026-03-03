@@ -1,10 +1,11 @@
-import { useState, Suspense, lazy } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import classNames from 'classnames'
+import type { WithHeaderItemProps } from '@/utils/hoc/withHeaderItem';
 import Drawer from '@/components/ui/Drawer'
 import NavToggle from '@/components/shared/NavToggle'
 import { DIR_RTL } from '@/constants/theme.constant'
-import withHeaderItem, { WithHeaderItemProps } from '@/utils/hoc/withHeaderItem'
+import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import navigationConfig from '@/configs/navigation.config'
 import appConfig from '@/configs/app.config'
 import { useThemeStore } from '@/store/themeStore'

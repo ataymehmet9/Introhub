@@ -1,4 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import debounce from 'lodash/debounce'
+import { HiChevronRight, HiOutlineSearch } from 'react-icons/hi'
+import { PiMagnifyingGlassDuotone } from 'react-icons/pi'
+import { Link } from '@tanstack/react-router'
+import Highlighter from 'react-highlight-words'
 import classNames from '@/utils/classNames'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import Button from '@/components/ui/Button'
@@ -7,11 +12,6 @@ import ScrollBar from '@/components/ui/ScrollBar'
 import navigationIcon from '@/configs/navigation-icon.config'
 // TODO: Implement search service
 // import { apiGetSearchResult } from '@/services/CommonService'
-import debounce from 'lodash/debounce'
-import { HiOutlineSearch, HiChevronRight } from 'react-icons/hi'
-import { PiMagnifyingGlassDuotone } from 'react-icons/pi'
-import { Link } from '@tanstack/react-router'
-import Highlighter from 'react-highlight-words'
 
 type SearchData = {
   key: string
@@ -24,10 +24,10 @@ type SearchData = {
 
 type SearchResult = {
   title: string
-  data: SearchData[]
+  data: Array<SearchData>
 }
 
-const recommendedSearch: SearchResult[] = [
+const recommendedSearch: Array<SearchResult> = [
   {
     title: 'Recommended',
     data: [],
@@ -81,7 +81,7 @@ const ListItem = (props: {
 const _Search = ({ className }: { className?: string }) => {
   const [searchDialogOpen, setSearchDialogOpen] = useState(false)
   const [searchResult, setSearchResult] =
-    useState<SearchResult[]>(recommendedSearch)
+    useState<Array<SearchResult>>(recommendedSearch)
   const [noResult, setNoResult] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)

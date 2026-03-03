@@ -1,14 +1,14 @@
 import { create } from 'zustand'
-import { SearchResult, SearchField } from '@/schemas'
-import { TableQueries } from '@/@types/common'
+import type { SearchField, SearchResult } from '@/schemas'
+import type { TableQueries } from '@/@types/common'
 
 interface SearchState {
   // Search query state
   searchQuery: string
-  searchFields: SearchField[]
+  searchFields: Array<SearchField>
 
   // Results state
-  results: SearchResult[]
+  results: Array<SearchResult>
   selectedResult: SearchResult | null
 
   // Table state
@@ -16,8 +16,8 @@ interface SearchState {
 
   // Actions
   setSearchQuery: (query: string) => void
-  setSearchFields: (fields: SearchField[]) => void
-  setResults: (results: SearchResult[]) => void
+  setSearchFields: (fields: Array<SearchField>) => void
+  setResults: (results: Array<SearchResult>) => void
   setSelectedResult: (result: SearchResult | null) => void
   setTableData: (data: TableQueries) => void
   resetSearch: () => void

@@ -1,15 +1,17 @@
 import { z } from 'zod'
-import { TRPCRouterRecord, TRPCError } from '@trpc/server'
-import { eq, and, like, or, desc } from 'drizzle-orm'
+import { TRPCError } from '@trpc/server'
+import { and, desc, eq, like, or } from 'drizzle-orm'
+import { protectedProcedure } from '../init'
+import type { TRPCRouterRecord} from '@trpc/server';
+import type {
+  InsertContact} from '@/schemas';
 import {
   contactSchema,
-  InsertContact,
   insertContactSchema,
   updateContactSchema,
 } from '@/schemas'
 import { contacts } from '@/db/schema'
 import { parseCSV } from '@/utils/fileUtils'
-import { protectedProcedure } from '../init'
 import { trackServerEvent } from '@/integrations/posthog'
 
 const listContactsSchema = contactSchema
@@ -351,7 +353,7 @@ export const contactRouter = {
           .where(
             and(
               eq(contacts.userId, user.id),
-              or(...validIds.map((id) => eq(contacts.id, id)))!,
+              or(...validIds.map((id) => eq(contacts.id, id))),
             ),
           )
           .returning()
@@ -534,19 +536,14 @@ export const contactRouter = {
         // Update existing contacts
         let updatedCount = 0
         if (contactsToUpdate.length > 0) {
-          for (const updateItem of contactsToUpdate) {
+          for (const { id, data } of contactsToUpdate) {
             await db
               .update(contacts)
               .set({
-                ...updateItem.data,
+                ...data,
                 updatedAt: new Date(),
               })
-              .where(
-                and(
-                  eq(contacts.id, updateItem.id),
-                  eq(contacts.userId, user.id),
-                ),
-              )
+              .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
           }
           updatedCount = contactsToUpdate.length
         }

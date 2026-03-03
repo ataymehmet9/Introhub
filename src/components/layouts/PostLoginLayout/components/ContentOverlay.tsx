@@ -1,3 +1,5 @@
+import type { CommonProps } from '@/@types/common'
+import type { FooterPageContainerType } from '@/components/template/Footer'
 import Header from '@/components/template/Header'
 import UserProfileDropdown from '@/components//template/UserProfileDropdown'
 import HeaderLogo from '@/components/template/HeaderLogo'
@@ -8,8 +10,6 @@ import classNames from '@/utils/classNames'
 import useScrollTop from '@/utils/hooks/useScrollTop'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { LAYOUT_CONTENT_OVERLAY } from '@/constants/theme.constant'
-import type { CommonProps } from '@/@types/common'
-import type { FooterPageContainerType } from '@/components/template/Footer'
 import Notification from '@/components/template/Notification'
 
 const ContentOverlay = ({ children }: CommonProps) => {

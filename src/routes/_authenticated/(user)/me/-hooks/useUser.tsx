@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
+import type { UpdateUser } from '@/schemas'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
-import { UpdateUser } from '@/schemas'
 import { Notification, toast } from '@/components/ui'
 import { useSession } from '@/lib/auth-client'
 

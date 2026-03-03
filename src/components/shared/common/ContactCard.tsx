@@ -1,18 +1,18 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, Avatar, Dropdown } from '@/components/ui'
 import {
-  HiEllipsisVertical,
-  HiPencil,
-  HiTrash,
   HiBuildingOffice2,
-  HiPhone,
+  HiEllipsisVertical,
   HiEnvelope,
+  HiPencil,
+  HiPhone,
+  HiTrash,
 } from 'react-icons/hi2'
 import { FaLinkedin } from 'react-icons/fa'
-import { ContactCardProps } from '@/@types/intro-hub'
-import { DateFormat, ConfirmationDialog } from '../common'
+import { ConfirmationDialog, DateFormat } from '../common'
+import type { ContactCardProps } from '@/@types/intro-hub'
+import { Avatar, Card, Dropdown } from '@/components/ui'
 
 const ContactCard: React.FC<ContactCardProps> = ({
   contact,

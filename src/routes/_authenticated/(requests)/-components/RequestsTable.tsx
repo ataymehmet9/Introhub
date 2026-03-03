@@ -1,23 +1,22 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { TbCheck, TbX, TbTrash } from 'react-icons/tb'
-import { Avatar, Tooltip, Badge, Dialog, Button } from '@/components/ui'
+import { TbCheck, TbTrash, TbX } from 'react-icons/tb'
+import { useRequestStore } from '../-store/requestStore'
+import type { ColumnDef, OnSortParam, Row } from '@/components/shared/DataTable'
+import type { IntroductionRequestWithDetails } from '../-store/requestStore'
+import { Avatar, Badge, Button, Dialog, Notification, Tooltip, toast  } from '@/components/ui'
 import { stringToColor } from '@/utils/colours'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import DataTable from '@/components/shared/DataTable'
 import { DateFormat } from '@/components/shared/common'
-import type { IntroductionRequestWithDetails } from '../-store/requestStore'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
-import { Notification, toast } from '@/components/ui'
 import { useTRPC } from '@/integrations/trpc/react'
-import { useRequestStore } from '../-store/requestStore'
 
 type RequestsTableProps = {
   onSelectAcceptRequest: (request: IntroductionRequestWithDetails) => void
   onSelectRejectRequest: (request: IntroductionRequestWithDetails) => void
   showActions?: boolean
   filterType?: 'sent' | 'received' | 'all'
-  requests: IntroductionRequestWithDetails[]
+  requests: Array<IntroductionRequestWithDetails>
   isLoading: boolean
   pagingData: {
     total: number
@@ -193,9 +192,9 @@ const RequestsTable = ({
     },
   })
 
-  const columns: ColumnDef<IntroductionRequestWithDetails>[] = useMemo(
+  const columns: Array<ColumnDef<IntroductionRequestWithDetails>> = useMemo(
     () => {
-      const baseColumns: ColumnDef<IntroductionRequestWithDetails>[] = [
+      const baseColumns: Array<ColumnDef<IntroductionRequestWithDetails>> = [
         {
           header: filterType === 'sent' ? 'Recipient' : 'Requester',
           accessorKey: 'requesterName',
@@ -270,7 +269,7 @@ const RequestsTable = ({
 
   const handleAllRowSelect = (
     checked: boolean,
-    rows: Row<IntroductionRequestWithDetails>[],
+    rows: Array<Row<IntroductionRequestWithDetails>>,
   ) => {
     if (checked) {
       const originalRows = rows.map((row) => row.original)

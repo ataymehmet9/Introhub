@@ -1,12 +1,12 @@
-import type { LazyExoticComponent, JSX } from 'react'
+import type { JSX, LazyExoticComponent } from 'react'
 
 export type DocRouteNav = {
-    path: string
-    label: string
-    component: LazyExoticComponent<() => JSX.Element>
+  path: string
+  label: string
+  component: LazyExoticComponent<() => JSX.Element>
 }
 
 export type DocumentationRoute = {
-    groupName: string
-    nav: DocRouteNav[]
+  groupName: string
+  nav: Array<DocRouteNav>
 }

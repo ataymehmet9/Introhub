@@ -1,18 +1,18 @@
-import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import _Dropdown, { DropdownProps } from './Dropdown'
+import _Dropdown from './Dropdown'
 import DropdownItem from './DropdownItem'
 import DropdownSub from './DropdownSub'
-import type { DropdownRef } from './Dropdown'
+import type { ForwardRefExoticComponent, RefAttributes } from 'react'
+import type { DropdownProps , DropdownRef } from './Dropdown'
 
 export type { DropdownProps, DropdownRef } from './Dropdown'
 export type { DropdownItemProps } from './DropdownItem'
 export type { DropdownSubProps as DropdownMenuProps } from './DropdownSub'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    DropdownProps & RefAttributes<DropdownRef>
+  DropdownProps & RefAttributes<DropdownRef>
 > & {
-    Item: typeof DropdownItem
-    Menu: typeof DropdownSub
+  Item: typeof DropdownItem
+  Menu: typeof DropdownSub
 }
 
 const Dropdown = _Dropdown as CompoundedComponent

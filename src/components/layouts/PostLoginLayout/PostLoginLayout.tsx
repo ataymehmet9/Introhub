@@ -1,11 +1,3 @@
-import {
-  LAYOUT_COLLAPSIBLE_SIDE,
-  LAYOUT_STACKED_SIDE,
-  LAYOUT_TOP_BAR_CLASSIC,
-  LAYOUT_FRAMELESS_SIDE,
-  LAYOUT_CONTENT_OVERLAY,
-  LAYOUT_BLANK,
-} from '@/constants/theme.constant'
 import CollapsibleSide from './components/CollapsibleSide'
 import StackedSide from './components/StackedSide'
 import TopBarClassic from './components/TopBarClassic'
@@ -15,6 +7,14 @@ import Blank from './components/Blank'
 import type { CommonProps } from '@/@types/common'
 import type { ComponentType } from 'react'
 import type { LayoutType } from '@/@types/theme'
+import {
+  LAYOUT_BLANK,
+  LAYOUT_COLLAPSIBLE_SIDE,
+  LAYOUT_CONTENT_OVERLAY,
+  LAYOUT_FRAMELESS_SIDE,
+  LAYOUT_STACKED_SIDE,
+  LAYOUT_TOP_BAR_CLASSIC,
+} from '@/constants/theme.constant'
 
 type Layouts = Record<string, ComponentType<CommonProps>>
 

@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { TbSearch, TbX } from 'react-icons/tb'
-import { Input, Button } from '@/components/ui'
+import { Button, Input } from '@/components/ui'
 
 interface SearchBarProps {
   placeholder?: string

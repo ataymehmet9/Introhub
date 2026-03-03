@@ -31,7 +31,7 @@
 
   .radio-label {
     @apply items-center cursor-pointer inline-flex gap-2.5 font-semibold;
-    
+
     &:not(.disabled) {
       &:hover {
         .radio {

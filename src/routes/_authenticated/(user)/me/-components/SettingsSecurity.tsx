@@ -7,8 +7,8 @@ import {
   Form,
   FormItem,
   Input,
-  toast,
   Notification,
+  toast,
 } from '@/components/ui'
 import { ConfirmDialog } from '@/components/shared'
 import { authClient } from '@/lib/auth-client'

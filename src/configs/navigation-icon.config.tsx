@@ -1,8 +1,8 @@
 import {
-  PiHouseLineDuotone,
-  PiUsersDuotone,
-  PiMagnifyingGlassBold,
   PiArrowsLeftRightBold,
+  PiHouseLineDuotone,
+  PiMagnifyingGlassBold,
+  PiUsersDuotone,
 } from 'react-icons/pi'
 import type { JSX } from 'react'
 
