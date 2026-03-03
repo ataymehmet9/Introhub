@@ -103,16 +103,18 @@ export default function ContactImportModal({
       // Read file content
       const csvContent = await fileToImport.text()
 
-      // Call tRPC batch upload endpoint
+      // Call tRPC batch upload endpoint with options
       const response = await trpcClient.contacts.batchUpload.mutate({
         csvContent,
+        skipDuplicates,
+        updateExisting,
       })
 
       // Map response to ImportResult format
       const importResult: ImportResult = {
         imported: response.data.insertedCount,
-        updated: 0, // Current implementation doesn't support updates
-        skipped: 0, // Current implementation doesn't track skips
+        updated: response.data.updatedCount || 0,
+        skipped: response.data.skippedCount || 0,
         errors:
           response.data.errors?.map((err) => ({
             row: err.row,

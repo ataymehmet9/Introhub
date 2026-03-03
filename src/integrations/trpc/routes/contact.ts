@@ -389,6 +389,8 @@ export const contactRouter = {
     .input(
       z.object({
         csvContent: z.string().min(1, 'CSV content cannot be empty'),
+        skipDuplicates: z.boolean().optional().default(true),
+        updateExisting: z.boolean().optional().default(false),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -398,7 +400,7 @@ export const contactRouter = {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
-      const { csvContent } = input
+      const { csvContent, skipDuplicates, updateExisting } = input
 
       try {
         // Parse CSV content
@@ -417,10 +419,25 @@ export const contactRouter = {
           })
         }
 
-        // Validate and prepare contacts for insertion
+        // Get existing contacts for this user to check for duplicates
+        const existingContacts = await db
+          .select()
+          .from(contacts)
+          .where(eq(contacts.userId, user.id))
+
+        const existingEmailMap = new Map(
+          existingContacts.map((c) => [c.email.toLowerCase(), c]),
+        )
+
+        // Validate and prepare contacts for insertion/update
         const contactsToInsert: Array<InsertContact> = []
+        const contactsToUpdate: Array<{
+          id: number
+          data: Partial<InsertContact>
+        }> = []
 
         const errors: Array<{ row: number; error: string }> = []
+        let skippedCount = 0
 
         for (let i = 0; i < rows.length; i++) {
           const row = rows[i]
@@ -446,21 +463,56 @@ export const contactRouter = {
               continue
             }
 
-            // Prepare contact object
-            const contact: InsertContact = {
-              userId: user.id,
-              email: row.email,
-              name: row.name,
+            // Check if contact already exists
+            const existingContact = existingEmailMap.get(
+              row.email.toLowerCase(),
+            )
+
+            if (existingContact) {
+              if (updateExisting) {
+                // Update existing contact
+                const updateData: Partial<InsertContact> = {
+                  name: row.name,
+                }
+                if (row.company) updateData.company = row.company
+                if (row.position) updateData.position = row.position
+                if (row.notes) updateData.notes = row.notes
+                if (row.phone) updateData.phone = row.phone
+                if (row.linkedinUrl) updateData.linkedinUrl = row.linkedinUrl
+
+                contactsToUpdate.push({
+                  id: existingContact.id,
+                  data: updateData,
+                })
+              } else if (skipDuplicates) {
+                // Skip duplicate
+                skippedCount++
+                continue
+              } else {
+                // Neither skip nor update - report as error
+                errors.push({
+                  row: rowNumber,
+                  error: `Duplicate email: ${row.email} already exists`,
+                })
+                continue
+              }
+            } else {
+              // Prepare contact object for insertion
+              const contact: InsertContact = {
+                userId: user.id,
+                email: row.email,
+                name: row.name,
+              }
+
+              // Add optional fields if present
+              if (row.company) contact.company = row.company
+              if (row.position) contact.position = row.position
+              if (row.notes) contact.notes = row.notes
+              if (row.phone) contact.phone = row.phone
+              if (row.linkedinUrl) contact.linkedinUrl = row.linkedinUrl
+
+              contactsToInsert.push(contact)
             }
-
-            // Add optional fields if present
-            if (row.company) contact.company = row.company
-            if (row.position) contact.position = row.position
-            if (row.notes) contact.notes = row.notes
-            if (row.phone) contact.phone = row.phone
-            if (row.linkedinUrl) contact.linkedinUrl = row.linkedinUrl
-
-            contactsToInsert.push(contact)
           } catch (error) {
             errors.push({
               row: rowNumber,
@@ -469,7 +521,7 @@ export const contactRouter = {
           }
         }
 
-        // Insert all valid contacts
+        // Insert new contacts
         let insertedCount = 0
         if (contactsToInsert.length > 0) {
           const inserted = await db
@@ -479,11 +531,38 @@ export const contactRouter = {
           insertedCount = inserted.length
         }
 
+        // Update existing contacts
+        let updatedCount = 0
+        if (contactsToUpdate.length > 0) {
+          for (const updateItem of contactsToUpdate) {
+            await db
+              .update(contacts)
+              .set({
+                ...updateItem.data,
+                updatedAt: new Date(),
+              })
+              .where(
+                and(
+                  eq(contacts.id, updateItem.id),
+                  eq(contacts.userId, user.id),
+                ),
+              )
+          }
+          updatedCount = contactsToUpdate.length
+        }
+
         trackServerEvent(user.id, 'contact_batch_upload_success', {
           totalRows: rows.length,
           insertedCount,
+          updatedCount,
+          skippedCount,
           errorCount: errors.length,
-          successRate: ((insertedCount / rows.length) * 100).toFixed(2),
+          successRate: (
+            ((insertedCount + updatedCount) / rows.length) *
+            100
+          ).toFixed(2),
+          skipDuplicates,
+          updateExisting,
           userId: user.id,
           userEmail: user.email,
           timestamp: new Date().toISOString(),
@@ -494,6 +573,8 @@ export const contactRouter = {
           data: {
             totalRows: rows.length,
             insertedCount,
+            updatedCount,
+            skippedCount,
             errorCount: errors.length,
             errors: errors.length > 0 ? errors : undefined,
           },
