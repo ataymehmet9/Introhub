@@ -1,5 +1,4 @@
 import { betterAuth } from 'better-auth'
-import { createAuthMiddleware } from 'better-auth/api'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 import { db } from '@/db'
@@ -52,12 +51,10 @@ export const auth = betterAuth({
     },
   },
   plugins: [tanstackStartCookies()],
-  hooks: {
-    after: createAuthMiddleware(async (ctx) => {
-      // Check if this is a signup request
-      if (ctx.path.startsWith('/sign-up')) {
-        const user = ctx.context.newSession?.user
-        if (user) {
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
           // Send welcome email to new user
           try {
             const dashboardUrl = `${process.env.APP_URL || 'http://localhost:3000'}/dashboard`
@@ -74,8 +71,8 @@ export const auth = betterAuth({
             console.error('Failed to send welcome email:', error)
             // Don't throw error to prevent signup failure
           }
-        }
-      }
-    }),
+        },
+      },
+    },
   },
 })
