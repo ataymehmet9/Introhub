@@ -34,6 +34,7 @@ services:
     environment:
       # Node Environment
       NODE_ENV: production
+      APP_URL: ${APP_URL:-http://localhost:3000}
 
       # Database
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-introhub}
@@ -65,6 +66,11 @@ services:
       VITE_SENTRY_ORG: ${VITE_SENTRY_ORG}
       VITE_SENTRY_PROJECT: ${VITE_SENTRY_PROJECT}
       SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+
+      # Analytics (PostHog)
+      VITE_PUBLIC_POSTHOG_KEY: ${VITE_PUBLIC_POSTHOG_KEY}
+      VITE_PUBLIC_POSTHOG_HOST: ${VITE_PUBLIC_POSTHOG_HOST}
+      VITE_PUBLIC_POSTHOG_DEFAULTS: ${VITE_PUBLIC_POSTHOG_DEFAULTS}
     depends_on:
       postgres:
         condition: service_healthy

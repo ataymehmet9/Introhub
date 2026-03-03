@@ -58,3 +58,4 @@ src/
 - **Error Handling**: Use `react-error-boundary` for error handling [18].
 - **Testing**: Use `vitest` for testing [19].
 - **File Upload**: Use `better-upload` for file uploads. The full documentation is available for you at https://better-upload.com/llms-full.txt
+- **Analytics**: Use `posthog` from Analytics [21] - Documentation is available at https://posthog.com/llms.txt
