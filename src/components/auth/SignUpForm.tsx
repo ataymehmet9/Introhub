@@ -7,6 +7,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CommonProps } from '@/@types/common'
 import { userSignupSchema, UserSignup } from '@/schemas'
+import { usePostHog } from '@posthog/react'
 
 interface SignUpFormProps extends CommonProps {
   disableSubmit?: boolean
@@ -23,6 +24,7 @@ const SignUpForm = (props: SignUpFormProps) => {
   } = props
 
   const [isSubmitting, setSubmitting] = useState<boolean>(false)
+  const posthog = usePostHog()
 
   const {
     handleSubmit,
@@ -49,7 +51,21 @@ const SignUpForm = (props: SignUpFormProps) => {
 
       if (error) {
         setMessage?.(error.message ?? 'An error occurred')
+        // Track failed signup
+        posthog?.capture('signup_failed', {
+          email,
+          error: error.message,
+          timestamp: new Date().toISOString(),
+        })
       } else {
+        // Track successful signup
+        posthog?.capture('signup_success', {
+          email,
+          name,
+          company: company || null,
+          position: position || null,
+          timestamp: new Date().toISOString(),
+        })
         onSignupSuccess()
       }
     }

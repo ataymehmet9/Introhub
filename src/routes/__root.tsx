@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { PostHogProvider } from '@posthog/react'
 
 import Theme from '@/components/template/Theme'
 import { RouteTransition } from '@/components/shared/RouteTransition'
@@ -61,10 +62,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Theme>
-          <RouteTransition />
-          {children}
-        </Theme>
+        <PostHogProvider
+          apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
+          options={{
+            api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+            defaults: import.meta.env.VITE_PUBLIC_POSTHOG_DEFAULTS,
+            capture_exceptions: true,
+          }}
+        >
+          <Theme>
+            <RouteTransition />
+            {children}
+          </Theme>
+        </PostHogProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

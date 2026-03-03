@@ -7,6 +7,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CommonProps } from '@/@types/common'
 import { z } from 'zod'
+import { usePostHog } from '@posthog/react'
 
 const signInSchema = z.object({
   email: z.email('Invalid email address'),
@@ -32,6 +33,7 @@ const SignInForm = (props: SignInFormProps) => {
   } = props
 
   const [isSubmitting, setSubmitting] = useState<boolean>(false)
+  const posthog = usePostHog()
 
   const {
     handleSubmit,
@@ -52,7 +54,18 @@ const SignInForm = (props: SignInFormProps) => {
 
       if (error) {
         setMessage?.(error.message ?? 'An error occurred')
+        // Track failed login
+        posthog?.capture('login_failed', {
+          email,
+          error: error.message,
+          timestamp: new Date().toISOString(),
+        })
       } else {
+        // Track successful login
+        posthog?.capture('login_success', {
+          email,
+          timestamp: new Date().toISOString(),
+        })
         onSignInSuccess()
       }
     }

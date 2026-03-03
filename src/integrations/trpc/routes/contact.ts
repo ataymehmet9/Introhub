@@ -10,6 +10,7 @@ import {
 import { contacts } from '@/db/schema'
 import { parseCSV } from '@/utils/fileUtils'
 import { protectedProcedure } from '../init'
+import { trackServerEvent } from '@/integrations/posthog'
 
 const listContactsSchema = contactSchema
   .pick({
@@ -49,22 +50,51 @@ export const contactRouter = {
 
       const { id } = input
 
-      const existingContact = await db
-        .select()
-        .from(contacts)
-        .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
-        .limit(1)
+      try {
+        const existingContact = await db
+          .select()
+          .from(contacts)
+          .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
+          .limit(1)
 
-      if (!existingContact.length) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Contact not found or you do not have permission to view it',
+        if (!existingContact.length) {
+          trackServerEvent(user.id, 'contact_read_failed', {
+            contactId: id,
+            reason: 'not_found',
+            userId: user.id,
+            userEmail: user.email,
+            timestamp: new Date().toISOString(),
+          })
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message:
+              'Contact not found or you do not have permission to view it',
+          })
+        }
+
+        const [contact] = existingContact
+
+        trackServerEvent(user.id, 'contact_read_success', {
+          contactId: id,
+          contactName: contact.name,
+          contactEmail: contact.email,
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
         })
+
+        return { success: true, data: contact }
+      } catch (error) {
+        if (error instanceof TRPCError) throw error
+        trackServerEvent(user.id, 'contact_read_error', {
+          contactId: id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+        throw error
       }
-
-      const [contact] = existingContact
-
-      return { success: true, data: contact }
     }),
   list: protectedProcedure
     .input(listContactsSchema)
@@ -77,29 +107,48 @@ export const contactRouter = {
 
       const { company, search } = input
 
-      const conditions = [eq(contacts.userId, user.id)]
+      try {
+        const conditions = [eq(contacts.userId, user.id)]
 
-      if (search) {
-        conditions.push(
-          or(
-            like(contacts.name, `%${search}%`),
-            like(contacts.email, `%${search}%`),
-            like(contacts.company, `%${search}%`),
-          )!,
-        )
+        if (search) {
+          conditions.push(
+            or(
+              like(contacts.name, `%${search}%`),
+              like(contacts.email, `%${search}%`),
+              like(contacts.company, `%${search}%`),
+            )!,
+          )
+        }
+
+        if (company) {
+          conditions.push(like(contacts.company, `%${company}%`))
+        }
+
+        const results = await db
+          .select()
+          .from(contacts)
+          .where(and(...conditions))
+          .orderBy(desc(contacts.createdAt))
+
+        trackServerEvent(user.id, 'contact_list_success', {
+          resultCount: results.length,
+          hasSearch: !!search,
+          hasCompanyFilter: !!company,
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+
+        return { success: true, data: results }
+      } catch (error) {
+        trackServerEvent(user.id, 'contact_list_error', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+        throw error
       }
-
-      if (company) {
-        conditions.push(like(contacts.company, `%${company}%`))
-      }
-
-      const results = await db
-        .select()
-        .from(contacts)
-        .where(and(...conditions))
-        .orderBy(desc(contacts.createdAt))
-
-      return { success: true, data: results }
     }),
   create: protectedProcedure
     .input(createContactSchema)
@@ -110,15 +159,36 @@ export const contactRouter = {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
-      const newContact = await db
-        .insert(contacts)
-        .values({
-          ...input,
-          userId: user.id,
-        })
-        .returning()
+      try {
+        const newContact = await db
+          .insert(contacts)
+          .values({
+            ...input,
+            userId: user.id,
+          })
+          .returning()
 
-      return { success: true, data: newContact[0] }
+        trackServerEvent(user.id, 'contact_create_success', {
+          contactId: newContact[0].id,
+          contactName: newContact[0].name,
+          contactEmail: newContact[0].email,
+          contactCompany: newContact[0].company || null,
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+
+        return { success: true, data: newContact[0] }
+      } catch (error) {
+        trackServerEvent(user.id, 'contact_create_error', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          contactEmail: input.email,
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+        throw error
+      }
     }),
   update: protectedProcedure
     .input(updateContactInputSchema)
@@ -131,25 +201,54 @@ export const contactRouter = {
 
       const { id, data } = input
 
-      // Update with user check in WHERE clause - no race condition
-      const updatedContact = await db
-        .update(contacts)
-        .set({
-          ...data,
-          updatedAt: new Date(),
-        })
-        .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
-        .returning()
+      try {
+        // Update with user check in WHERE clause - no race condition
+        const updatedContact = await db
+          .update(contacts)
+          .set({
+            ...data,
+            updatedAt: new Date(),
+          })
+          .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
+          .returning()
 
-      if (!updatedContact.length) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message:
-            'Contact not found or you do not have permission to update it',
+        if (!updatedContact.length) {
+          trackServerEvent(user.id, 'contact_update_failed', {
+            contactId: id,
+            reason: 'not_found',
+            userId: user.id,
+            userEmail: user.email,
+            timestamp: new Date().toISOString(),
+          })
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message:
+              'Contact not found or you do not have permission to update it',
+          })
+        }
+
+        trackServerEvent(user.id, 'contact_update_success', {
+          contactId: id,
+          contactName: updatedContact[0].name,
+          contactEmail: updatedContact[0].email,
+          updatedFields: Object.keys(data),
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
         })
+
+        return { success: true, data: updatedContact[0] }
+      } catch (error) {
+        if (error instanceof TRPCError) throw error
+        trackServerEvent(user.id, 'contact_update_error', {
+          contactId: id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+        throw error
       }
-
-      return { success: true, data: updatedContact[0] }
     }),
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
@@ -162,21 +261,49 @@ export const contactRouter = {
 
       const { id } = input
 
-      // Delete with user check in WHERE clause - no race condition
-      const deletedContact = await db
-        .delete(contacts)
-        .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
-        .returning()
+      try {
+        // Delete with user check in WHERE clause - no race condition
+        const deletedContact = await db
+          .delete(contacts)
+          .where(and(eq(contacts.id, id), eq(contacts.userId, user.id)))
+          .returning()
 
-      if (!deletedContact.length) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message:
-            'Contact not found or you do not have permission to delete it',
+        if (!deletedContact.length) {
+          trackServerEvent(user.id, 'contact_delete_failed', {
+            contactId: id,
+            reason: 'not_found',
+            userId: user.id,
+            userEmail: user.email,
+            timestamp: new Date().toISOString(),
+          })
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message:
+              'Contact not found or you do not have permission to delete it',
+          })
+        }
+
+        trackServerEvent(user.id, 'contact_delete_success', {
+          contactId: id,
+          contactName: deletedContact[0].name,
+          contactEmail: deletedContact[0].email,
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
         })
-      }
 
-      return { success: true, id }
+        return { success: true, id }
+      } catch (error) {
+        if (error instanceof TRPCError) throw error
+        trackServerEvent(user.id, 'contact_delete_error', {
+          contactId: id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+        throw error
+      }
     }),
   batchDelete: protectedProcedure
     .input(
@@ -193,41 +320,69 @@ export const contactRouter = {
 
       const { ids } = input
 
-      // Verify all contacts belong to the user
-      const existingContacts = await db
-        .select()
-        .from(contacts)
-        .where(and(eq(contacts.userId, user.id)))
+      try {
+        // Verify all contacts belong to the user
+        const existingContacts = await db
+          .select()
+          .from(contacts)
+          .where(and(eq(contacts.userId, user.id)))
 
-      const existingIds = existingContacts.map((contact) => contact.id)
-      const validIds = ids.filter((id) => existingIds.includes(id))
+        const existingIds = existingContacts.map((contact) => contact.id)
+        const validIds = ids.filter((id) => existingIds.includes(id))
 
-      if (validIds.length === 0) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message:
-            'No valid contacts found or you do not have permission to delete them',
-        })
-      }
+        if (validIds.length === 0) {
+          trackServerEvent(user.id, 'contact_batch_delete_failed', {
+            requestedCount: ids.length,
+            reason: 'no_valid_contacts',
+            userId: user.id,
+            userEmail: user.email,
+            timestamp: new Date().toISOString(),
+          })
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message:
+              'No valid contacts found or you do not have permission to delete them',
+          })
+        }
 
-      // Delete all valid contacts
-      const deletedContacts = await db
-        .delete(contacts)
-        .where(
-          and(
-            eq(contacts.userId, user.id),
-            or(...validIds.map((id) => eq(contacts.id, id)))!,
-          ),
-        )
-        .returning()
+        // Delete all valid contacts
+        const deletedContacts = await db
+          .delete(contacts)
+          .where(
+            and(
+              eq(contacts.userId, user.id),
+              or(...validIds.map((id) => eq(contacts.id, id)))!,
+            ),
+          )
+          .returning()
 
-      return {
-        success: true,
-        data: {
+        trackServerEvent(user.id, 'contact_batch_delete_success', {
+          requestedCount: ids.length,
           deletedCount: deletedContacts.length,
-          deletedIds: deletedContacts.map((contact) => contact.id),
-          invalidIds: ids.filter((id) => !validIds.includes(id)),
-        },
+          invalidCount: ids.length - validIds.length,
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+
+        return {
+          success: true,
+          data: {
+            deletedCount: deletedContacts.length,
+            deletedIds: deletedContacts.map((contact) => contact.id),
+            invalidIds: ids.filter((id) => !validIds.includes(id)),
+          },
+        }
+      } catch (error) {
+        if (error instanceof TRPCError) throw error
+        trackServerEvent(user.id, 'contact_batch_delete_error', {
+          requestedCount: ids.length,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+        throw error
       }
     }),
   batchUpload: protectedProcedure
@@ -250,6 +405,12 @@ export const contactRouter = {
         const rows = parseCSV(csvContent)
 
         if (rows.length === 0) {
+          trackServerEvent(user.id, 'contact_batch_upload_failed', {
+            reason: 'no_valid_rows',
+            userId: user.id,
+            userEmail: user.email,
+            timestamp: new Date().toISOString(),
+          })
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'No valid data rows found in CSV file',
@@ -318,6 +479,16 @@ export const contactRouter = {
           insertedCount = inserted.length
         }
 
+        trackServerEvent(user.id, 'contact_batch_upload_success', {
+          totalRows: rows.length,
+          insertedCount,
+          errorCount: errors.length,
+          successRate: ((insertedCount / rows.length) * 100).toFixed(2),
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
+
         return {
           success: true,
           data: {
@@ -331,6 +502,12 @@ export const contactRouter = {
         if (error instanceof TRPCError) {
           throw error
         }
+        trackServerEvent(user.id, 'contact_batch_upload_error', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          userId: user.id,
+          userEmail: user.email,
+          timestamp: new Date().toISOString(),
+        })
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message:

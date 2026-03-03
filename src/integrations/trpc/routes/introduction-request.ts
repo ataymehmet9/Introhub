@@ -19,6 +19,7 @@ import {
   sendIntroductionEmail,
 } from '@/services/email.functions'
 import { notificationEmitter } from '@/lib/notification-emitter'
+import { trackServerEvent } from '@/integrations/posthog'
 
 const createIntroductionRequestSchema = insertIntroductionRequestSchema
   .omit({
@@ -110,6 +111,18 @@ export const introductionRequestRouter = {
           status: 'pending',
         })
         .returning()
+
+      // Track successful request creation
+      trackServerEvent(currentUser.id, 'introduction_request_create_success', {
+        requestId: newRequest[0].id,
+        targetContactId,
+        targetContactName: contact.name,
+        targetContactEmail: contact.email,
+        approverId: contact.userId,
+        userId: currentUser.id,
+        userEmail: currentUser.email,
+        timestamp: new Date().toISOString(),
+      })
 
       // Get approver (contact owner) details for email
       const approver = await db
@@ -337,6 +350,17 @@ export const introductionRequestRouter = {
         })
         .where(eq(introductionRequests.id, id))
         .returning()
+
+      // Track status update
+      trackServerEvent(currentUser.id, `introduction_request_${data.status}`, {
+        requestId: id,
+        status: data.status,
+        hasResponseMessage: !!data.responseMessage,
+        approverId: currentUser.id,
+        approverEmail: currentUser.email,
+        requesterId: request.requesterId,
+        timestamp: new Date().toISOString(),
+      })
 
       // Get requester and contact details concurrently
       const [requester, targetContact] = await Promise.all([

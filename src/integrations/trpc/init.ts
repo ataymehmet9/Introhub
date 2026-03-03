@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import { TRPCError } from '@trpc/server'
 import { db } from '@/db'
+import { posthogMiddleware } from './middleware/posthog'
 
 export const createContext = async ({ req }: CreateNextContextOptions) => {
   const { session, user } =
@@ -23,11 +24,14 @@ const t = initTRPC.context<typeof createContext>().create({
 
 export const createTRPCRouter = t.router
 
-export const publicProcedure = t.procedure
+// Apply PostHog middleware to all procedures
+export const publicProcedure = t.procedure.use(posthogMiddleware)
 
-export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (!ctx.session) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-  return next()
-})
+export const protectedProcedure = t.procedure
+  .use(posthogMiddleware)
+  .use(async ({ ctx, next }) => {
+    if (!ctx.session) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
+    return next()
+  })

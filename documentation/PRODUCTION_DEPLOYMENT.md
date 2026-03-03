@@ -26,6 +26,9 @@ These variables are **embedded into the client bundle at build time** and are vi
 - `VITE_SENTRY_DSN`
 - `VITE_SENTRY_ORG`
 - `VITE_SENTRY_PROJECT`
+- `VITE_PUBLIC_POSTHOG_KEY`
+- `VITE_PUBLIC_POSTHOG_HOST`
+- `VITE_PUBLIC_POSTHOG_DEFAULTS`
 
 ⚠️ **Important**: These must be set during the build process, not just at runtime.
 
@@ -126,14 +129,22 @@ VITE_BETTER_UPLOAD_BUCKET_REGION="ap-southeast-2"
 
 ### 6. Monitoring (Sentry)
 
-```bash
+````bash
 VITE_SENTRY_DSN="https://xxxxx@xxxxx.ingest.sentry.io/xxxxx"
 VITE_SENTRY_ORG="your-org-id"
 VITE_SENTRY_PROJECT="your-project-name"
 SENTRY_AUTH_TOKEN="sntryu_xxxxxxxxxxxxx"
-```
 
-Get from: https://sentry.io/
+
+### 7. Analytics (PostHog)
+
+```bash
+VITE_PUBLIC_POSTHOG_KEY="AKIAXXXXXXXXXXXXXXXX"
+VITE_PUBLIC_POSTHOG_HOST="your-host"
+VITE_PUBLIC_POSTHOG_DEFAULTS="your-default"
+````
+
+Get from: https://posthog.com/
 
 ---
 
@@ -199,7 +210,10 @@ docker-compose build --build-arg VITE_BETTER_AUTH_URL=https://yourdomain.com \
   --build-arg VITE_BETTER_UPLOAD_BUCKET_REGION=ap-southeast-2 \
   --build-arg VITE_SENTRY_DSN=your-sentry-dsn \
   --build-arg VITE_SENTRY_ORG=your-org \
-  --build-arg VITE_SENTRY_PROJECT=your-project
+  --build-arg VITE_SENTRY_PROJECT=your-project \
+  --build-arg VITE_PUBLIC_POSTHOG_KEY=your-posthog-key \
+  --build-arg VITE_PUBLIC_POSTHOG_HOST=your-posthog-host \
+  --build-arg VITE_PUBLIC_POSTHOG_DEFAULTS=your-posthog-default
 
 # Start services
 docker-compose up -d
@@ -216,6 +230,9 @@ docker build \
   --build-arg VITE_SENTRY_DSN=your-sentry-dsn \
   --build-arg VITE_SENTRY_ORG=your-org \
   --build-arg VITE_SENTRY_PROJECT=your-project \
+  --build-arg VITE_PUBLIC_POSTHOG_KEY=your-posthog-key \
+  --build-arg VITE_PUBLIC_POSTHOG_HOST=your-posthog-host \
+  --build-arg VITE_PUBLIC_POSTHOG_DEFAULTS=your-pothog-default \
   -t introhub:latest .
 
 # Run with runtime environment variables
@@ -238,6 +255,9 @@ docker run -d \
   -e VITE_SENTRY_ORG="..." \
   -e VITE_SENTRY_PROJECT="..." \
   -e SENTRY_AUTH_TOKEN="..." \
+  -e VITE_PUBLIC_POSTHOG_KEY="..." \
+  -e VITE_PUBLIC_POSTHOG_HOST="..." \
+  -e VITE_PUBLIC_POSTHOG_DEFAULTS="..." \
   introhub:latest
 ```
 

@@ -6,6 +6,7 @@ import PostLoginLayout from '@/components/layouts/PostLoginLayout'
 import PageContainer from '@/components/template/PageContainer'
 import { useThemeStore } from '@/store/themeStore'
 import { useSession } from '@/lib/auth-client'
+import { usePostHogIdentify } from '@/hooks/usePostHogIdentify'
 
 export const Route = createFileRoute('/_authenticated')({
   component: RouteComponent,
@@ -22,6 +23,9 @@ export const Route = createFileRoute('/_authenticated')({
 function RouteComponent() {
   const layoutType = useThemeStore((state) => state.layout.type)
   const { data: session, isPending } = useSession()
+
+  // Identify user in PostHog on session start
+  usePostHogIdentify()
 
   // Show loading state while session is being fetched
   if (isPending || !session) {

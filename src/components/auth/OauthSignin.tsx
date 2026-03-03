@@ -1,6 +1,7 @@
 import Button from '@/components/ui/Button'
 import appConfig from '@/configs/app.config'
 import { signIn } from '@/lib/auth-client'
+import { usePostHog } from '@posthog/react'
 
 type OauthSignInProps = {
   setMessage?: (message: string) => void
@@ -8,9 +9,17 @@ type OauthSignInProps = {
 }
 
 const OauthSignIn = (_props: OauthSignInProps) => {
+  const posthog = usePostHog()
+
   const handleSocialSignIn = async (
     provider: 'linkedin' | 'microsoft' | 'google',
   ) => {
+    // Track OAuth sign-in attempt
+    posthog?.capture('oauth_signin_attempt', {
+      provider,
+      timestamp: new Date().toISOString(),
+    })
+
     await signIn.social({
       provider,
       callbackURL: appConfig.authenticatedEntryPath,
