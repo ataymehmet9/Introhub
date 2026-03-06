@@ -15,17 +15,26 @@ export const initialTableData: TableQueries = {
 type ContactState = {
   tableData: TableQueries
   selectedContact: Array<Partial<Contact>>
+  sortConfig: {
+    key: string
+    order: 'asc' | 'desc' | ''
+  }
 }
 
 type ContactAction = {
   setTableData: (payload: TableQueries) => void
   setSelectedContact: (checked: boolean, contact: Contact) => void
   setSelectAllContact: (contact: Array<Contact>) => void
+  setSortConfig: (key: string, order: 'asc' | 'desc' | '') => void
 }
 
 const initialState: ContactState = {
   tableData: initialTableData,
   selectedContact: [],
+  sortConfig: {
+    key: '',
+    order: '',
+  },
 }
 
 export const useContactStore = create<ContactState & ContactAction>((set) => ({
@@ -49,4 +58,9 @@ export const useContactStore = create<ContactState & ContactAction>((set) => ({
     }),
 
   setSelectAllContact: (row) => set(() => ({ selectedContact: row })),
+
+  setSortConfig: (key, order) =>
+    set(() => ({
+      sortConfig: { key, order },
+    })),
 }))

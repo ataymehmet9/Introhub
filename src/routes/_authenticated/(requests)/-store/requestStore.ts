@@ -24,15 +24,26 @@ export type IntroductionRequestWithDetails = {
 
 type RequestStore = {
   selectedRequests: Array<IntroductionRequestWithDetails>
+  sortConfig: {
+    key: string
+    order: 'asc' | 'desc' | ''
+  }
   setSelectedRequest: (
     checked: boolean,
     request: IntroductionRequestWithDetails,
   ) => void
-  setSelectAllRequests: (requests: Array<IntroductionRequestWithDetails>) => void
+  setSelectAllRequests: (
+    requests: Array<IntroductionRequestWithDetails>,
+  ) => void
+  setSortConfig: (key: string, order: 'asc' | 'desc' | '') => void
 }
 
 export const useRequestStore = create<RequestStore>((set) => ({
   selectedRequests: [],
+  sortConfig: {
+    key: '',
+    order: '',
+  },
   setSelectedRequest: (checked, request) =>
     set((state) => ({
       selectedRequests: checked
@@ -42,5 +53,9 @@ export const useRequestStore = create<RequestStore>((set) => ({
   setSelectAllRequests: (requests) =>
     set(() => ({
       selectedRequests: requests,
+    })),
+  setSortConfig: (key, order) =>
+    set(() => ({
+      sortConfig: { key, order },
     })),
 }))

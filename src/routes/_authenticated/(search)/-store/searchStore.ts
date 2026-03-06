@@ -14,12 +14,19 @@ interface SearchState {
   // Table state
   tableData: TableQueries
 
+  // Sort state
+  sortConfig: {
+    key: string
+    order: 'asc' | 'desc' | ''
+  }
+
   // Actions
   setSearchQuery: (query: string) => void
   setSearchFields: (fields: Array<SearchField>) => void
   setResults: (results: Array<SearchResult>) => void
   setSelectedResult: (result: SearchResult | null) => void
   setTableData: (data: TableQueries) => void
+  setSortConfig: (key: string, order: 'asc' | 'desc' | '') => void
   resetSearch: () => void
 }
 
@@ -40,6 +47,10 @@ export const useSearchStore = create<SearchState>((set) => ({
   results: [],
   selectedResult: null,
   tableData: initialTableData,
+  sortConfig: {
+    key: '',
+    order: '',
+  },
 
   // Actions
   setSearchQuery: (query) => set({ searchQuery: query }),
@@ -52,6 +63,11 @@ export const useSearchStore = create<SearchState>((set) => ({
 
   setTableData: (data) => set({ tableData: data }),
 
+  setSortConfig: (key, order) =>
+    set(() => ({
+      sortConfig: { key, order },
+    })),
+
   resetSearch: () =>
     set({
       searchQuery: '',
@@ -59,5 +75,9 @@ export const useSearchStore = create<SearchState>((set) => ({
       results: [],
       selectedResult: null,
       tableData: initialTableData,
+      sortConfig: {
+        key: '',
+        order: '',
+      },
     }),
 }))

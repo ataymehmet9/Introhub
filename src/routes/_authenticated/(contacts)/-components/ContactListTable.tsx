@@ -2,6 +2,7 @@ import { TbEye, TbPencil, TbTrash } from 'react-icons/tb'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { useContact } from '../-hooks/useContact'
+import { useContactStore } from '../-store/contactStore'
 import type { ColumnDef, OnSortParam, Row } from '@/components/shared/DataTable'
 import type { Contact } from '@/schemas'
 import { Avatar, Button, Dialog, Tooltip } from '@/components/ui'
@@ -86,6 +87,7 @@ const ContactListTable = ({
   })
 
   const [deletingContact, setDeletingContact] = useState<Contact | null>(null)
+  const { sortConfig, setSortConfig } = useContactStore()
   const {
     contacts: allContacts,
     isLoading,
@@ -110,18 +112,57 @@ const ContactListTable = ({
     })
   }, [allContacts, searchParams.q])
 
+  // Sort filtered contacts
+  const sortedContacts = useMemo(() => {
+    if (!sortConfig || !sortConfig.key || !sortConfig.order) {
+      return filteredContacts
+    }
+
+    const sorted = [...filteredContacts].sort((a, b) => {
+      const aValue = a[sortConfig.key as keyof Contact]
+      const bValue = b[sortConfig.key as keyof Contact]
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0
+      if (aValue == null) return 1
+      if (bValue == null) return -1
+
+      // Handle dates
+      if (aValue instanceof Date && bValue instanceof Date) {
+        return sortConfig.order === 'asc'
+          ? aValue.getTime() - bValue.getTime()
+          : bValue.getTime() - aValue.getTime()
+      }
+
+      // Handle strings and numbers
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.order === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      }
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.order === 'asc' ? aValue - bValue : bValue - aValue
+      }
+
+      return 0
+    })
+
+    return sorted
+  }, [filteredContacts, sortConfig])
+
   // Pagination state from URL - URL is source of truth
   const pageIndex = searchParams.page || 1
   const pageSize = searchParams.pageSize || 10
 
-  // Paginate filtered contacts
+  // Paginate sorted contacts
   const paginatedContacts = useMemo(() => {
     const startIndex = (pageIndex - 1) * pageSize
     const endIndex = startIndex + pageSize
-    return filteredContacts.slice(startIndex, endIndex)
-  }, [filteredContacts, pageIndex, pageSize])
+    return sortedContacts.slice(startIndex, endIndex)
+  }, [sortedContacts, pageIndex, pageSize])
 
-  const contactsTotal = filteredContacts.length
+  const contactsTotal = sortedContacts.length
 
   const columns: Array<ColumnDef<Contact>> = useMemo(
     () => [
@@ -200,9 +241,7 @@ const ContactListTable = ({
   }
 
   const handleSort = (sort: OnSortParam) => {
-    // Sorting - you could add sort params to URL if needed
-    // For now, this is a placeholder
-    console.log('Sort:', sort)
+    setSortConfig(String(sort.key), sort.order)
   }
 
   const handleRowSelect = (checked: boolean, row: Contact) => {

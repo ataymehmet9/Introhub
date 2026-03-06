@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { TbSend } from 'react-icons/tb'
-import type { ColumnDef } from '@/components/shared/DataTable'
+import { useSearchStore } from '../-store/searchStore'
+import type { ColumnDef, OnSortParam } from '@/components/shared/DataTable'
 import type { SearchResult } from '@/schemas'
 import { Avatar, Badge, Button, Tooltip } from '@/components/ui'
 import { stringToColor } from '@/utils/colours'
@@ -97,6 +98,51 @@ const SearchResultsTable = ({
   onPageChange,
   onPageSizeChange,
 }: SearchResultsTableProps) => {
+  const { sortConfig, setSortConfig } = useSearchStore()
+
+  // Sort results on the client side
+  const sortedResults = useMemo(() => {
+    if (!sortConfig || !sortConfig.key || !sortConfig.order) {
+      return results
+    }
+
+    const sorted = [...results].sort((a, b) => {
+      const aValue = a[sortConfig.key as keyof SearchResult]
+      const bValue = b[sortConfig.key as keyof SearchResult]
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0
+      if (aValue == null) return 1
+      if (bValue == null) return -1
+
+      // Handle dates
+      if (aValue instanceof Date && bValue instanceof Date) {
+        return sortConfig.order === 'asc'
+          ? aValue.getTime() - bValue.getTime()
+          : bValue.getTime() - aValue.getTime()
+      }
+
+      // Handle strings and numbers
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.order === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      }
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.order === 'asc' ? aValue - bValue : bValue - aValue
+      }
+
+      return 0
+    })
+
+    return sorted
+  }, [results, sortConfig])
+
+  const handleSort = (sort: OnSortParam) => {
+    setSortConfig(String(sort.key), sort.order)
+  }
+
   const columns: Array<ColumnDef<SearchResult>> = useMemo(
     () => [
       {
@@ -157,8 +203,8 @@ const SearchResultsTable = ({
   return (
     <DataTable
       columns={columns}
-      data={results}
-      noData={!isLoading && results.length === 0}
+      data={sortedResults}
+      noData={!isLoading && sortedResults.length === 0}
       skeletonAvatarColumns={[0]}
       skeletonAvatarProps={{ width: 40, height: 40 }}
       loading={isLoading}
@@ -169,6 +215,7 @@ const SearchResultsTable = ({
       }}
       onPaginationChange={onPageChange}
       onSelectChange={onPageSizeChange}
+      onSort={handleSort}
     />
   )
 }

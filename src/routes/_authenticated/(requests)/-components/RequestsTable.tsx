@@ -4,7 +4,15 @@ import { TbCheck, TbTrash, TbX } from 'react-icons/tb'
 import { useRequestStore } from '../-store/requestStore'
 import type { ColumnDef, OnSortParam, Row } from '@/components/shared/DataTable'
 import type { IntroductionRequestWithDetails } from '../-store/requestStore'
-import { Avatar, Badge, Button, Dialog, Notification, Tooltip, toast  } from '@/components/ui'
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  Notification,
+  Tooltip,
+  toast,
+} from '@/components/ui'
 import { stringToColor } from '@/utils/colours'
 import DataTable from '@/components/shared/DataTable'
 import { DateFormat } from '@/components/shared/common'
@@ -158,11 +166,55 @@ const RequestsTable = ({
   const [deletingRequest, setDeletingRequest] =
     useState<IntroductionRequestWithDetails | null>(null)
 
-  const { setSelectAllRequests, setSelectedRequest, selectedRequests } =
-    useRequestStore()
+  const {
+    setSelectAllRequests,
+    setSelectedRequest,
+    selectedRequests,
+    sortConfig,
+    setSortConfig,
+  } = useRequestStore()
 
   const queryClient = useQueryClient()
   const trpc = useTRPC()
+
+  // Sort requests on the client side
+  const sortedRequests = useMemo(() => {
+    if (!sortConfig || !sortConfig.key || !sortConfig.order) {
+      return requests
+    }
+
+    const sorted = [...requests].sort((a, b) => {
+      const aValue = a[sortConfig.key as keyof IntroductionRequestWithDetails]
+      const bValue = b[sortConfig.key as keyof IntroductionRequestWithDetails]
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0
+      if (aValue == null) return 1
+      if (bValue == null) return -1
+
+      // Handle dates
+      if (aValue instanceof Date && bValue instanceof Date) {
+        return sortConfig.order === 'asc'
+          ? aValue.getTime() - bValue.getTime()
+          : bValue.getTime() - aValue.getTime()
+      }
+
+      // Handle strings and numbers
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.order === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      }
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.order === 'asc' ? aValue - bValue : bValue - aValue
+      }
+
+      return 0
+    })
+
+    return sorted
+  }, [requests, sortConfig])
 
   // Delete request mutation
   const deleteRequestMutation = useMutation({
@@ -257,7 +309,7 @@ const RequestsTable = ({
   )
 
   const handleSort = (sort: OnSortParam) => {
-    console.log('Sort:', sort)
+    setSortConfig(String(sort.key), sort.order)
   }
 
   const handleRowSelect = (
@@ -294,8 +346,8 @@ const RequestsTable = ({
       <DataTable
         selectable
         columns={columns}
-        data={requests}
-        noData={!isLoading && requests.length === 0}
+        data={sortedRequests}
+        noData={!isLoading && sortedRequests.length === 0}
         skeletonAvatarColumns={[0]}
         skeletonAvatarProps={{ width: 28, height: 28 }}
         loading={isLoading}
