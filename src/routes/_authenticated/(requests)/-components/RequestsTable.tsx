@@ -184,8 +184,22 @@ const RequestsTable = ({
     }
 
     const sorted = [...requests].sort((a, b) => {
-      const aValue = a[sortConfig.key as keyof IntroductionRequestWithDetails]
-      const bValue = b[sortConfig.key as keyof IntroductionRequestWithDetails]
+      let aValue: string | number | Date | null | undefined
+      let bValue: string | number | Date | null | undefined
+
+      // Handle the dynamic requester/recipient column
+      if (sortConfig.key === 'requesterName') {
+        if (filterType === 'sent') {
+          aValue = a.approverName
+          bValue = b.approverName
+        } else {
+          aValue = a.requesterName
+          bValue = b.requesterName
+        }
+      } else {
+        aValue = a[sortConfig.key as keyof IntroductionRequestWithDetails]
+        bValue = b[sortConfig.key as keyof IntroductionRequestWithDetails]
+      }
 
       // Handle null/undefined values
       if (aValue == null && bValue == null) return 0
@@ -214,7 +228,7 @@ const RequestsTable = ({
     })
 
     return sorted
-  }, [requests, sortConfig])
+  }, [requests, sortConfig, filterType])
 
   // Delete request mutation
   const deleteRequestMutation = useMutation({
