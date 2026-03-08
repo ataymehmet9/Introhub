@@ -1,26 +1,31 @@
+import {
+  LuCircleCheck,
+  LuCircleUserRound,
+  LuCircleX,
+  LuMailbox,
+} from 'react-icons/lu'
 import type { Notification } from '@/schemas'
 import Avatar from '@/components/ui/Avatar'
-import useDarkMode from '@/utils/hooks/useDarkMode'
 
 const NotificationAvatar = (props: { notification: Notification }) => {
-  const [isDark] = useDarkMode()
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'introduction_request':
-        return '🤝'
+        return <LuCircleUserRound />
       case 'introduction_approved':
-        return '✅'
+        return <LuCircleCheck />
       case 'introduction_declined':
-        return '❌'
+        return <LuCircleX />
       default:
-        return '📬'
+        return <LuMailbox />
     }
   }
 
   return (
-    <Avatar shape="circle" className={!isDark ? 'bg-gray-100' : ''}>
-      {getNotificationIcon(props.notification.type)}
-    </Avatar>
+    <Avatar
+      shape="circle"
+      icon={getNotificationIcon(props.notification.type)}
+    />
   )
 }
 
