@@ -2,18 +2,17 @@ import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { and, desc, eq, gte, lte, or, sql } from 'drizzle-orm'
 import { protectedProcedure } from '../init'
-import type { TRPCRouterRecord} from '@trpc/server';
-import type {Granularity, PeriodStats, ResponseTime, StatsComparison, StatusBreakdown, TopContact, TrendDataPoint} from '@/schemas';
-import {
-  
-  
-  
-  
-  
-  
-  
-  dashboardQuerySchema
+import type { TRPCRouterRecord } from '@trpc/server'
+import type {
+  Granularity,
+  PeriodStats,
+  ResponseTime,
+  StatsComparison,
+  StatusBreakdown,
+  TopContact,
+  TrendDataPoint,
 } from '@/schemas'
+import { dashboardQuerySchema } from '@/schemas'
 import { contacts, introductionRequests } from '@/db/schema'
 
 /**
@@ -382,7 +381,7 @@ export const dashboardRouter = {
         // Get requests made trend
         db
           .select({
-            date: sql<string>`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
+            date: sql<string>`DATE_TRUNC(${sql.raw(`'${dateTrunc}'`)}, ${introductionRequests.createdAt})::date`,
             status: introductionRequests.status,
             count: sql<number>`count(*)::int`,
           })
@@ -396,16 +395,16 @@ export const dashboardRouter = {
             ),
           )
           .groupBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
+            sql`DATE_TRUNC(${sql.raw(`'${dateTrunc}'`)}, ${introductionRequests.createdAt})::date`,
             introductionRequests.status,
           )
           .orderBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
+            sql`DATE_TRUNC(${sql.raw(`'${dateTrunc}'`)}, ${introductionRequests.createdAt})::date`,
           ),
         // Get requests received trend
         db
           .select({
-            date: sql<string>`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
+            date: sql<string>`DATE_TRUNC(${sql.raw(`'${dateTrunc}'`)}, ${introductionRequests.createdAt})::date`,
             status: introductionRequests.status,
             count: sql<number>`count(*)::int`,
           })
@@ -419,11 +418,11 @@ export const dashboardRouter = {
             ),
           )
           .groupBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
+            sql`DATE_TRUNC(${sql.raw(`'${dateTrunc}'`)}, ${introductionRequests.createdAt})::date`,
             introductionRequests.status,
           )
           .orderBy(
-            sql`DATE_TRUNC(${dateTrunc}, ${introductionRequests.createdAt})::date`,
+            sql`DATE_TRUNC(${sql.raw(`'${dateTrunc}'`)}, ${introductionRequests.createdAt})::date`,
           ),
       ])
 
