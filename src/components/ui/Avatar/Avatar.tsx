@@ -117,7 +117,7 @@ const Avatar = (props: AvatarProps) => {
     <span
       ref={avatarMergeRef}
       className={classes}
-      style={{ ...sizeStyle, ...rest.style }}
+      style={{ ...sizeStyle, ...(rest.style || {}) }}
       {...rest}
     >
       {children}

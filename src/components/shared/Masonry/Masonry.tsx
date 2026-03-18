@@ -2,7 +2,7 @@ import { useId } from 'react'
 import useMasonry from './useMasonry'
 import { MasonryItemContext } from './context'
 import type { MasonryProps } from './types'
-import type { ElementType , Ref} from 'react'
+import type { ElementType, Ref } from 'react'
 
 const MasonryBase = <T extends ElementType = 'div'>(
   props: MasonryProps<T> & {
@@ -26,7 +26,7 @@ const MasonryBase = <T extends ElementType = 'div'>(
       data-masonry-id={`Masonry-${uniq}`}
       {...rest}
       ref={forwaredRef}
-      style={{ display: 'flex', gap, ...rest.style }}
+      style={{ display: 'flex', gap, ...(rest.style || {}) }}
     >
       {columnsChildren.map((column, index) => {
         return (
