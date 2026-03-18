@@ -54,7 +54,7 @@ const MenuItem = (props: MenuItemProps) => {
     <Component
       ref={ref}
       className={menuItemClass}
-      style={{ height: `${menuItemHeight}px`, ...style }}
+      style={{ height: `${menuItemHeight}px`, ...(style || {}) }}
       onClick={hanldeOnClick}
       {...rest}
     >

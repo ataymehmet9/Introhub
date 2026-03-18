@@ -64,7 +64,7 @@ const Notification = (props: NotificationProps) => {
       ref={ref}
       {...rest}
       className={notificationClass}
-      style={{ width: width, ...style }}
+      style={{ width: width, ...(style || {}) }}
     >
       <div
         className={classNames('notification-content', !children && 'no-child')}
