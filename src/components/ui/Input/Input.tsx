@@ -173,7 +173,12 @@ const Input = (props: InputProps) => {
   )
 
   const renderInput = (
-    <Component style={{ ...affixGutterStyle(), ...style }} {...inputProps} />
+    <Component
+      style={
+        prefix || suffix ? { ...affixGutterStyle(), ...(style || {}) } : style
+      }
+      {...inputProps}
+    />
   )
 
   const renderAffixInput = (
