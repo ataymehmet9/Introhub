@@ -82,6 +82,9 @@ const Chart = (props: ChartProps) => {
       const lengend = chartRef.current.querySelectorAll<HTMLDivElement>(
         'div.apexcharts-legend',
       )[0]
+      if (!lengend) {
+        return
+      }
       if (direction === DIR_RTL) {
         lengend.style.right = 'auto'
         lengend.style.left = '0'
