@@ -79,10 +79,10 @@ const FormItem = (props: FormItemProps) => {
 
   const formLabelStyle = () => {
     if (formItemLayout === LAYOUT.HORIZONTAL) {
-      return { ...style, ...{ minWidth: formItemLabelWidth } }
+      return { ...(style || {}), ...{ minWidth: formItemLabelWidth } }
     }
 
-    return { ...style }
+    return { ...(style || {}) }
   }
 
   const enterStyle = { opacity: 1, marginTop: 3, bottom: -21 }
