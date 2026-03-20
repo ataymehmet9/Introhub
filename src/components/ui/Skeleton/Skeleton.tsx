@@ -36,7 +36,7 @@ const Skeleton = (props: SkeletonProps) => {
       style={{
         width,
         height,
-        ...style,
+        ...(style || {}),
       }}
     />
   )

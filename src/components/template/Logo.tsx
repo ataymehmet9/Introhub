@@ -36,7 +36,7 @@ const Logo = (props: LogoProps) => {
     <div
       className={classNames('logo', className)}
       style={{
-        ...style,
+        ...(style || {}),
         ...{ width: logoWidth },
       }}
     >

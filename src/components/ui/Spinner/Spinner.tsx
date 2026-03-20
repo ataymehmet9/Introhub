@@ -30,7 +30,7 @@ const Spinner = (props: SpinnerProps) => {
   const spinnerStyle = {
     height: size,
     width: size,
-    ...style,
+    ...(style || {}),
   }
 
   const spinnerClass = classNames(

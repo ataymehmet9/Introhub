@@ -39,7 +39,7 @@ const MasonryBase = <T extends ElementType = 'div'>(
               flex: 1,
               flexDirection: 'column',
               gap,
-              ...columnProps?.style,
+              ...(columnProps?.style || {}),
             }}
           >
             {column.map((child, childIndex) => {

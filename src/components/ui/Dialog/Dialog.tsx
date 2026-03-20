@@ -50,7 +50,7 @@ const Dialog = (props: DialogProps) => {
     content: {
       inset: 'unset',
     },
-    ...style,
+    ...(style || {}),
   }
 
   if (width !== undefined) {
