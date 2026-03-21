@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { usePostHog } from '@posthog/react'
-import type { ReactNode} from 'react';
+import type { ReactNode } from 'react'
 import type { CommonProps } from '@/@types/common'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -54,7 +54,14 @@ const SignInForm = (props: SignInFormProps) => {
       setSubmitting(false)
 
       if (error) {
-        setMessage?.(error.message ?? 'An error occurred')
+        // Provide more helpful error message for OAuth users
+        const errorMessage = error.message?.includes(
+          'Invalid email or password',
+        )
+          ? 'Invalid email or password. If you signed up with Google, LinkedIn, or Microsoft, please use the social login buttons below.'
+          : (error.message ?? 'An error occurred')
+
+        setMessage?.(errorMessage)
         // Track failed login
         posthog?.capture('login_failed', {
           email,

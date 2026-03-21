@@ -17,6 +17,10 @@ export const auth = betterAuth({
       trustedProviders: ['linkedin', 'google', 'microsoft'],
     },
   },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day (update session every day)
+  },
   user: {
     additionalFields: {
       company: {
