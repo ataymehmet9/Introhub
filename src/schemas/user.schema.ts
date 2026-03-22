@@ -34,7 +34,10 @@ export type UserSignup = z.infer<typeof userSignupSchema>
 /**
  * User Update Schema - For updating existing users
  */
-export const updateUserSchema = createUpdateSchema(user)
+export const updateUserSchema = createUpdateSchema(user).extend({
+  name: z.string().min(1, { message: 'Name is required' }),
+  email: z.string().email({ message: 'Invalid email address' }),
+})
 
 /**
  * User Public Schema - For public user data (excludes sensitive fields)
