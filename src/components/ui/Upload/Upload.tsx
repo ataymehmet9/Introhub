@@ -11,7 +11,10 @@ import type { ChangeEvent, MouseEvent, ReactNode, Ref } from 'react'
 
 export interface UploadProps extends CommonProps {
   accept?: string
-  beforeUpload?: (file: FileList | null, fileList: Array<File>) => boolean | string
+  beforeUpload?: (
+    file: FileList | null,
+    fileList: Array<File>,
+  ) => boolean | string
   disabled?: boolean
   draggable?: boolean
   fileList?: Array<File>

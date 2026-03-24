@@ -3,7 +3,7 @@ import CarouselContent from './CarouselContent'
 import CarouselItem from './CarouselItem'
 import CarouselPrevious from './CarouselPrevious'
 import CarouselNext from './CarouselNext'
-import type { CarouselProps } from './Carousel';
+import type { CarouselProps } from './Carousel'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { CarouselProps } from './Carousel'

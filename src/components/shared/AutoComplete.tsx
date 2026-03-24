@@ -12,8 +12,8 @@ import {
   useListNavigation,
   useRole,
 } from '@floating-ui/react'
-import type { ChangeEvent, ReactNode} from 'react';
-import type { InputProps } from '@/components/ui/Input';
+import type { ChangeEvent, ReactNode } from 'react'
+import type { InputProps } from '@/components/ui/Input'
 import Input from '@/components/ui/Input'
 
 interface ItemProps {

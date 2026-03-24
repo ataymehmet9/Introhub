@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { eq } from 'drizzle-orm'
 import { protectedProcedure } from '../init'
-import type { TRPCRouterRecord} from '@trpc/server';
+import type { TRPCRouterRecord } from '@trpc/server'
 import { updateUserSchema } from '@/schemas'
 import { user as userDb } from '@/db/schema'
 import { trackServerEvent } from '@/integrations/posthog'

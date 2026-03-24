@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { and, count, desc, eq } from 'drizzle-orm'
 import { protectedProcedure } from '../init'
-import type { TRPCRouterRecord} from '@trpc/server';
+import type { TRPCRouterRecord } from '@trpc/server'
 import {
   createNotificationInputSchema,
   getNotificationsSchema,

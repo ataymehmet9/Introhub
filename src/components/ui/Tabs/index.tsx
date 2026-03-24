@@ -2,7 +2,7 @@ import _Tabs from './Tabs'
 import TabList from './TabList'
 import TabNav from './TabNav'
 import TabContent from './TabContent'
-import type { TabsProps } from './Tabs';
+import type { TabsProps } from './Tabs'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { TabsProps } from './Tabs'

@@ -26,7 +26,6 @@ const OTPInput = ({
   placeholder,
   invalid = false,
 }: OTPInputProps) => {
-   
   const [_, setActiveInput] = useState<number>(0)
   const inputRefs = useRef<Array<HTMLInputElement | null>>([])
 

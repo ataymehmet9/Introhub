@@ -47,7 +47,7 @@ const Steps = (props: StepsProps) => {
         ...item.props,
       }
 
-      if (status === ERROR && index === (current) - 1) {
+      if (status === ERROR && index === current - 1) {
         itemProps.className = classNames('steps-item-error')
       }
 
@@ -58,7 +58,7 @@ const Steps = (props: StepsProps) => {
             itemProps.className,
             'steps-item-active',
           )
-        } else if (index < (current)) {
+        } else if (index < current) {
           itemProps.status = COMPLETE as StepStatus
         }
       }

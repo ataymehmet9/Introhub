@@ -95,11 +95,7 @@ const Alert = (props: AlertProps) => {
 
   const [display, setDisplay] = useState('show')
 
-  const { clear } = useTimeout(
-    onClose as () => void,
-    duration,
-    (duration) > 0,
-  )
+  const { clear } = useTimeout(onClose as () => void, duration, duration > 0)
 
   const handleClose = (e: MouseEvent<HTMLDivElement>) => {
     setDisplay('hiding')

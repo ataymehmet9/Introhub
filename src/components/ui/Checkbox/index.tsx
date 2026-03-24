@@ -1,6 +1,6 @@
 import _Checkbox from './Checkbox'
 import CheckboxGroup from './Group'
-import type { CheckboxProps } from './Checkbox';
+import type { CheckboxProps } from './Checkbox'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { CheckboxProps } from './Checkbox'

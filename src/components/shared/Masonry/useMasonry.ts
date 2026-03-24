@@ -1,14 +1,17 @@
 import { Children, isValidElement, useMemo } from 'react'
 
 import useColumnsCount from './useCoulmnsCount'
-import type { ReactNode} from 'react';
+import type { ReactNode } from 'react'
 import type { Columns } from './types'
 
 const createEmptyColumns = (count: number): Array<[]> => {
   return Array.from({ length: count }, () => [])
 }
 
-const useMasonry = (children: ReactNode, columns?: Columns): Array<Array<ReactNode>> => {
+const useMasonry = (
+  children: ReactNode,
+  columns?: Columns,
+): Array<Array<ReactNode>> => {
   const noOfColumns = useColumnsCount(columns)
 
   const columnsChildren = useMemo(() => {

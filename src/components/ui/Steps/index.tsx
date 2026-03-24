@@ -1,6 +1,6 @@
 import _Steps from './Steps'
 import StepItem from './StepItem'
-import type { StepsProps } from './Steps';
+import type { StepsProps } from './Steps'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { StepsProps } from './Steps'

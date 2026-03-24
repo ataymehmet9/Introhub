@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { LegacyRef} from 'react';
+import type { LegacyRef } from 'react'
 
 type Options = {
   offset?: string
@@ -35,7 +35,9 @@ function useInfiniteScroll(options?: Options) {
       observe.disconnect()
     }
 
-    async function handler([{ isIntersecting }]: Array<IntersectionObserverEntry>) {
+    async function handler([
+      { isIntersecting },
+    ]: Array<IntersectionObserverEntry>) {
       if (
         isIntersecting &&
         !isLoading &&

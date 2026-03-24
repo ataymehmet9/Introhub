@@ -1,5 +1,5 @@
 import { NumericFormat } from 'react-number-format'
-import type { NumericFormatProps } from 'react-number-format';
+import type { NumericFormatProps } from 'react-number-format'
 import type { ComponentType, ReactNode } from 'react'
 import type { InputProps } from '@/components/ui'
 import Input from '@/components/ui/Input'

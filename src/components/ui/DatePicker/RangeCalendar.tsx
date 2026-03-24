@@ -104,7 +104,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
       range={value as [Date, Date]}
       dateViewCount={dateViewCount}
       paginateBy={paginateBy || dateViewCount}
-      hideOutOfMonthDates={(dateViewCount) > 1}
+      hideOutOfMonthDates={dateViewCount > 1}
       isDateInRange={shouldHighlightDate}
       isDateFirstInRange={isPickedDateFirstInRange}
       isDateLastInRange={isPickedDateLastInRange}

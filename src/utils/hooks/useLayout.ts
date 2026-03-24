@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react'
 import type { ReactNode } from 'react'
-import type { PageContainerBody,
+import type {
+  PageContainerBody,
   PageContainerFooter,
   PageContainerHeader,
-  PageContainerProps } from '@/components/template/PageContainer'
+  PageContainerProps,
+} from '@/components/template/PageContainer'
 import type { LayoutType } from '@/@types/theme'
 import { LAYOUT_COLLAPSIBLE_SIDE } from '@/constants/theme.constant'
 

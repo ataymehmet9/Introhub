@@ -5,12 +5,9 @@ import { TbPlus } from 'react-icons/tb'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFileUpload } from '../-hooks/useFileUpload'
 import { useUser } from '../-hooks/useUser'
-import type {
-  UpdateUser as ProfileSchema} from '@/schemas/user.schema';
+import type { UpdateUser as ProfileSchema } from '@/schemas/user.schema'
 import { useSessionUser } from '@/store/authStore'
-import {
-  updateUserSchema as validationSchema
-} from '@/schemas/user.schema'
+import { updateUserSchema as validationSchema } from '@/schemas/user.schema'
 import { Avatar, Button, Form, FormItem, Input, Upload } from '@/components/ui'
 import { generateFileCloudUrl } from '@/utils/fileUtils'
 

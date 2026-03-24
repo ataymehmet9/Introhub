@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CommonProps } from '@/@types/common'
-import type { UserEmail } from '@/schemas';
+import type { UserEmail } from '@/schemas'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { Form, FormItem } from '@/components/ui/Form'

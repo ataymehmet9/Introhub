@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import useMergedRef from '../hooks/useMergeRef'
 import type { CommonProps, TypeAttributes } from '../@types/common'
@@ -36,7 +36,7 @@ const Avatar = (props: AvatarProps) => {
 
   const avatarMergeRef = useMergedRef(ref, avatarNode)
 
-  const innerScale = () => {
+  useLayoutEffect(() => {
     if (!avatarChildren.current || !avatarNode.current) {
       return
     }
@@ -45,16 +45,17 @@ const Avatar = (props: AvatarProps) => {
     if (avatarChildrenWidth === 0 || avatarNodeWidth === 0) {
       return
     }
-    setScale(
+
+    const newScale =
       avatarNodeWidth - 8 < avatarChildrenWidth
         ? (avatarNodeWidth - 8) / avatarChildrenWidth
-        : 1,
-    )
-  }
+        : 1
 
-  useEffect(() => {
-    innerScale()
-  }, [scale, children])
+    // Defer state update to avoid cascading renders
+    queueMicrotask(() => {
+      setScale(newScale)
+    })
+  }, [children])
 
   const sizeStyle =
     typeof size === 'number'

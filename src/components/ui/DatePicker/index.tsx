@@ -1,7 +1,7 @@
 import _DatePicker from './DatePicker'
 import DatePickerRange from './DatePickerRange'
 import DateTimepicker from './DateTimepicker'
-import type { DatePickerProps } from './DatePicker';
+import type { DatePickerProps } from './DatePicker'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { DatePickerProps } from './DatePicker'

@@ -18,9 +18,9 @@ const MenuItem = (props: MenuItemProps) => {
               {() => (
                 <BaseMenuItem
                   menuItemHeight={context.menuItemHeight}
-                  isActive={(context.defaultActiveKeys as Array<string>).includes(
-                    eventKey as string,
-                  )}
+                  isActive={(
+                    context.defaultActiveKeys as Array<string>
+                  ).includes(eventKey as string)}
                   eventKey={eventKey}
                   onSelect={context.onSelect}
                   {...rest}

@@ -6,9 +6,7 @@ import {
   HiXCircle,
 } from 'react-icons/hi2'
 import type { InsertContact } from '@/schemas'
-import type {
-  ContactFormHandle,
-} from '@/components/shared/common/ContactForm';
+import type { ContactFormHandle } from '@/components/shared/common/ContactForm'
 import { Alert, Button, Card, Dialog, Progress, Tabs } from '@/components/ui'
 import ContactForm from '@/components/shared/common/ContactForm'
 import { validateCSVFile } from '@/utils/fileUtils'

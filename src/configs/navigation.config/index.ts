@@ -1,7 +1,6 @@
 import type { NavigationTree } from '@/@types/navigation'
 import { NAV_ITEM_TYPE_ITEM } from '@/constants/navigation.constant'
 
-
 const navigationConfig: Array<NavigationTree> = [
   {
     key: 'dashboard',

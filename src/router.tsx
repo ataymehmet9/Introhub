@@ -5,7 +5,6 @@ import * as TanstackQuery from './integrations/tanstack-query/root-provider'
 import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
 import { NotFound } from './components/NotFound'
 
-
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 

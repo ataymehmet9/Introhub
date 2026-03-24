@@ -18,7 +18,6 @@ import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
 // Import CSS directly so Vite can inline it during SSR to prevent FOUC
 import '../index.css'
 
-
 import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
 import { NotFound } from '@/components/NotFound'
 

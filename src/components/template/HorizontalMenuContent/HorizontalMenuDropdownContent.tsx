@@ -242,7 +242,10 @@ const DefaultLayout = ({
   routeKey,
   userAuthority,
 }: LayoutProps) => {
-  const renderNavigation = (navTree: Array<NavigationTree>, cascade: number) => {
+  const renderNavigation = (
+    navTree: Array<NavigationTree>,
+    cascade: number,
+  ) => {
     const nextCascade = cascade + 1
 
     return (

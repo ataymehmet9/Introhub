@@ -1,6 +1,11 @@
 // Intro-Hub Type Definitions
 
-import type { Contact, InsertContact, IntroductionRequest, User } from '@/schemas'
+import type {
+  Contact,
+  InsertContact,
+  IntroductionRequest,
+  User,
+} from '@/schemas'
 
 export interface AuthTokens {
   access: string

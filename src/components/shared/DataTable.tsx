@@ -12,7 +12,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable
+  useReactTable,
 } from '@tanstack/react-table'
 import TableRowSkeleton from './loaders/TableRowSkeleton'
 import Loading from './Loading'
@@ -20,7 +20,8 @@ import type {
   CellContext,
   ColumnDef,
   ColumnSort,
-  Row} from '@tanstack/react-table';
+  Row,
+} from '@tanstack/react-table'
 import type { TableProps } from '@/components/ui/Table'
 import type { SkeletonProps } from '@/components/ui/Skeleton'
 import type { ChangeEvent, ReactNode, Ref } from 'react'
@@ -41,7 +42,10 @@ type DataTableProps<T> = {
   noData?: boolean
   instanceId?: string
   onCheckBoxChange?: (checked: boolean, row: T) => void
-  onIndeterminateCheckBoxChange?: (checked: boolean, rows: Array<Row<T>>) => void
+  onIndeterminateCheckBoxChange?: (
+    checked: boolean,
+    rows: Array<Row<T>>,
+  ) => void
   onPaginationChange?: (page: number) => void
   onSelectChange?: (num: number) => void
   onSort?: (sort: OnSortParam) => void
@@ -225,8 +229,10 @@ function DataTable<T>(props: DataTableProps<T>) {
 
   const table = useReactTable({
     data,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    columns: finalColumns as Array<ColumnDef<unknown | object | Array<any>, any>>,
+     
+    columns: finalColumns as Array<
+      ColumnDef<unknown | object | Array<any>, any>
+    >,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { and, desc, eq, ilike, ne, or } from 'drizzle-orm'
 import { protectedProcedure } from '../init'
-import type { TRPCRouterRecord} from '@trpc/server';
+import type { TRPCRouterRecord } from '@trpc/server'
 import { globalSearchInputSchema } from '@/schemas'
 import { contacts, introductionRequests, user } from '@/db/schema'
 

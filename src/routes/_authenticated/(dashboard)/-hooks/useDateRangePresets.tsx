@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useDashboardStore } from '../-store/dashboardStore'
-import type { DateRangePreset } from '../-store/dashboardStore';
+import type { DateRangePreset } from '../-store/dashboardStore'
 
 export interface DateRangePresetOption {
   value: DateRangePreset

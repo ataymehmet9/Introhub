@@ -1,6 +1,6 @@
 import _TimeInput from './TimeInput'
 import TimeInputRange from './TimeInputRange'
-import type { TimeInputProps } from './TimeInput';
+import type { TimeInputProps } from './TimeInput'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { TimeInputProps } from './TimeInput'

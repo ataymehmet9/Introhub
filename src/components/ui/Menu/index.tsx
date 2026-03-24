@@ -2,7 +2,7 @@ import _Menu from './Menu'
 import MenuItem from './MenuItem'
 import MenuCollapse from './MenuCollapse'
 import MenuGroup from './MenuGroup'
-import type { MenuProps } from './Menu';
+import type { MenuProps } from './Menu'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { MenuProps } from './Menu'

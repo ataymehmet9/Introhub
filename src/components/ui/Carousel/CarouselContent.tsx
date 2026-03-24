@@ -1,8 +1,8 @@
-import { Children,  useEffect, useRef } from 'react'
+import { Children, useEffect, useRef } from 'react'
 import classNames from '../utils/classNames'
 import { useConfig } from '../ConfigProvider'
 import { useCarousel } from './context'
-import type {Ref} from 'react';
+import type { Ref } from 'react'
 import type { CommonProps } from '../@types/common'
 
 export interface CarouselContentProps extends CommonProps {

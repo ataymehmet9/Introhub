@@ -7,7 +7,9 @@ export interface CalenderProps<MultipleSelection extends boolean = false>
   extends CommonProps, CalendarSharedProps {
   multipleSelection?: MultipleSelection
   value?: MultipleSelection extends true ? Array<Date> : Date | null
-  onChange?: (value: MultipleSelection extends true ? Array<Date> : Date | null) => void
+  onChange?: (
+    value: MultipleSelection extends true ? Array<Date> : Date | null,
+  ) => void
 }
 
 const Calendar = <MultipleSelection extends boolean = false>(
@@ -17,7 +19,9 @@ const Calendar = <MultipleSelection extends boolean = false>(
 
   const handleChange = (date: Date | Array<Date>) => {
     if (!multipleSelection) {
-      return onChange?.(date as MultipleSelection extends true ? Array<Date> : Date)
+      return onChange?.(
+        date as MultipleSelection extends true ? Array<Date> : Date,
+      )
     }
 
     const isSelected = (value as Array<Date>)?.some((val) =>

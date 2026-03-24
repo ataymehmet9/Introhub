@@ -1,6 +1,6 @@
 import _Slider from './Slider'
 import RangeSlider from './RangeSlider'
-import type { SliderProps } from './Slider';
+import type { SliderProps } from './Slider'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { SliderProps } from './Slider'

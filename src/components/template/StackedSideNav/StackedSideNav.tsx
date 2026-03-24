@@ -3,7 +3,7 @@ import { useLocation } from '@tanstack/react-router'
 import isEmpty from 'lodash/isEmpty'
 import StackedSideNavMini from './StackedSideNavMini'
 import StackedSideNavSecondary from './StackedSideNavSecondary'
-import type { SelectedMenuItem } from './StackedSideNavMini';
+import type { SelectedMenuItem } from './StackedSideNavMini'
 import type { TraslationFn } from '@/@types/common'
 import {
   DIR_LTR,

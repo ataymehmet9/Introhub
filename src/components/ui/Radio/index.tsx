@@ -1,6 +1,6 @@
 import _Radio from './Radio'
 import Group from './Group'
-import type { RadioProps } from './Radio';
+import type { RadioProps } from './Radio'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { RadioProps } from './Radio'

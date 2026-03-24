@@ -1,6 +1,6 @@
 import _Segment from './Segment'
 import SegmentItem from './SegmentItem'
-import type { SegmentProps } from './Segment';
+import type { SegmentProps } from './Segment'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { SegmentProps } from './Segment'

@@ -47,7 +47,9 @@ const Segment = (props: SegmentProps) => {
 
     if (selectionType === 'multiple') {
       setValue((prevValue = []) => {
-        return (prevValue as Array<string>).filter((value) => value !== itemValue)
+        return (prevValue as Array<string>).filter(
+          (value) => value !== itemValue,
+        )
       })
     }
   }

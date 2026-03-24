@@ -1,6 +1,6 @@
 import _Timeline from './Timeline'
 import TimeLineItem from './TimeLineItem'
-import type { TimelineProps } from './Timeline';
+import type { TimelineProps } from './Timeline'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { TimelineProps } from './Timeline'

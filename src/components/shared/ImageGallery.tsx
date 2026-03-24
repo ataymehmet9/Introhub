@@ -1,5 +1,5 @@
 import Lightbox from 'yet-another-react-lightbox'
-import type { LightboxProps } from 'yet-another-react-lightbox';
+import type { LightboxProps } from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 import type { ReactNode } from 'react'
 

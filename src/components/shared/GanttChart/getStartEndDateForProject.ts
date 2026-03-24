@@ -1,6 +1,9 @@
 import type { ExtendedTask } from './GanttChart'
 
-function getStartEndDateForProject(tasks: Array<ExtendedTask>, projectId: string) {
+function getStartEndDateForProject(
+  tasks: Array<ExtendedTask>,
+  projectId: string,
+) {
   const projectTasks = tasks.filter((t) => t.project === projectId)
   let start = projectTasks[0].start
   let end = projectTasks[0].end

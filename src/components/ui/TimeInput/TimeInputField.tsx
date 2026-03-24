@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import useMergedRef from '../hooks/useMergeRef'
 import { clamp } from '../utils/clamp'
 import { padTime } from './utils'
-import type { createTimeHandler } from './utils';
+import type { createTimeHandler } from './utils'
 import type { CommonProps } from '../@types/common'
 import type {
   ChangeEvent,

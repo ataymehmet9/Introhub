@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PasswordInput } from '../shared'
 import type { CommonProps } from '@/@types/common'
-import type { UserResetPassword } from '@/schemas';
+import type { UserResetPassword } from '@/schemas'
 import Button from '@/components/ui/Button'
 import { Form, FormItem } from '@/components/ui/Form'
 import { userResetPasswordSchema } from '@/schemas'

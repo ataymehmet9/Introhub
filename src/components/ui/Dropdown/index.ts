@@ -2,7 +2,7 @@ import _Dropdown from './Dropdown'
 import DropdownItem from './DropdownItem'
 import DropdownSub from './DropdownSub'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import type { DropdownProps , DropdownRef } from './Dropdown'
+import type { DropdownProps, DropdownRef } from './Dropdown'
 
 export type { DropdownProps, DropdownRef } from './Dropdown'
 export type { DropdownItemProps } from './DropdownItem'

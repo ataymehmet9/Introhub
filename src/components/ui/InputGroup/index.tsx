@@ -1,6 +1,6 @@
 import _InputGroup from './InputGroup'
 import Addon from './Addon'
-import type { InputGroupProps } from './InputGroup';
+import type { InputGroupProps } from './InputGroup'
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 export type { InputGroupProps } from './InputGroup'

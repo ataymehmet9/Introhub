@@ -1,4 +1,4 @@
-import { TRPCError, initTRPC  } from '@trpc/server'
+import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { posthogMiddleware } from './middleware/posthog'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'

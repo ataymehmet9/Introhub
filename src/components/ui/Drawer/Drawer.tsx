@@ -119,9 +119,7 @@ const Drawer = (props: DrawerProps) => {
         style={contentStyle}
         initial={motionStyle}
         animate={{
-          [placement]: isOpen
-            ? 0
-            : motionStyle[placement],
+          [placement]: isOpen ? 0 : motionStyle[placement],
         }}
       >
         {title || closable ? (

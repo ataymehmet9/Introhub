@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { PiGearDuotone } from 'react-icons/pi'
 import SidePanelContent from './SidePanelContent'
-import type { SidePanelContentProps } from './SidePanelContent';
+import type { SidePanelContentProps } from './SidePanelContent'
 import type { CommonProps } from '@/@types/common'
 import Drawer from '@/components/ui/Drawer'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'

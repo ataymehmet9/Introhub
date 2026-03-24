@@ -1,7 +1,7 @@
 import { Suspense, lazy, useState } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import classNames from 'classnames'
-import type { WithHeaderItemProps } from '@/utils/hoc/withHeaderItem';
+import type { WithHeaderItemProps } from '@/utils/hoc/withHeaderItem'
 import Drawer from '@/components/ui/Drawer'
 import NavToggle from '@/components/shared/NavToggle'
 import { DIR_RTL } from '@/constants/theme.constant'

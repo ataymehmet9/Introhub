@@ -135,7 +135,11 @@ const DateTable = (props: DateTableProps) => {
           </Header>
           <Month
             month={monthDate}
-            daysRefs={(daysRefs.current as Array<Array<Array<HTMLButtonElement>>>)[index]}
+            daysRefs={
+              (daysRefs.current as Array<Array<Array<HTMLButtonElement>>>)[
+                index
+              ]
+            }
             minDate={minDate}
             maxDate={maxDate}
             className={className}

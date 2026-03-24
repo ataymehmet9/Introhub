@@ -50,7 +50,8 @@ export function useContact(options: UseContactOptions = {}) {
       await queryClient.cancelQueries({ queryKey })
 
       // Snapshot the previous value
-      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
+      const previousContacts =
+        queryClient.getQueryData<Array<Contact>>(queryKey)
 
       // Optimistically update to the new value
       queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
@@ -72,7 +73,10 @@ export function useContact(options: UseContactOptions = {}) {
     onError: (error: Error, _newContact, context) => {
       // Rollback on error
       if (context?.previousContacts) {
-        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(
+          queryKey,
+          context.previousContacts,
+        )
       }
       toast.push(
         <Notification type="danger" title="Error">
@@ -101,7 +105,8 @@ export function useContact(options: UseContactOptions = {}) {
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey })
 
-      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
+      const previousContacts =
+        queryClient.getQueryData<Array<Contact>>(queryKey)
 
       queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
@@ -116,7 +121,10 @@ export function useContact(options: UseContactOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousContacts) {
-        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(
+          queryKey,
+          context.previousContacts,
+        )
       }
       toast.push(
         <Notification type="danger" title="Error">
@@ -143,7 +151,8 @@ export function useContact(options: UseContactOptions = {}) {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey })
 
-      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
+      const previousContacts =
+        queryClient.getQueryData<Array<Contact>>(queryKey)
 
       queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
@@ -154,7 +163,10 @@ export function useContact(options: UseContactOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousContacts) {
-        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(
+          queryKey,
+          context.previousContacts,
+        )
       }
       toast.push(
         <Notification type="danger" title="Error">
@@ -182,7 +194,8 @@ export function useContact(options: UseContactOptions = {}) {
     onMutate: async (ids) => {
       await queryClient.cancelQueries({ queryKey })
 
-      const previousContacts = queryClient.getQueryData<Array<Contact>>(queryKey)
+      const previousContacts =
+        queryClient.getQueryData<Array<Contact>>(queryKey)
 
       queryClient.setQueryData<Array<Contact>>(queryKey, (old) => {
         if (!old || !Array.isArray(old)) return []
@@ -193,7 +206,10 @@ export function useContact(options: UseContactOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousContacts) {
-        queryClient.setQueryData<Array<Contact>>(queryKey, context.previousContacts)
+        queryClient.setQueryData<Array<Contact>>(
+          queryKey,
+          context.previousContacts,
+        )
       }
       toast.push(
         <Notification type="danger" title="Error">

@@ -20,7 +20,6 @@ const getRouteInfo = (
   for (const p in navTree) {
     if (
       p !== 'icon' &&
-       
       navTree.hasOwnProperty(p) &&
       typeof (navTree as any)[p] === 'object'
     ) {
@@ -47,7 +46,10 @@ const getRouteInfo = (
   return activedRoute
 }
 
-const findNestedRoute = (navTree: Array<NavigationTree>, key: string): boolean => {
+const findNestedRoute = (
+  navTree: Array<NavigationTree>,
+  key: string,
+): boolean => {
   const found = navTree.find((node) => {
     return node.key === key
   })

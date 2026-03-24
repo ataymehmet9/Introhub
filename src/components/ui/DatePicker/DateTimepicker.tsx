@@ -99,7 +99,6 @@ const DateTimepicker = (props: DateTimepickerProps) => {
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-   
   const [_, setLastValidValue] = useState(defaultValue ?? null)
   const [_value, setValue] = useControllableState({
     prop: value,

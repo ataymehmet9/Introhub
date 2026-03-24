@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePostHog } from '@posthog/react'
 import type { CommonProps } from '@/@types/common'
-import type { UserSignup } from '@/schemas';
+import type { UserSignup } from '@/schemas'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { Form, FormItem } from '@/components/ui/Form'
