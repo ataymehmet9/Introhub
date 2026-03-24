@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { and, count, eq, or } from 'drizzle-orm'
+import { and, count, desc, eq, or } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 import { protectedProcedure } from '../init'
-import type { TRPCRouterRecord} from '@trpc/server';
+import type { TRPCRouterRecord } from '@trpc/server'
 import {
   insertIntroductionRequestSchema,
   updateRequestStatusSchema,
@@ -212,11 +212,15 @@ export const introductionRequestRouter = {
       z.object({
         page: z.number().min(1).default(1),
         pageSize: z.number().min(1).max(100).default(10),
+        filterType: z
+          .enum(['sent', 'received', 'all'])
+          .optional()
+          .default('all'),
       }),
     )
     .query(async ({ input, ctx }) => {
       const { user: currentUser, db } = ctx
-      const { page, pageSize } = input
+      const { page, pageSize, filterType } = input
 
       if (!currentUser) {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
@@ -226,14 +230,28 @@ export const introductionRequestRouter = {
       const requesterUser = alias(user, 'requester_user')
       const approverUser = alias(user, 'approver_user')
 
-      // Build the where clause
-      const whereClause = and(
-        or(
+      // Build the where clause based on filter type
+      let whereClause
+      if (filterType === 'sent') {
+        whereClause = and(
           eq(introductionRequests.requesterId, currentUser.id),
+          eq(introductionRequests.deleted, false),
+        )
+      } else if (filterType === 'received') {
+        whereClause = and(
           eq(introductionRequests.approverId, currentUser.id),
-        ),
-        eq(introductionRequests.deleted, false),
-      )
+          eq(introductionRequests.deleted, false),
+        )
+      } else {
+        // 'all' - show both sent and received
+        whereClause = and(
+          or(
+            eq(introductionRequests.requesterId, currentUser.id),
+            eq(introductionRequests.approverId, currentUser.id),
+          ),
+          eq(introductionRequests.deleted, false),
+        )
+      }
 
       // Get total count
       const [{ total }] = await db
@@ -241,7 +259,7 @@ export const introductionRequestRouter = {
         .from(introductionRequests)
         .where(whereClause)
 
-      // Get paginated requests
+      // Get paginated requests - ordered by newest first
       const requests = await db
         .select({
           id: introductionRequests.id,
@@ -284,7 +302,7 @@ export const introductionRequestRouter = {
           eq(introductionRequests.targetContactId, contacts.id),
         )
         .where(whereClause)
-        .orderBy(introductionRequests.createdAt)
+        .orderBy(desc(introductionRequests.createdAt))
         .limit(pageSize)
         .offset((page - 1) * pageSize)
 

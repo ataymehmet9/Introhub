@@ -37,11 +37,16 @@ export function useRequests(options: UseRequestsOptions = {}) {
   const queryKey = trpc.introductionRequests.listByUser.queryKey({
     page,
     pageSize,
+    filterType,
   })
 
-  // Fetch requests with pagination
+  // Fetch requests with pagination - now with server-side filtering
   const { data, isFetching: isLoading } = useQuery({
-    ...trpc.introductionRequests.listByUser.queryOptions({ page, pageSize }),
+    ...trpc.introductionRequests.listByUser.queryOptions({
+      page,
+      pageSize,
+      filterType,
+    }),
     enabled,
   })
 
@@ -205,25 +210,10 @@ export function useRequests(options: UseRequestsOptions = {}) {
     },
   })
 
-  const allRequests = data?.data ?? []
+  // Server now handles filtering, so we can use the data directly
+  const requests = data?.data ?? []
   const pagination = data?.pagination
-
-  // Filter requests based on filterType (client-side filtering for tab switching)
-  const requests = allRequests.filter((request) => {
-    if (filterType === 'all') return true
-    if (!currentUserId) return true
-
-    if (filterType === 'sent') {
-      return request.requesterId === currentUserId
-    } else if (filterType === 'received') {
-      return request.approverId === currentUserId
-    }
-
-    return true
-  })
-
-  // Use server-provided total, or fallback to filtered count
-  const requestsTotal = pagination?.total ?? requests.length
+  const requestsTotal = pagination?.total ?? 0
 
   return {
     requests,
