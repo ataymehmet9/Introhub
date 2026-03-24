@@ -48,6 +48,9 @@ export function useRequests(options: UseRequestsOptions = {}) {
       filterType,
     }),
     enabled,
+    refetchOnWindowFocus: true, // Refetch when user returns to the page
+    staleTime: 1000 * 30, // Cache for 30 seconds - balance between freshness and performance
+    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes when not in use
   })
 
   // Accept request mutation

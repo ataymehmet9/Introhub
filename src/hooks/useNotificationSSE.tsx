@@ -59,6 +59,10 @@ export function useNotificationSSE() {
   })
   const unreadCountQueryKey = trpc.notifications.getUnreadCount.queryKey()
 
+  // Introduction requests query key - for invalidating when new requests arrive
+  const introductionRequestsQueryKey =
+    trpc.introductionRequests.listByUser.queryKey()
+
   // ─── Cache update helpers ────────────────────────────────────────────────
 
   const handleNotificationCreated = useCallback(
@@ -100,8 +104,22 @@ export function useNotificationSSE() {
           },
         )
       }
+
+      // Invalidate introduction requests cache when a new introduction request notification arrives
+      // This ensures the requests page shows new requests immediately
+      if (notification.type === 'introduction_request') {
+        queryClient.invalidateQueries({
+          queryKey: introductionRequestsQueryKey,
+          refetchType: 'active', // Only refetch if the query is currently being used
+        })
+      }
     },
-    [queryClient, notificationsQueryKey, unreadCountQueryKey],
+    [
+      queryClient,
+      notificationsQueryKey,
+      unreadCountQueryKey,
+      introductionRequestsQueryKey,
+    ],
   )
 
   const handleNotificationRead = useCallback(
@@ -124,8 +142,28 @@ export function useNotificationSSE() {
           return { count: newCount, hasUnread: newCount > 0 }
         },
       )
+
+      // Invalidate introduction requests when approval/decline notifications are read
+      // This ensures the requests list reflects the updated status
+      const notification = queryClient
+        .getQueryData<any>(notificationsQueryKey)
+        ?.data?.find((n: NotificationWithMetadata) => n.id === notificationId)
+      if (
+        notification?.type === 'introduction_approved' ||
+        notification?.type === 'introduction_declined'
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: introductionRequestsQueryKey,
+          refetchType: 'active',
+        })
+      }
     },
-    [queryClient, notificationsQueryKey, unreadCountQueryKey],
+    [
+      queryClient,
+      notificationsQueryKey,
+      unreadCountQueryKey,
+      introductionRequestsQueryKey,
+    ],
   )
 
   const handleNotificationDeleted = useCallback(

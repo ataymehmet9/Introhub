@@ -4,7 +4,9 @@
 
 In production, a user with contacts received an introduction request from another user. The email notification was sent successfully, but when the recipient logged in and navigated to the requests page, no received requests were displayed despite the data existing in the database.
 
-## Root Cause Analysis
+## Issues Identified
+
+### Issue 1: Client-Side Filtering After Pagination (Initial Issue)
 
 The issue was caused by a combination of three problems in the data retrieval implementation:
 
@@ -169,6 +171,112 @@ LIMIT 10 OFFSET 0;
 - `src/routes/_authenticated/(requests)/requests.tsx` - Requests page component
 - `src/db/schema.ts` - Database schema definition
 
+---
+
+### Issue 2: Stale Cache Not Invalidated (Follow-up Issue)
+
+After fixing the pagination issue, a second problem was discovered: users on the introduction requests screen were not seeing new requests until they clicked the notification icon in the header.
+
+#### Root Cause
+
+1. **Stale Cache**: The requests query had a `staleTime: 1000 * 60` (1 minute) from the global TanStack Query config
+2. **No Cache Invalidation**: When a new introduction request notification arrived via SSE, only the notification cache was updated - the introduction requests cache was NOT invalidated
+3. **Window Focus Trigger**: Clicking the notification icon triggered a window focus event or navigation, which caused `refetchOnWindowFocus: true` to refetch the data
+
+#### Solution Implemented
+
+**Changes to `src/hooks/useNotificationSSE.tsx`:**
+
+1. **Added introduction requests query key**:
+
+```typescript
+const introductionRequestsQueryKey =
+  trpc.introductionRequests.listByUser.queryKey()
+```
+
+2. **Invalidate cache when new introduction request notification arrives**:
+
+```typescript
+// In handleNotificationCreated callback
+if (notification.type === 'introduction_request') {
+  queryClient.invalidateQueries({
+    queryKey: introductionRequestsQueryKey,
+    refetchType: 'active', // Only refetch if the query is currently being used
+  })
+}
+```
+
+3. **Invalidate cache when approval/decline notifications are read**:
+
+```typescript
+// In handleNotificationRead callback
+if (
+  notification?.type === 'introduction_approved' ||
+  notification?.type === 'introduction_declined'
+) {
+  queryClient.invalidateQueries({
+    queryKey: introductionRequestsQueryKey,
+    refetchType: 'active',
+  })
+}
+```
+
+**Changes to `src/routes/_authenticated/(requests)/-hooks/useRequests.tsx`:**
+
+1. **Added balanced caching strategy**:
+
+```typescript
+const { data, isFetching: isLoading } = useQuery({
+  ...trpc.introductionRequests.listByUser.queryOptions({
+    page,
+    pageSize,
+    filterType,
+  }),
+  enabled,
+  refetchOnWindowFocus: true, // Refetch when user returns to the page
+  staleTime: 1000 * 30, // Cache for 30 seconds - balance between freshness and performance
+  gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes when not in use
+})
+```
+
+#### How It Works Now
+
+1. **Real-time Updates**: When a new introduction request notification arrives via SSE:
+   - Notification cache is updated (existing behavior)
+   - Introduction requests cache is invalidated (new behavior)
+   - If user is on the requests page, data refetches automatically
+
+2. **Window Focus**: When user returns to the requests page:
+   - Data is considered stale after 30 seconds (`staleTime: 1000 * 30`)
+   - Automatic refetch occurs if data is stale (`refetchOnWindowFocus: true`)
+   - Cached data shown immediately while refetching in background
+
+3. **Status Updates**: When approval/decline notifications are read:
+   - Introduction requests cache is invalidated
+   - Ensures the requests list reflects updated statuses
+
+#### Benefits
+
+- **Immediate Updates**: New requests appear instantly via SSE cache invalidation
+- **Performance**: 30-second cache reduces unnecessary API calls
+- **Fresh Data**: Window focus refetch ensures data is current when user returns
+- **Efficient**: Only refetches active queries (not background cached data)
+- **Reliable**: Multiple fallback mechanisms ensure data freshness
+- **Better UX**: Cached data shown immediately while refetching in background
+
+#### Performance Characteristics
+
+- **Cache Duration**: 30 seconds (good balance for request data that changes infrequently)
+- **Garbage Collection**: 5 minutes (keeps data available for quick navigation)
+- **Refetch Triggers**:
+  1. SSE notification arrives → immediate invalidation and refetch
+  2. Window focus after 30 seconds → background refetch
+  3. Manual navigation → uses cache if fresh, refetches if stale
+- **Network Requests**: Minimized through intelligent caching while maintaining data freshness
+
+---
+
 ## Date Fixed
 
-2026-03-24
+2026-03-24 (Initial pagination fix)
+2026-03-24 (Cache invalidation fix)
