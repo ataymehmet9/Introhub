@@ -43,8 +43,8 @@ const StackedSideNav = ({
 
   const { larger } = useResponsive()
 
-  const navColor = (navType: string, mode: string) => {
-    return `${navType}-${mode}`
+  const navColor = (navType: string, navMode: string) => {
+    return `${navType}-${navMode}`
   }
 
   const handleChange = (selected: SelectedMenuItem) => {
