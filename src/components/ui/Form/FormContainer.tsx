@@ -25,6 +25,7 @@ const FormContainer = (props: FormContainerProps) => {
   const contextValue = {
     labelWidth,
     layout,
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     size: size || controlSize,
   }
 

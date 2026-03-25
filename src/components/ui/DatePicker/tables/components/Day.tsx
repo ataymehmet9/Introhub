@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import classNames from 'classnames'
 import type { ComponentPropsWithRef, MouseEvent, ReactNode, Ref } from 'react'
 import type { CommonProps } from '../../../@types/common'

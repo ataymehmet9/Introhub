@@ -13,6 +13,7 @@ export interface MenuItemProps extends CommonProps {
   menuItemHeight?: string | number
   onSelect?: (eventKey: string, e: MouseEvent) => void
   ref?: Ref<HTMLElement>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 

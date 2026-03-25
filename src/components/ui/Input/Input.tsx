@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import isNil from 'lodash/isNil'
@@ -120,6 +121,7 @@ const Input = (props: InputProps) => {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getAffixSize()
   }, [prefix, suffix])
 

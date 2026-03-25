@@ -70,6 +70,7 @@ const Drawer = (props: DrawerProps) => {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (placement === 'top' || placement === 'bottom') {
       return {
         dimensionClass: 'horizontal',

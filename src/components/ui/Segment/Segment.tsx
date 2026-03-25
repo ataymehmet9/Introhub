@@ -67,6 +67,7 @@ const Segment = (props: SegmentProps) => {
       return []
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (selectionType === 'multiple') {
       return value ? value : []
     }

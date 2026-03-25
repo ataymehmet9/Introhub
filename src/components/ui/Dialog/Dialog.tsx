@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import Modal from 'react-modal'
 import classNames from 'classnames'
 import { motion } from 'framer-motion'

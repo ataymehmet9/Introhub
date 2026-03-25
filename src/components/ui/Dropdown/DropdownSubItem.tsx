@@ -48,6 +48,7 @@ const DropdownSubMenu = (props: DropdownSubItemProps) => {
 
   const active =
     activeProp ||
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     (!isNil(dropdown?.activeKey) && dropdown?.activeKey === eventKey)
 
   return (

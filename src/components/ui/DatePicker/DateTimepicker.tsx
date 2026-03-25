@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import useControllableState from '../hooks/useControllableState'
@@ -152,11 +153,12 @@ const DateTimepicker = (props: DateTimepickerProps) => {
     if (!value && !closePickerOnChange) {
       setInputState(dayjs(date).locale(finalLocale).format(dateFormat))
     }
-    closePickerOnChange &&
+    if (closePickerOnChange) {
       setInputState(
         capitalize(dayjs(date).locale(finalLocale).format(dateFormat)),
       )
-    closePickerOnChange && closeDropdown()
+      closeDropdown()
+    }
     window.setTimeout(() => inputRef.current?.focus(), 0)
   }
 
@@ -164,7 +166,9 @@ const DateTimepicker = (props: DateTimepickerProps) => {
     setValue(null)
     setLastValidValue(null)
     setInputState('')
-    openPickerOnClear && openDropdown()
+    if (openPickerOnClear) {
+      openDropdown()
+    }
     inputRef.current?.focus()
     onChange?.(null)
   }
@@ -173,12 +177,16 @@ const DateTimepicker = (props: DateTimepickerProps) => {
     dayjs(date, dateFormat, finalLocale).toDate()
 
   const handleInputBlur = (event: FocusEvent<HTMLInputElement, Element>) => {
-    typeof onBlur === 'function' && onBlur(event)
+    if (typeof onBlur === 'function') {
+      onBlur(event)
+    }
     setFocused(false)
   }
 
   const handleInputFocus = (event: FocusEvent<HTMLInputElement, Element>) => {
-    typeof onFocus === 'function' && onFocus(event)
+    if (typeof onFocus === 'function') {
+      onFocus(event)
+    }
     setFocused(true)
   }
 
@@ -189,10 +197,12 @@ const DateTimepicker = (props: DateTimepickerProps) => {
     if (dayjs(date).isValid()) {
       setValue(date)
       setLastValidValue(date)
-      closePickerOnChange && setInputState(event.target.value)
+      if (closePickerOnChange) {
+        setInputState(event.target.value)
+      }
       setCalendarMonth(date)
-    } else {
-      closePickerOnChange && setInputState(event.target.value)
+    } else if (closePickerOnChange) {
+      setInputState(event.target.value)
     }
   }
 
@@ -215,12 +225,15 @@ const DateTimepicker = (props: DateTimepickerProps) => {
         )
       }
 
-      closePickerOnChange &&
+      if (closePickerOnChange) {
         setInputState(
           capitalize(dayjs(newDateTime).locale(finalLocale).format(dateFormat)),
         )
+      }
     }
-    closePickerOnChange && closeDropdown()
+    if (closePickerOnChange) {
+      closeDropdown()
+    }
   }
 
   const handleOk = () => {

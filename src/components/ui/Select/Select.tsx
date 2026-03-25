@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import ReactSelect from 'react-select'
 import { HiChevronDown, HiX } from 'react-icons/hi'

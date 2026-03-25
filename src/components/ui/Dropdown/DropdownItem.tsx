@@ -63,6 +63,7 @@ const DropdownItem = (props: DropdownItemProps) => {
 
   const active =
     activeProp ||
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     (!isNil(dropdown?.activeKey) && dropdown?.activeKey === eventKey)
 
   const tree = useFloatingTree()

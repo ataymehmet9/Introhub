@@ -156,6 +156,7 @@ const Month = (props: MonthProps) => {
         <td key={cellIndex} className={classNames('date-picker-cell')}>
           <Day
             ref={(button) => {
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               if (daysRefs) {
                 if (!Array.isArray(daysRefs[rowIndex])) {
                   daysRefs[rowIndex] = []
