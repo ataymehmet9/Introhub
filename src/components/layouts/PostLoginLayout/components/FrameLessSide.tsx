@@ -28,6 +28,7 @@ const FrameLessSide = ({ children }: CommonProps) => {
         pageContainerType,
         pageBackgroundType,
         pageContainerGutterClass,
+        // eslint-disable-next-line no-shadow
         children,
         footer,
         header,

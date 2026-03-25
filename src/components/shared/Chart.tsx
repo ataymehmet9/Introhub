@@ -11,6 +11,7 @@ import {
 import { DIR_RTL } from '@/constants/theme.constant'
 
 // Use a generic type to avoid importing apexcharts on the server
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ApexOptions = Record<string, any>
 
 const notDonut = ['line', 'bar', 'area']
@@ -82,6 +83,7 @@ const Chart = (props: ChartProps) => {
       const lengend = chartRef.current.querySelectorAll<HTMLDivElement>(
         'div.apexcharts-legend',
       )[0]
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!lengend) {
         return
       }

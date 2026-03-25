@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { createRef, useEffect } from 'react'
 import classNames from 'classnames'
 import type { CommonProps } from '@/@types/common'

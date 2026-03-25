@@ -22,6 +22,7 @@ const ContentOverlay = ({ children }: CommonProps) => {
       type={LAYOUT_CONTENT_OVERLAY}
       className="app-layout-content-overlay flex flex-auto flex-col min-h-screen"
       pageContainerReassemble={({
+        // eslint-disable-next-line no-shadow
         children,
         defaultClass,
         header,
@@ -48,7 +49,7 @@ const ContentOverlay = ({ children }: CommonProps) => {
                   className="mb-20"
                   customeHeader={() => (
                     <>
-                      {header?.title && typeof header?.title === 'string' && (
+                      {header?.title && typeof header.title === 'string' && (
                         <h2 className="mb-2">{header.title}</h2>
                       )}
                       {header?.description && (

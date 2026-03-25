@@ -95,6 +95,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
               {...register('name')}
               placeholder="Enter name"
               disabled={isFormLoading}
+              autoComplete="off"
             />
           </FormItem>
 
@@ -108,6 +109,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
               type="email"
               placeholder="Enter email address"
               disabled={isFormLoading}
+              autoComplete="off"
             />
           </FormItem>
 
@@ -121,6 +123,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
               type="tel"
               placeholder="Enter phone number (optional)"
               disabled={isFormLoading}
+              autoComplete="off"
             />
           </FormItem>
 
@@ -134,6 +137,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
                 {...register('company')}
                 placeholder="Enter company name (optional)"
                 disabled={isFormLoading}
+                autoComplete="off"
               />
             </FormItem>
 
@@ -146,6 +150,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
                 {...register('position')}
                 placeholder="Enter position/role"
                 disabled={isFormLoading}
+                autoComplete="off"
               />
             </FormItem>
           </div>
@@ -160,6 +165,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
               type="url"
               placeholder="https://linkedin.com/in/username (optional)"
               disabled={isFormLoading}
+              autoComplete="off"
             />
           </FormItem>
 
@@ -174,6 +180,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
               rows={4}
               placeholder="Add any additional notes (optional)"
               disabled={isFormLoading}
+              autoComplete="off"
             />
           </FormItem>
 
