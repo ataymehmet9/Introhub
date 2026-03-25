@@ -9,7 +9,8 @@ import { useThemeStore } from '@/store/themeStore'
 
 type SidePanelProps = SidePanelContentProps & CommonProps
 
-const _SidePanel = (props: SidePanelProps) => {
+// eslint-disable-next-line react-refresh/only-export-components
+const SidePanel = (props: SidePanelProps) => {
   const { className, ...rest } = props
 
   const panelExpand = useThemeStore((state) => state.panelExpand)
@@ -23,6 +24,7 @@ const _SidePanel = (props: SidePanelProps) => {
   const closePanel = () => {
     setPanelExpand(false)
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (document) {
       const bodyClassList = document.body.classList
       if (bodyClassList.contains('drawer-lock-scroll')) {
@@ -54,6 +56,6 @@ const _SidePanel = (props: SidePanelProps) => {
   )
 }
 
-const SidePanel = withHeaderItem(_SidePanel)
+const _SidePanel = withHeaderItem(SidePanel)
 
-export default SidePanel
+export default _SidePanel

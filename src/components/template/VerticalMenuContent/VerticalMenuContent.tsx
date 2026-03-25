@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Fragment, useEffect, useState } from 'react'
 import VerticalSingleMenuItem from './VerticalSingleMenuItem'
 import VerticalCollapsedMenuItem from './VerticalCollapsedMenuItem'
@@ -48,7 +49,8 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
 
   useEffect(() => {
     if (activedRoute?.parentKey) {
-      setDefaulExpandKey([activedRoute?.parentKey])
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDefaulExpandKey([activedRoute.parentKey])
     }
   }, [activedRoute?.parentKey])
 

@@ -66,35 +66,35 @@ const RichTextEditor = (props: RichTextEditorProps) => {
     ref,
     ...rest
   } = props
-
-  const editor = customEditor
-    ? customEditor
-    : useEditor({
-        extensions: [
-          StarterKit.configure({
-            bulletList: {
-              keepMarks: true,
-            },
-            orderedList: {
-              keepMarks: true,
-            },
-          }),
-        ],
-        editorProps: {
-          attributes: {
-            class: 'm-2 focus:outline-hidden',
-          },
+  const tipTapEditor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
         },
-        content,
-        onUpdate({ editor }) {
-          onChange?.({
-            text: editor.getText(),
-            html: editor.getHTML(),
-            json: editor.getJSON(),
-          })
+        orderedList: {
+          keepMarks: true,
         },
+      }),
+    ],
+    editorProps: {
+      attributes: {
+        class: 'm-2 focus:outline-hidden',
+      },
+    },
+    content,
+    onUpdate({ editor }) {
+      onChange?.({
+        text: editor.getText(),
+        html: editor.getHTML(),
+        json: editor.getJSON(),
       })
+    },
+  })
 
+  const editor = customEditor ? customEditor : tipTapEditor
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!editor) return null
 
   return (

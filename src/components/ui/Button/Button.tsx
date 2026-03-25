@@ -31,6 +31,7 @@ export interface ButtonProps
   size?: TypeAttributes.Size
   variant?: 'solid' | 'plain' | 'default'
   iconAlignment?: 'start' | 'end'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 

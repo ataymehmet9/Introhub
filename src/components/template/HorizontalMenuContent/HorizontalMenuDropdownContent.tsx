@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useState } from 'react'
 import { TbCircle } from 'react-icons/tb'
 import HorizontalMenuNavLink from './HorizontalMenuNavLink'

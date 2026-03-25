@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { ComponentPropsWithRef, ElementType } from 'react'
 import navigationIcon from '@/configs/navigation-icon.config'
 

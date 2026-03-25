@@ -50,9 +50,11 @@ const HorizontalMenuDropdownTrigger = (
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (asElement === 'button') {
     return (
       <button
+        // eslint-disable-next-line react-hooks/refs
         ref={(rest as ButtonProps).ref}
         {...commonProps}
         {...(rest as ButtonProps)}

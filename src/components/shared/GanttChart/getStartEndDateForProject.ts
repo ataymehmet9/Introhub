@@ -8,6 +8,7 @@ function getStartEndDateForProject(
   let start = projectTasks[0].start
   let end = projectTasks[0].end
 
+  // eslint-disable-next-line @typescript-eslint/prefer-for-of
   for (let i = 0; i < projectTasks.length; i++) {
     const task = projectTasks[i]
     if (start.getTime() > task.start.getTime()) {

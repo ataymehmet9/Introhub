@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect } from 'react'
 import isEmpty from 'lodash/isEmpty'
 import { Link } from '@tanstack/react-router'

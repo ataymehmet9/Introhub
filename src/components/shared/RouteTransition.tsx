@@ -19,10 +19,12 @@ export function RouteTransition() {
         setShowLoader(true)
       }, 150)
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowLoader(false)
     }
 
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (timeout) clearTimeout(timeout)
     }
   }, [isLoading])

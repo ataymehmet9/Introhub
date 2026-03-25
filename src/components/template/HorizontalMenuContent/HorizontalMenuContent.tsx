@@ -56,7 +56,7 @@ const HorizontalMenuContent = (props: HorizontalMenuContentProps) => {
                   style={styles}
                   navigationTree={nav.subMenu}
                   t={t as TraslationFn}
-                  layoutMeta={nav?.meta?.horizontalMenu}
+                  layoutMeta={nav.meta?.horizontalMenu}
                   routeKey={routeKey}
                   routeParentKey={activedRoute?.parentKey}
                   userAuthority={userAuthority}
