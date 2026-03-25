@@ -79,7 +79,7 @@ Feel free to take it from here and connect directly.`
       await onSubmit(data.customMessage)
       reset()
       onClose()
-    } catch (error) {
+    } catch {
       // Error is handled in the hook
     }
   }

@@ -17,7 +17,7 @@ export const useFileUpload = (props: UseFileUploadProps = {}) => {
       if (user) {
         try {
           deleteProfileImage({ data: { userId: user?.id ?? '' } })
-        } catch (_) {}
+        } catch {}
       }
     },
     mutationFn: async (file: File) =>

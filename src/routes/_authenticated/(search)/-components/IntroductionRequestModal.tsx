@@ -96,7 +96,7 @@ ${user.name || '[Your Name]'}`
   const onFormSubmit = async (data: IntroductionRequestFormData) => {
     try {
       await onSubmit(data.message)
-    } catch (error) {
+    } catch {
       // Error is handled in the hook
     } finally {
       reset()
