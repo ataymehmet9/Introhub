@@ -11,5 +11,3 @@ export function RoutePendingComponent() {
     </div>
   )
 }
-
-// Made with Bob

@@ -141,5 +141,3 @@ export const WelcomeEmail = ({
     </Body>
   </Html>
 )
-
-// Made with Bob

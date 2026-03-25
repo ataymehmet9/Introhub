@@ -44,5 +44,3 @@ export function usePostHogIdentify() {
     }
   }, [session, isPending, posthog])
 }
-
-// Made with Bob

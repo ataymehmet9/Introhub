@@ -54,5 +54,3 @@ export function PageTransitionWrapper({
 }) {
   return <div className="content-reveal">{children}</div>
 }
-
-// Made with Bob

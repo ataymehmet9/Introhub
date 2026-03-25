@@ -78,5 +78,3 @@ export function preparePageTransition(): void {
     document.documentElement.classList.remove('view-transition-active')
   }, 500)
 }
-
-// Made with Bob

@@ -52,5 +52,3 @@ export const posthogMiddleware = async (opts: {
     throw error
   }
 }
-
-// Made with Bob

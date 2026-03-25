@@ -35,5 +35,3 @@ function HelpLayout() {
     </Container>
   )
 }
-
-// Made with Bob

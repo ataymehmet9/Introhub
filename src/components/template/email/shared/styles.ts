@@ -215,5 +215,3 @@ export const createMessageText = (
   ...emailStyles.messageText,
   color: messageBoxColors[variant].textColor,
 })
-
-// Made with Bob

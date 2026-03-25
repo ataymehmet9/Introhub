@@ -35,5 +35,3 @@ export function PageWrapper({ children, className = '' }: PageWrapperProps) {
     </div>
   )
 }
-
-// Made with Bob
