@@ -23,7 +23,6 @@ export function useRequests(options: UseRequestsOptions = {}) {
     onRejectSuccess,
     onDeleteSuccess,
     filterType = 'all',
-    currentUserId,
     page = 1,
     pageSize = 10,
   } = options

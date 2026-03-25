@@ -138,7 +138,8 @@ const DateTimepicker = (props: DateTimepickerProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, focused])
 
-  const handleValueChange = (date: Date) => {
+  const handleValueChange = (date: Date | null) => {
+    if (!date) return
     if (_value) {
       date.setHours(_value.getHours())
       date.setMinutes(_value.getMinutes())

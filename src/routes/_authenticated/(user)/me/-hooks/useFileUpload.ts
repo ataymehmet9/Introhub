@@ -25,7 +25,7 @@ export const useFileUpload = (props: UseFileUploadProps = {}) => {
         file,
         route: BETTER_UPLOAD_PROFILE_PIC_NAME,
       }),
-    onError: (error, variables, onMutateResult) => {
+    onError: () => {
       onError?.()
     },
   })
