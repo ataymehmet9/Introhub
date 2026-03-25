@@ -28,14 +28,21 @@ interface ContactImportModalProps {
 
 // Custom hook for media queries
 const useMediaQuery = (query: string) => {
-  const [matches, setMatches] = useState(false)
+  const [matches, setMatches] = useState(() => {
+    // Initialize state with current media query result
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches
+    }
+    return false
+  })
 
   useEffect(() => {
     const media = window.matchMedia(query)
-    setMatches(media.matches)
 
+    // Set up listener for future changes
     const listener = (e: MediaQueryListEvent) => setMatches(e.matches)
     media.addEventListener('change', listener)
+
     return () => media.removeEventListener('change', listener)
   }, [query])
 
@@ -162,16 +169,19 @@ export default function ContactImportModal({
     e.stopPropagation()
 
     const droppedFile = e.dataTransfer.files[0]
-    if (droppedFile && fileInputRef.current) {
-      // Create a new FileList-like object
-      const dataTransfer = new DataTransfer()
-      dataTransfer.items.add(droppedFile)
-      fileInputRef.current.files = dataTransfer.files
 
-      // Trigger change event
-      const event = new Event('change', { bubbles: true })
-      fileInputRef.current.dispatchEvent(event)
-    }
+    // Create a new FileList-like object
+    const dataTransfer = new DataTransfer()
+    dataTransfer.items.add(droppedFile)
+
+    const fileInput = fileInputRef.current
+    if (!fileInput) return
+
+    fileInput.files = dataTransfer.files
+
+    // Trigger change event
+    const event = new Event('change', { bubbles: true })
+    fileInput.dispatchEvent(event)
   }
 
   const handleDownloadTemplate = () => {
