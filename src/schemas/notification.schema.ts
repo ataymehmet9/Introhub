@@ -25,6 +25,7 @@ export const insertNotificationSchema = createInsertSchema(notifications, {
   message: z.string().min(1),
   read: z.boolean().default(false),
   metadata: z.string().optional(),
+  emailContent: z.string().optional(),
 })
 
 /**

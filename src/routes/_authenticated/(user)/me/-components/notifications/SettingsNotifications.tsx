@@ -1,6 +1,13 @@
 import dayjs from 'dayjs'
 import parse from 'html-react-parser'
-import { HiCheckCircle } from 'react-icons/hi'
+import { useState } from 'react'
+import {
+  HiCheckCircle,
+  HiChevronDown,
+  HiChevronUp,
+  HiMail,
+} from 'react-icons/hi'
+import { AnimatePresence, motion } from 'framer-motion'
 import type { NotificationWithMetadata } from '@/schemas'
 import { Button, Card, Timeline } from '@/components/ui'
 import classNames from '@/utils/classNames'
@@ -16,6 +23,46 @@ type SettingsNotificationsProps = {
 
 const UnixDateTime = ({ value }: { value: string }) => {
   return <>{dayjs(value).format('hh:mm A')}</>
+}
+
+const EmailContentCard = ({ emailContent }: { emailContent: string }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  return (
+    <div className="mt-4">
+      <Button
+        variant="plain"
+        size="sm"
+        className="flex items-center gap-2 text-primary hover:text-primary-dark"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <HiMail className="text-lg" />
+        <span>Email Sent</span>
+        {isExpanded ? (
+          <HiChevronUp className="text-lg" />
+        ) : (
+          <HiChevronDown className="text-lg" />
+        )}
+      </Button>
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <Card className="mt-3 bg-gray-50 dark:bg-gray-800/50 border-l-4 border-l-primary">
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                {parse(emailContent)}
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
 }
 
 const SettingsNotifications = ({
@@ -55,8 +102,13 @@ const SettingsNotifications = ({
                       </span>
                     </div>
                     <p className="py-4">{parse(notification.message)}</p>
+                    {notification.emailContent && (
+                      <EmailContentCard
+                        emailContent={notification.emailContent}
+                      />
+                    )}
                     {!notification.read && (
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end mt-4">
                         <Button
                           icon={<HiCheckCircle />}
                           size="xs"

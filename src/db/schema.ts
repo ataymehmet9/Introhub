@@ -153,6 +153,7 @@ export const notifications = pgTable(
       { onDelete: 'cascade' },
     ),
     metadata: text('metadata'), // JSON string for additional data
+    emailContent: text('email_content'), // HTML content of the email sent with this notification
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [
