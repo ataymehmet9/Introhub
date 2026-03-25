@@ -124,6 +124,7 @@ export const sendIntroductionRequestEmail = createServerFn({ method: 'POST' })
         success: true,
         message: 'Email sent successfully',
         emailId: emailData.id,
+        emailHtml,
       }
     } catch (error) {
       console.error('Error sending introduction request email:', {
@@ -231,6 +232,7 @@ export const sendIntroductionResponseEmail = createServerFn({ method: 'POST' })
         success: true,
         message: 'Email sent successfully',
         emailId: emailData.id,
+        emailHtml,
       }
     } catch (error) {
       console.error('Error sending introduction response email:', {
@@ -328,6 +330,7 @@ export const sendIntroductionEmail = createServerFn({ method: 'POST' })
         success: true,
         message: 'Email sent successfully',
         emailId: emailData.id,
+        emailHtml,
       }
     } catch (error) {
       console.error('Error sending introduction email:', {

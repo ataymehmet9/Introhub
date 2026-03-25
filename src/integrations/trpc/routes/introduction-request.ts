@@ -135,10 +135,12 @@ export const introductionRequestRouter = {
       // Send email notification to the approver (contact owner)
       // Email sending failures should not block the request creation
       if (approver.length > 0) {
+        let emailHtmlContent: string | null = null
+
         try {
           const dashboardUrl = `${process.env.APP_URL || 'http://localhost:3000'}/requests`
 
-          await sendIntroductionRequestEmail({
+          const emailResult = await sendIntroductionRequestEmail({
             data: {
               to: approver[0].email,
               approverName: approver[0].name,
@@ -152,6 +154,11 @@ export const introductionRequestRouter = {
               dashboardUrl,
             },
           })
+
+          // Capture email HTML if email was sent successfully
+          if (emailResult.success && emailResult.emailHtml) {
+            emailHtmlContent = emailResult.emailHtml
+          }
         } catch (error) {
           // Log error but don't fail the request
           console.error('Failed to send introduction request email:', {
@@ -180,6 +187,7 @@ export const introductionRequestRouter = {
               message: `${currentUser.name} wants to be introduced to ${contact.name}`,
               relatedRequestId: newRequest[0].id,
               metadata: JSON.stringify(notificationMetadata),
+              emailContent: emailHtmlContent,
               read: false,
             })
             .returning()
@@ -394,10 +402,12 @@ export const introductionRequestRouter = {
       // Send email notification based on status
       // Email sending failures should not block the status update
       if (requester.length > 0 && targetContact.length > 0) {
+        let emailHtmlContent: string | null = null
+
         try {
           if (data.status === 'approved') {
             // Send introduction email to both contact (TO) and requester (CC)
-            await sendIntroductionEmail({
+            const emailResult = await sendIntroductionEmail({
               data: {
                 to: targetContact[0].email, // Contact's email
                 cc: requester[0].email, // Requester's email
@@ -413,9 +423,14 @@ export const introductionRequestRouter = {
                 customMessage: data.responseMessage,
               },
             })
+
+            // Capture email HTML if email was sent successfully
+            if (emailResult.success && emailResult.emailHtml) {
+              emailHtmlContent = emailResult.emailHtml
+            }
           } else {
             // Send rejection email only to requester
-            await sendIntroductionResponseEmail({
+            const emailResult = await sendIntroductionResponseEmail({
               data: {
                 to: requester[0].email,
                 requesterName: requester[0].name,
@@ -428,6 +443,11 @@ export const introductionRequestRouter = {
                 contactPosition: null,
               },
             })
+
+            // Capture email HTML if email was sent successfully
+            if (emailResult.success && emailResult.emailHtml) {
+              emailHtmlContent = emailResult.emailHtml
+            }
           }
         } catch (error) {
           // Log error but don't fail the status update
@@ -471,6 +491,7 @@ export const introductionRequestRouter = {
               message: notificationMessage,
               relatedRequestId: id,
               metadata: JSON.stringify(notificationMetadata),
+              emailContent: emailHtmlContent,
               read: false,
             })
             .returning()
