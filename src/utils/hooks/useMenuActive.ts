@@ -17,29 +17,41 @@ const getRouteInfo = (
   }
   let activedRoute: NavInfo | undefined
   let isIncludeActivedRoute = false
-  for (const p in navTree) {
-    if (
-      p !== 'icon' &&
-      navTree.hasOwnProperty(p) &&
-      typeof (navTree as any)[p] === 'object'
-    ) {
-      if (
-        isPlainObject((navTree as any)[p]) &&
-        (navTree as any)[p].subMenu?.length > 0
-      ) {
-        if ((navTree as any)[p].subMenu.some((el: NavInfo) => el.key === key)) {
-          isIncludeActivedRoute = true
-        }
-      }
 
-      activedRoute = getRouteInfo((navTree as any)[p], key)
-
+  if (Array.isArray(navTree)) {
+    for (const item of navTree) {
+      activedRoute = getRouteInfo(item, key)
       if (activedRoute) {
-        if (isIncludeActivedRoute) {
-          activedRoute.parentKey = (navTree as any)[p].key
+        return activedRoute
+      }
+    }
+  } else {
+    for (const p of Object.keys(navTree)) {
+      if (
+        p !== 'icon' &&
+        navTree.hasOwnProperty(p) &&
+        typeof (navTree as any)[p] === 'object'
+      ) {
+        if (
+          isPlainObject((navTree as any)[p]) &&
+          (navTree as any)[p].subMenu?.length > 0
+        ) {
+          if (
+            (navTree as any)[p].subMenu.some((el: NavInfo) => el.key === key)
+          ) {
+            isIncludeActivedRoute = true
+          }
         }
 
-        return activedRoute
+        activedRoute = getRouteInfo((navTree as any)[p], key)
+
+        if (activedRoute) {
+          if (isIncludeActivedRoute) {
+            activedRoute.parentKey = (navTree as any)[p].key
+          }
+
+          return activedRoute
+        }
       }
     }
   }
