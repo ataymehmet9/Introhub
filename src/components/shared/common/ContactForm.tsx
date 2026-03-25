@@ -59,7 +59,16 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
 
     const handleFormSubmit = async (data: ContactFormSchema) => {
       try {
-        await onSubmit(data as InsertContact)
+        // Convert empty strings to null for optional fields
+        const sanitizedData = {
+          ...data,
+          phone: data.phone?.trim() || null,
+          company: data.company?.trim() || null,
+          position: data.position?.trim() || null,
+          linkedinUrl: data.linkedinUrl?.trim() || null,
+          notes: data.notes?.trim() || null,
+        }
+        await onSubmit(sanitizedData as InsertContact)
       } catch (error) {
         console.error('Form submission error:', error)
       }
