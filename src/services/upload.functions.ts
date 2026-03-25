@@ -38,7 +38,7 @@ export const deleteProfileImage = createServerFn({ method: 'POST' })
         const imageUrl = new URL(existingUser.image)
         const pathname = imageUrl.pathname
         key = pathname.startsWith('/') ? pathname.slice(1) : pathname
-      } catch (e: unknown) {
+      } catch {
         console.error('Error retrieving imageUrl for user', existingUser.image)
         key = existingUser.image
       }

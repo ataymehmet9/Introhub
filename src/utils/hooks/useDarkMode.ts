@@ -14,11 +14,13 @@ function useDarkMode(): [
 
   const isEnabled = mode === MODE_DARK
 
-  const onModeChange = (mode: Mode) => {
-    setMode(mode)
+  const onModeChange = (newMode: Mode) => {
+    setMode(newMode)
   }
 
   useEffect(() => {
+    // Required in mobile - was failing to load graphs on mobile phone due to rendering
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (window === undefined) {
       return
     }
