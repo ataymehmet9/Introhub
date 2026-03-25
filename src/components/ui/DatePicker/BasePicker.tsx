@@ -88,7 +88,11 @@ const BasePicker = (props: BasePickerProps) => {
   } = props
 
   const handleInputClick = () => {
-    inputtable ? openDropdown() : toggleDropdown(!dropdownOpened)
+    if (inputtable) {
+      openDropdown()
+    } else {
+      toggleDropdown(!dropdownOpened)
+    }
   }
 
   const closeDropdown = () => {
@@ -110,7 +114,11 @@ const BasePicker = (props: BasePickerProps) => {
 
   const toggleDropdown = (open: boolean) => {
     setDropdownOpened(open)
-    open ? onDropdownOpen?.() : onDropdownClose?.()
+    if (open) {
+      onDropdownOpen?.()
+    } else {
+      onDropdownClose?.()
+    }
   }
 
   const openDropdown = () => {
@@ -119,7 +127,9 @@ const BasePicker = (props: BasePickerProps) => {
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    typeof onKeyDown === 'function' && onKeyDown(event)
+    if (typeof onKeyDown === 'function') {
+      onKeyDown(event)
+    }
     if ((event.key === 'Space' || event.key === 'Enter') && !inputtable) {
       event.preventDefault()
       openDropdown()

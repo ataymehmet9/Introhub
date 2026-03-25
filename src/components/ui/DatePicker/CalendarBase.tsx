@@ -121,6 +121,7 @@ const CalendarBase = (props: CalendarBaseProps) => {
 
     const dayToFocus = daysRefs.current[monthIndex][rowIndex][cellIndex]
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!dayToFocus) {
       return
     }

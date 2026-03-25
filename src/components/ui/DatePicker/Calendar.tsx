@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/naming-convention */
 import CalendarBase from './CalendarBase'
 import { isSameDate } from './utils'
 import type { CommonProps } from '../@types/common'

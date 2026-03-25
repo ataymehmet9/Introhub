@@ -131,7 +131,9 @@ const DatePickerRange = (props: DatePickerRangeProps) => {
   const handleClear = () => {
     setValue([null, null])
     setDropdownOpened(true)
-    openPickerOnClear && onDropdownOpen?.()
+    if (openPickerOnClear) {
+      onDropdownOpen?.()
+    }
     inputRef.current?.focus()
   }
 

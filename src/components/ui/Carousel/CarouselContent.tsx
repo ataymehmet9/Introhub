@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Children, useEffect, useRef } from 'react'
 import classNames from '../utils/classNames'
 import { useConfig } from '../ConfigProvider'

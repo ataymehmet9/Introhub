@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import useControllableState from '../hooks/useControllableState'
