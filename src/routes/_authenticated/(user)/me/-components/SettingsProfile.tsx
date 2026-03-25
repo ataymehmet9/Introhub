@@ -47,8 +47,8 @@ const SettingsProfile = () => {
     const updateValues = { ...values }
     if (getFieldState('image').isDirty && profileImg) {
       await upload(profileImg, {
-        onSuccess: (data) => {
-          updateValues.image = data.file.objectInfo.key
+        onSuccess: (successData) => {
+          updateValues.image = successData.file.objectInfo.key
           doSubmit(updateValues)
         },
       })

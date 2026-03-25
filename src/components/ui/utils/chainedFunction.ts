@@ -13,6 +13,7 @@ export default function chainedFunction<T = any>(...funcs: Array<T | null>) {
         return f
       }
 
+      // eslint-disable-next-line no-shadow
       return function chainedFunction(this: any, ...args: Array<any>) {
         acc.apply(this, args)
         f.apply(this, args)

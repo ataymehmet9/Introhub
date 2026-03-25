@@ -54,15 +54,15 @@ const GanttChart = <T extends Record<string, unknown>>(
         milestoneBackgroundSelectedColor="#3380fa"
         todayColor="url(#horzLines)"
         rowHeight={50}
-        TaskListHeader={(props) => (
+        TaskListHeader={(headerProps) => (
           <TaskListHeader
-            {...props}
+            {...headerProps}
             extraHeaders={extraColumns?.map((col) => col.header)}
           />
         )}
-        TaskListTable={(props) => (
+        TaskListTable={(listProps) => (
           <TaskListTable
-            {...props}
+            {...listProps}
             extraCells={extraColumns?.map((col) => col.cell)}
           />
         )}

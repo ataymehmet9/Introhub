@@ -46,10 +46,10 @@ function useControllableState<T>({
       (nextValue) => {
         const setter = nextValue as (prevState?: T) => T
         if (isControlled) {
-          const value =
+          const thisValue =
             typeof nextValue === 'function' ? setter(prop) : nextValue
-          if (value !== prop) {
-            handleChange(value as T)
+          if (thisValue !== prop) {
+            handleChange(thisValue as T)
           }
         } else {
           setUncontrolledProp(nextValue)
