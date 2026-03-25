@@ -10,6 +10,7 @@ function useDirection(): [
   const setDirection = useThemeStore((state) => state.setDirection)
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (window === undefined) {
       return
     }

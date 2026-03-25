@@ -19,7 +19,6 @@ import { useNotificationSSE } from '@/hooks/useNotificationSSE'
 
 const notificationHeight = 'h-[280px]'
 
-// eslint-disable-next-line react-refresh/only-export-components
 const Notification = ({ className }: { className?: string }) => {
   const { larger } = useResponsive()
   const notificationDropdownRef = useRef<DropdownRef>(null)

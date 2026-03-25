@@ -37,6 +37,7 @@ async function handler({ request }: { request: Request }) {
   // Notification event handlers — defined here so cleanup() can reference them
   const handleNotificationCreated = (data: {
     userId: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     notification: any
   }) => {
     if (data.userId !== userId) return

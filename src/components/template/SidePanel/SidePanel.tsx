@@ -9,7 +9,6 @@ import { useThemeStore } from '@/store/themeStore'
 
 type SidePanelProps = SidePanelContentProps & CommonProps
 
-// eslint-disable-next-line react-refresh/only-export-components
 const SidePanel = (props: SidePanelProps) => {
   const { className, ...rest } = props
 

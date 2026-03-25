@@ -4,7 +4,6 @@ import { useThemeStore } from '@/store/themeStore'
 import useResponsive from '@/utils/hooks/useResponsive'
 import NavToggle from '@/components/shared/NavToggle'
 
-// eslint-disable-next-line react-refresh/only-export-components
 const SideNavToggle = ({ className }: CommonProps) => {
   const { layout, setSideNavCollapse } = useThemeStore((state) => state)
 

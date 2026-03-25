@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * View Transitions API utilities for smooth page transitions
  * Provides fallback for browsers that don't support the API

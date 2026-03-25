@@ -9,7 +9,6 @@ import { useLocaleStore } from '@/store/localeStore'
 
 const languageList = [{ label: 'English', value: 'en', flag: 'US' }]
 
-// eslint-disable-next-line react-refresh/only-export-components
 const LanguageSelector = ({ className }: CommonProps) => {
   const { currentLang: locale, setLang } = useLocaleStore((state) => state)
 

@@ -17,7 +17,6 @@ export interface CheckboxGroupContextProps {
 
 const CheckboxGroupContext = createContext<CheckboxGroupContextProps>({})
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const CheckboxGroupContextProvider = CheckboxGroupContext.Provider
 
 export default CheckboxGroupContext

@@ -13,7 +13,6 @@ type RadioGroupContextProps = {
 
 const RadioGroupContext = createContext<RadioGroupContextProps>({})
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const RadioGroupContextProvider = RadioGroupContext.Provider
 
 export default RadioGroupContext
