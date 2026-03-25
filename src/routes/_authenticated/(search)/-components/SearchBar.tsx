@@ -9,7 +9,7 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({
-  placeholder = 'Search by name, company, or position...',
+  placeholder = 'Find connections by name, company, or position...',
   debounceMs = 300,
 }: SearchBarProps) => {
   const navigate = useNavigate()
@@ -70,7 +70,7 @@ const SearchBar = ({
       />
       {localQuery.length > 0 && localQuery.length < 2 && (
         <p className="text-xs text-red-500 mt-1">
-          Please enter at least 2 characters to search
+          Please enter at least 2 characters to find connections
         </p>
       )}
     </div>

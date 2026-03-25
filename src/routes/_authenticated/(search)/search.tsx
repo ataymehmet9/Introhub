@@ -86,9 +86,9 @@ function SearchPage() {
   return (
     <Container>
       <div className="mb-8">
-        <h1>Search Contacts</h1>
+        <h1>Find Connections</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Search for contacts across the platform and request introductions
+          Discover new contacts across the platform and request introductions
         </p>
       </div>
 
@@ -103,14 +103,14 @@ function SearchPage() {
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 <p className="mt-4 text-gray-600 dark:text-gray-400">
-                  Searching...
+                  Finding connections...
                 </p>
               </div>
             ) : hasResults ? (
               <>
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold">
-                    Search Results ({total})
+                    Available Connections ({total})
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Found {total} contact
@@ -139,10 +139,10 @@ function SearchPage() {
         <Card>
           <div className="p-12 text-center">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold mb-2">Start Searching</h3>
+            <h3 className="text-xl font-semibold mb-2">Find New Connections</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Enter at least 2 characters to search for contacts by name,
-              company, or position
+              Enter at least 2 characters to find contacts by name, company, or
+              position
             </p>
           </div>
         </Card>

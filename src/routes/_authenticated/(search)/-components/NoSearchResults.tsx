@@ -12,7 +12,7 @@ const NoSearchResults = ({ query }: NoSearchResultsProps) => {
       </div>
 
       <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-        No results found
+        No connections found
       </h3>
 
       <p className="text-gray-600 dark:text-gray-400 text-center mb-6 max-w-md">
@@ -24,12 +24,12 @@ const NoSearchResults = ({ query }: NoSearchResultsProps) => {
         <div className="flex items-start gap-3">
           <TbInfoCircle className="text-xl text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-900 dark:text-blue-100">
-            <p className="font-semibold mb-2">Search tips:</p>
+            <p className="font-semibold mb-2">Tips for finding connections:</p>
             <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
               <li>Try different keywords or spellings</li>
               <li>Use broader search terms</li>
-              <li>Check for typos in your search query</li>
-              <li>Search by company name or position</li>
+              <li>Check for typos in your query</li>
+              <li>Try searching by company name or position</li>
             </ul>
           </div>
         </div>

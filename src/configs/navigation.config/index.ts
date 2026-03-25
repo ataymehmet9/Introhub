@@ -25,7 +25,7 @@ const navigationConfig: Array<NavigationTree> = [
   {
     key: 'search',
     path: '/search',
-    title: 'Search',
+    title: 'Find Connections',
     translateKey: 'nav.search',
     icon: 'search',
     type: NAV_ITEM_TYPE_ITEM,
