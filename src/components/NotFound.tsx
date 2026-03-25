@@ -3,7 +3,7 @@ import Container from '@/components/shared/Container'
 import SpaceSignBoard from '@/assets/svg/SpaceSignBoard'
 import { Button } from '@/components/ui'
 
-export function NotFound({ children }: { children?: any }) {
+export function NotFound({ children }: { children?: React.ReactNode }) {
   return (
     <Container className="h-full">
       <div className="h-full flex flex-col items-center justify-center">

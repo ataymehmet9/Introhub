@@ -15,7 +15,7 @@ const OauthSignIn = (_props: OauthSignInProps) => {
     provider: 'linkedin' | 'microsoft' | 'google',
   ) => {
     // Track OAuth sign-in attempt
-    posthog?.capture('oauth_signin_attempt', {
+    posthog.capture('oauth_signin_attempt', {
       provider,
       timestamp: new Date().toISOString(),
     })

@@ -59,18 +59,18 @@ const SignInForm = (props: SignInFormProps) => {
           'Invalid email or password',
         )
           ? 'Invalid email or password. If you signed up with Google, LinkedIn, or Microsoft, please use the social login buttons below.'
-          : (error.message ?? 'An error occurred')
+          : error.message || 'An error occurred'
 
         setMessage?.(errorMessage)
         // Track failed login
-        posthog?.capture('login_failed', {
+        posthog.capture('login_failed', {
           email,
           error: error.message,
           timestamp: new Date().toISOString(),
         })
       } else {
         // Track successful login
-        posthog?.capture('login_success', {
+        posthog.capture('login_success', {
           email,
           timestamp: new Date().toISOString(),
         })

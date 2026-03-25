@@ -42,7 +42,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
     try {
       const { error } = await authClient.resetPassword({
         newPassword: password,
-        token: token ?? '',
+        token: token || '',
       })
 
       if (!error) {

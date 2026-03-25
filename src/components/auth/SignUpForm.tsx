@@ -51,16 +51,16 @@ const SignUpForm = (props: SignUpFormProps) => {
       setSubmitting(false)
 
       if (error) {
-        setMessage?.(error.message ?? 'An error occurred')
+        setMessage?.(error.message || 'An error occurred')
         // Track failed signup
-        posthog?.capture('signup_failed', {
+        posthog.capture('signup_failed', {
           email,
           error: error.message,
           timestamp: new Date().toISOString(),
         })
       } else {
         // Track successful signup
-        posthog?.capture('signup_success', {
+        posthog.capture('signup_success', {
           email,
           name,
           company: company || null,
