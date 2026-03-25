@@ -47,9 +47,8 @@ const getRegionValue = (
   suffix = '',
   prefix = '',
 ) => {
-  if (data.length > 0 || name) {
-    for (let i = 0; i < data.length; i++) {
-      const elm = data[i]
+  if (data.length > 0 && name) {
+    for (const elm of data) {
       if (name === elm.name) {
         return `${elm.name} - ${prefix}${elm.value}${suffix}`
       }
