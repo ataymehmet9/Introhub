@@ -49,9 +49,9 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
         setSubmitting(false)
         setResetComplete?.(true)
       }
-    } catch (errors) {
+    } catch (error) {
       setMessage?.(
-        typeof errors === 'string' ? errors : 'Failed to reset password',
+        typeof error === 'string' ? error : 'Failed to reset password',
       )
       setSubmitting(false)
     }
