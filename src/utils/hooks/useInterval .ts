@@ -11,6 +11,7 @@ const useInterval = (callback: () => void, delay: number | null) => {
   useEffect(() => {
     if (delay !== null) {
       const tick = () => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (savedCallback.current) {
           savedCallback.current()
         }

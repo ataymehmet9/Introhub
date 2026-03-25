@@ -5,6 +5,7 @@ export default function wildCardSearch(
 ) {
   const searchText = (item: Record<string, string | number>) => {
     for (const key in item) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (item[specifyKey ? specifyKey : key] == null) {
         continue
       }

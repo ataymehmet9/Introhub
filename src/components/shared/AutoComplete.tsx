@@ -110,12 +110,12 @@ function AutoComplete<T>(props: AutoCompleteProps<T>) {
   )
 
   function onAutoCompleteChange(event: ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value
-    onInputChange(value)
+    const inputValue = event.target.value
+    onInputChange(inputValue)
     const items = data.filter((item) =>
-      optionKey(item).toLowerCase().includes(value.toLowerCase()),
+      optionKey(item).toLowerCase().includes(inputValue.toLowerCase()),
     )
-    if (value && items.length > 0) {
+    if (inputValue && items.length > 0) {
       setOpen(true)
       setActiveIndex(0)
     } else {

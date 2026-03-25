@@ -26,8 +26,10 @@ function useThemeSchema() {
   const mode = useThemeStore((state) => state.mode)
 
   const applyTheme = (theme: string): void => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (presetThemeSchemaConfig[theme][mode]) {
       const themeObject = mapTheme(presetThemeSchemaConfig[theme][mode])
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!themeObject) return
 
       const root = document.documentElement
