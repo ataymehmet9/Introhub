@@ -5,13 +5,14 @@ import Avatar from '@/components/ui/Avatar'
 import Dropdown from '@/components/ui/Dropdown'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import { useSessionUser } from '@/store/authStore'
-import { signOut } from '@/lib/auth-client'
+import { useLogout } from '@/lib/logout'
 import { dropdownItemList } from '@/configs/navigation.config/user'
 import { generateFileCloudUrl } from '@/utils/fileUtils'
 
 const UserDropdown = () => {
   const { user = {} } = useSessionUser()
   const navigate = useNavigate()
+  const { logout } = useLogout()
   const mainUser: User | null = user as User | null
 
   // Handle null user during SSR or before session loads
@@ -21,9 +22,17 @@ const UserDropdown = () => {
 
   const { image: avatar, name: userName, email } = mainUser
 
-  const handleSignOut = () => {
-    signOut()
-    navigate({ to: '/login' })
+  const handleSignOut = async () => {
+    try {
+      // Use the secure logout handler that clears all caches
+      await logout()
+      // Navigate to login after successful logout
+      navigate({ to: '/login' })
+    } catch (error) {
+      console.error('Logout failed:', error)
+      // Still navigate to login even if there's an error
+      navigate({ to: '/login' })
+    }
   }
 
   const avatarProps = {
