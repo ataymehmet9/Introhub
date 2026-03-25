@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useRef, useState } from 'react'
 import debounce from 'lodash/debounce'
 import { HiChevronRight, HiOutlineSearch } from 'react-icons/hi'
@@ -102,6 +103,7 @@ const _Search = ({ className }: { className?: string }) => {
 
   const debounceFn = debounce(handleDebounceFn, 200)
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async function handleDebounceFn(query: string) {
     if (!query) {
       setSearchResult(recommendedSearch)

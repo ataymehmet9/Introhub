@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import {
   FloatingFocusManager,

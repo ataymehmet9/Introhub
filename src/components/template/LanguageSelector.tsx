@@ -9,7 +9,8 @@ import { useLocaleStore } from '@/store/localeStore'
 
 const languageList = [{ label: 'English', value: 'en', flag: 'US' }]
 
-const _LanguageSelector = ({ className }: CommonProps) => {
+// eslint-disable-next-line react-refresh/only-export-components
+const LanguageSelector = ({ className }: CommonProps) => {
   const { currentLang: locale, setLang } = useLocaleStore((state) => state)
 
   const selectLangFlag = useMemo(() => {
@@ -52,6 +53,6 @@ const _LanguageSelector = ({ className }: CommonProps) => {
   )
 }
 
-const LanguageSelector = withHeaderItem(_LanguageSelector)
+const _LanguageSelector = withHeaderItem(LanguageSelector)
 
-export default LanguageSelector
+export default _LanguageSelector

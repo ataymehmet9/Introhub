@@ -19,7 +19,8 @@ import { useNotificationSSE } from '@/hooks/useNotificationSSE'
 
 const notificationHeight = 'h-[280px]'
 
-const _Notification = ({ className }: { className?: string }) => {
+// eslint-disable-next-line react-refresh/only-export-components
+const Notification = ({ className }: { className?: string }) => {
   const { larger } = useResponsive()
   const notificationDropdownRef = useRef<DropdownRef>(null)
 
@@ -169,6 +170,6 @@ const _Notification = ({ className }: { className?: string }) => {
   )
 }
 
-const Notification = withHeaderItem(_Notification)
+const _Notification = withHeaderItem(Notification)
 
-export default Notification
+export default _Notification

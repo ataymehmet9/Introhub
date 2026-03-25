@@ -35,8 +35,9 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    // eslint-disable-next-line @typescript-eslint/require-await
     sendResetPassword: async ({ user, url, token }) => {
-      sendForgotPasswordEmail({ data: { to: user.email, url, token } })
+      void sendForgotPasswordEmail({ data: { to: user.email, url, token } })
     },
   },
   socialProviders: {

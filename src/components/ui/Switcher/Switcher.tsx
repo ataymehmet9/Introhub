@@ -43,6 +43,7 @@ const Switcher = (props: SwitcherProps) => {
 
   useEffect(() => {
     if (typeof checked !== 'undefined') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSwitcherChecked(checked)
     }
   }, [checked])

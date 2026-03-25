@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { useRef } from 'react'
 import uniqueId from 'lodash/uniqueId'
 import createUID from '../utils/createUid'

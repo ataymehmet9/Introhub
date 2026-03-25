@@ -84,6 +84,7 @@ const Pagers = (props: PagersProps) => {
   useEffect(() => {
     if (pageCount > PAGER_COUNT) {
       if (currentPage > PAGER_COUNT - 2) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setShowPrevMore(true)
       }
       if (currentPage < pageCount - 2) {

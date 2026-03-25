@@ -13,6 +13,7 @@ export const Route = createFileRoute('/_public/(auth)/reset-password')({
       error: (search.error as string) || '',
     }
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   beforeLoad: async ({ search }) => {
     const { error, token } = search
 

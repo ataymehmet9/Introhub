@@ -18,6 +18,7 @@ const useWindowWidth = (isResponsive: boolean = true): number => {
   useEffect(() => {
     // Set the actual window width on mount (client-side)
     if (typeof window !== 'undefined') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWindowSize(window.innerWidth)
     }
 

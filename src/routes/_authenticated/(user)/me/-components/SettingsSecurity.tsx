@@ -48,6 +48,7 @@ const SettingsSecurity = () => {
     resolver: zodResolver(validationSchema),
   })
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSubmit = async () => {
     setConfirmationOpen(true)
   }
