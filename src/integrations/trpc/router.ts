@@ -1,5 +1,6 @@
 import { createTRPCRouter } from './init'
 import {
+  billingRouter,
   contactRouter,
   dashboardRouter,
   introductionRequestRouter,
@@ -15,5 +16,6 @@ export const trpcRouter = createTRPCRouter({
   introductionRequests: introductionRequestRouter,
   notifications: notificationRouter,
   dashboard: dashboardRouter,
+  billing: billingRouter,
 })
 export type TRPCRouter = typeof trpcRouter

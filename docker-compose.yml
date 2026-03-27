@@ -71,6 +71,9 @@ services:
       VITE_PUBLIC_POSTHOG_KEY: ${VITE_PUBLIC_POSTHOG_KEY}
       VITE_PUBLIC_POSTHOG_HOST: ${VITE_PUBLIC_POSTHOG_HOST}
       VITE_PUBLIC_POSTHOG_DEFAULTS: ${VITE_PUBLIC_POSTHOG_DEFAULTS}
+
+      # Billing (Stripe)
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
     depends_on:
       postgres:
         condition: service_healthy

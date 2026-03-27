@@ -19,6 +19,7 @@ import { Route as PublicGetDemoRouteImport } from './routes/_public/get-demo'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/_help'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
 import { Route as ApiNotificationsStreamRouteImport } from './routes/api/notifications/stream'
+import { Route as ApiBillingWebhookRouteImport } from './routes/api/billing/webhook'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as PublicauthSignupRouteImport } from './routes/_public/(auth)/signup'
 import { Route as PublicauthResetPasswordRouteImport } from './routes/_public/(auth)/reset-password'
@@ -34,6 +35,7 @@ import { Route as AuthenticatedcontactsContactsRouteImport } from './routes/_aut
 import { Route as AuthenticateduserMeIndexRouteImport } from './routes/_authenticated/(user)/me/index'
 import { Route as AuthenticateduserMeSecurityRouteImport } from './routes/_authenticated/(user)/me/security'
 import { Route as AuthenticateduserMeNotificationsRouteImport } from './routes/_authenticated/(user)/me/notifications'
+import { Route as AuthenticateduserMeBillingRouteImport } from './routes/_authenticated/(user)/me/billing'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -80,6 +82,11 @@ const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
 const ApiNotificationsStreamRoute = ApiNotificationsStreamRouteImport.update({
   id: '/api/notifications/stream',
   path: '/api/notifications/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBillingWebhookRoute = ApiBillingWebhookRouteImport.update({
+  id: '/api/billing/webhook',
+  path: '/api/billing/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -167,6 +174,12 @@ const AuthenticateduserMeNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticateduserMeRoute,
   } as any)
+const AuthenticateduserMeBillingRoute =
+  AuthenticateduserMeBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticateduserMeRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -186,8 +199,10 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof PublicauthResetPasswordRoute
   '/signup': typeof PublicauthSignupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/billing/webhook': typeof ApiBillingWebhookRoute
   '/api/notifications/stream': typeof ApiNotificationsStreamRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/me/billing': typeof AuthenticateduserMeBillingRoute
   '/me/notifications': typeof AuthenticateduserMeNotificationsRoute
   '/me/security': typeof AuthenticateduserMeSecurityRoute
   '/me/': typeof AuthenticateduserMeIndexRoute
@@ -209,8 +224,10 @@ export interface FileRoutesByTo {
   '/reset-password': typeof PublicauthResetPasswordRoute
   '/signup': typeof PublicauthSignupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/billing/webhook': typeof ApiBillingWebhookRoute
   '/api/notifications/stream': typeof ApiNotificationsStreamRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/me/billing': typeof AuthenticateduserMeBillingRoute
   '/me/notifications': typeof AuthenticateduserMeNotificationsRoute
   '/me/security': typeof AuthenticateduserMeSecurityRoute
   '/me': typeof AuthenticateduserMeIndexRoute
@@ -237,8 +254,10 @@ export interface FileRoutesById {
   '/_public/(auth)/reset-password': typeof PublicauthResetPasswordRoute
   '/_public/(auth)/signup': typeof PublicauthSignupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/billing/webhook': typeof ApiBillingWebhookRoute
   '/api/notifications/stream': typeof ApiNotificationsStreamRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/_authenticated/(user)/me/billing': typeof AuthenticateduserMeBillingRoute
   '/_authenticated/(user)/me/notifications': typeof AuthenticateduserMeNotificationsRoute
   '/_authenticated/(user)/me/security': typeof AuthenticateduserMeSecurityRoute
   '/_authenticated/(user)/me/': typeof AuthenticateduserMeIndexRoute
@@ -263,8 +282,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/api/auth/$'
+    | '/api/billing/webhook'
     | '/api/notifications/stream'
     | '/api/trpc/$'
+    | '/me/billing'
     | '/me/notifications'
     | '/me/security'
     | '/me/'
@@ -286,8 +307,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/api/auth/$'
+    | '/api/billing/webhook'
     | '/api/notifications/stream'
     | '/api/trpc/$'
+    | '/me/billing'
     | '/me/notifications'
     | '/me/security'
     | '/me'
@@ -313,8 +336,10 @@ export interface FileRouteTypes {
     | '/_public/(auth)/reset-password'
     | '/_public/(auth)/signup'
     | '/api/auth/$'
+    | '/api/billing/webhook'
     | '/api/notifications/stream'
     | '/api/trpc/$'
+    | '/_authenticated/(user)/me/billing'
     | '/_authenticated/(user)/me/notifications'
     | '/_authenticated/(user)/me/security'
     | '/_authenticated/(user)/me/'
@@ -325,6 +350,7 @@ export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
   ApiUploadRoute: typeof ApiUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiBillingWebhookRoute: typeof ApiBillingWebhookRoute
   ApiNotificationsStreamRoute: typeof ApiNotificationsStreamRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
@@ -399,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/api/notifications/stream'
       fullPath: '/api/notifications/stream'
       preLoaderRoute: typeof ApiNotificationsStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/billing/webhook': {
+      id: '/api/billing/webhook'
+      path: '/api/billing/webhook'
+      fullPath: '/api/billing/webhook'
+      preLoaderRoute: typeof ApiBillingWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -506,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticateduserMeNotificationsRouteImport
       parentRoute: typeof AuthenticateduserMeRoute
     }
+    '/_authenticated/(user)/me/billing': {
+      id: '/_authenticated/(user)/me/billing'
+      path: '/billing'
+      fullPath: '/me/billing'
+      preLoaderRoute: typeof AuthenticateduserMeBillingRouteImport
+      parentRoute: typeof AuthenticateduserMeRoute
+    }
   }
 }
 
@@ -524,12 +564,14 @@ const AuthenticatedHelpRouteWithChildren =
   AuthenticatedHelpRoute._addFileChildren(AuthenticatedHelpRouteChildren)
 
 interface AuthenticateduserMeRouteChildren {
+  AuthenticateduserMeBillingRoute: typeof AuthenticateduserMeBillingRoute
   AuthenticateduserMeNotificationsRoute: typeof AuthenticateduserMeNotificationsRoute
   AuthenticateduserMeSecurityRoute: typeof AuthenticateduserMeSecurityRoute
   AuthenticateduserMeIndexRoute: typeof AuthenticateduserMeIndexRoute
 }
 
 const AuthenticateduserMeRouteChildren: AuthenticateduserMeRouteChildren = {
+  AuthenticateduserMeBillingRoute: AuthenticateduserMeBillingRoute,
   AuthenticateduserMeNotificationsRoute: AuthenticateduserMeNotificationsRoute,
   AuthenticateduserMeSecurityRoute: AuthenticateduserMeSecurityRoute,
   AuthenticateduserMeIndexRoute: AuthenticateduserMeIndexRoute,
@@ -590,6 +632,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
   ApiUploadRoute: ApiUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiBillingWebhookRoute: ApiBillingWebhookRoute,
   ApiNotificationsStreamRoute: ApiNotificationsStreamRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }

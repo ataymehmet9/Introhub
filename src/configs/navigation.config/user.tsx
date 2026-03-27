@@ -1,5 +1,5 @@
 import { PiUserDuotone } from 'react-icons/pi'
-import { TbBell, TbLock, TbUserSquare } from 'react-icons/tb'
+import { TbBell, TbCreditCard, TbLock, TbUserSquare } from 'react-icons/tb'
 import type {
   UserMainSettingsNavigation,
   UserSettingsNavigation,
@@ -31,5 +31,11 @@ export const userSettingsMenu: Array<UserMainSettingsNavigation> = [
     value: 'notifications',
     path: '/me/notifications',
     icon: <TbBell />,
+  },
+  {
+    label: 'Billing',
+    value: 'billing',
+    path: '/me/billing',
+    icon: <TbCreditCard />,
   },
 ]
