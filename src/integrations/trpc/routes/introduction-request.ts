@@ -21,6 +21,7 @@ import {
 } from '@/services/email.functions'
 import { notificationEmitter } from '@/lib/notification-emitter'
 import { trackServerEvent } from '@/integrations/posthog'
+import { extractEmailBodyContent } from '@/utils/extractEmailBodyContent'
 
 const createIntroductionRequestSchema = insertIntroductionRequestSchema
   .omit({
@@ -156,8 +157,9 @@ export const introductionRequestRouter = {
           })
 
           // Capture email HTML if email was sent successfully
+          // Extract only the body content to avoid breaking the page when rendered
           if (emailResult.success && emailResult.emailHtml) {
-            emailHtmlContent = emailResult.emailHtml
+            emailHtmlContent = extractEmailBodyContent(emailResult.emailHtml)
           }
         } catch (error) {
           // Log error but don't fail the request
@@ -425,8 +427,9 @@ export const introductionRequestRouter = {
             })
 
             // Capture email HTML if email was sent successfully
+            // Extract only the body content to avoid breaking the page when rendered
             if (emailResult.success && emailResult.emailHtml) {
-              emailHtmlContent = emailResult.emailHtml
+              emailHtmlContent = extractEmailBodyContent(emailResult.emailHtml)
             }
           } else {
             // Send rejection email only to requester
@@ -445,8 +448,9 @@ export const introductionRequestRouter = {
             })
 
             // Capture email HTML if email was sent successfully
+            // Extract only the body content to avoid breaking the page when rendered
             if (emailResult.success && emailResult.emailHtml) {
-              emailHtmlContent = emailResult.emailHtml
+              emailHtmlContent = extractEmailBodyContent(emailResult.emailHtml)
             }
           }
         } catch (error) {
