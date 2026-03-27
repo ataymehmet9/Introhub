@@ -19,6 +19,9 @@ export const user = pgTable('user', {
   image: text('image'),
   company: text('company'),
   position: text('position'),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  stripeSubscriptionStatus: text('stripe_subscription_status'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
