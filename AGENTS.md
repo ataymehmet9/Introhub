@@ -1,5 +1,7 @@
 # AGENTS.md - IntroHub TanStack Start Application
 
+Use 'bd' for task tracking
+
 ## Core Principles
 
 - **TypeScript First**: Strict mode, no implicit any.
