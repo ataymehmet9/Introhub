@@ -70,7 +70,7 @@ function RouteComponent() {
 
   return (
     <AdaptiveCard>
-      <div className="max-w-[800px] mx-auto">
+      <div className="mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h4>Notifications</h4>
           <SettingsNotificationAction
@@ -81,7 +81,7 @@ function RouteComponent() {
         <div style={{ opacity: isFetchingNextPage ? 0.5 : 1 }}>
           <SettingsNotifications
             isLoading={isLoading}
-            loadable={hasNextPage ?? false}
+            loadable={hasNextPage}
             notifications={notifications}
             onLoadMore={handleLoadMore}
             onMarkAsRead={handleMarkAsRead}
