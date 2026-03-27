@@ -12,6 +12,7 @@ import type { NotificationWithMetadata } from '@/schemas'
 import { Button, Card, Timeline } from '@/components/ui'
 import classNames from '@/utils/classNames'
 import NotificationAvatar from '@/components/template/Notification/NotificationAvatar'
+import { extractEmailBodyContent } from '@/utils/extractEmailBodyContent'
 
 type SettingsNotificationsProps = {
   notifications: Array<NotificationWithMetadata>
@@ -27,6 +28,10 @@ const UnixDateTime = ({ value }: { value: string }) => {
 
 const EmailContentCard = ({ emailContent }: { emailContent: string }) => {
   const [isExpanded, setIsExpanded] = useState(false)
+
+  // Extract body content if the emailContent contains full HTML document
+  // This handles backward compatibility with old notifications that have full HTML
+  const bodyContent = extractEmailBodyContent(emailContent)
 
   return (
     <div className="mt-4">
@@ -55,7 +60,7 @@ const EmailContentCard = ({ emailContent }: { emailContent: string }) => {
           >
             <Card className="mt-3 bg-gray-50 dark:bg-gray-800/50 border-l-4 border-l-primary">
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                {parse(emailContent)}
+                {parse(bodyContent)}
               </div>
             </Card>
           </motion.div>
