@@ -92,9 +92,18 @@ export function useContact(options: UseContactOptions = {}) {
       )
       onCreateSuccess?.()
     },
-    onSettled: () => {
+    onSettled: async () => {
       // Always refetch after error or success to ensure sync
-      queryClient.invalidateQueries({ queryKey })
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the new contact
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 
@@ -140,8 +149,17 @@ export function useContact(options: UseContactOptions = {}) {
       )
       onUpdateSuccess?.()
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the contact update
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 
@@ -182,8 +200,17 @@ export function useContact(options: UseContactOptions = {}) {
       )
       onDeleteSuccess?.()
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the contact deletion
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 
@@ -227,8 +254,17 @@ export function useContact(options: UseContactOptions = {}) {
       )
       onDeleteSuccess?.()
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the batch deletion
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 

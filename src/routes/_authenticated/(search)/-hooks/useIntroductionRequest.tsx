@@ -40,6 +40,17 @@ export function useIntroductionRequest(
           )
         },
       })
+
+      // Invalidate dashboard queries to reflect the new request
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
+
       onSuccess?.()
     },
     onError: (error: Error) => {

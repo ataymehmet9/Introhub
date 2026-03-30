@@ -105,8 +105,17 @@ export function useRequests(options: UseRequestsOptions = {}) {
       )
       onAcceptSuccess?.()
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the status change
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 
@@ -163,8 +172,17 @@ export function useRequests(options: UseRequestsOptions = {}) {
       )
       onRejectSuccess?.()
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the status change
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 
@@ -207,8 +225,17 @@ export function useRequests(options: UseRequestsOptions = {}) {
       )
       onDeleteSuccess?.()
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      // Invalidate dashboard queries to reflect the deletion
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'dashboard'
+          )
+        },
+      })
     },
   })
 
