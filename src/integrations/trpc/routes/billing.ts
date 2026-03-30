@@ -5,6 +5,11 @@ import type Stripe from 'stripe'
 import type { TRPCRouterRecord } from '@trpc/server'
 import { stripe } from '@/integrations/stripe/init'
 import { user as userTable } from '@/db/schema'
+import {
+  canCreateRequest,
+  getUserSubscription,
+} from '@/services/subscription.service'
+import { getUsageStats } from '@/services/usage-tracking.service'
 
 export const billingRouter = {
   getSubscription: protectedProcedure.query(async ({ ctx }) => {
@@ -106,5 +111,33 @@ export const billingRouter = {
     })
 
     return { url: session.url }
+  }),
+
+  // Get detailed plan information including usage
+  getPlanDetails: protectedProcedure.query(async ({ ctx }) => {
+    const { user } = ctx
+
+    if (!user) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
+
+    const subscription = await getUserSubscription(user.id)
+    const usageStats = await getUsageStats(user.id)
+
+    return {
+      ...subscription,
+      usageStats,
+    }
+  }),
+
+  // Check if user can create a request
+  canCreateRequest: protectedProcedure.query(async ({ ctx }) => {
+    const { user } = ctx
+
+    if (!user) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+    }
+
+    return await canCreateRequest(user.id)
   }),
 } satisfies TRPCRouterRecord
