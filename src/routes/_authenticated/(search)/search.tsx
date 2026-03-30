@@ -8,6 +8,7 @@ import IntroductionRequestModal from './-components/IntroductionRequestModal'
 import { useSearch } from './-hooks/useSearch'
 import { useIntroductionRequest } from './-hooks/useIntroductionRequest'
 import type { SearchResult } from '@/schemas'
+import { LimitReachedModal } from '@/components/shared/LimitReachedModal'
 import { Card } from '@/components/ui'
 import { Container } from '@/components/shared'
 
@@ -39,11 +40,12 @@ function SearchPage() {
   })
 
   // Use the introduction request hook
-  const { createRequest } = useIntroductionRequest({
-    onSuccess: () => {
-      handleCloseModal()
-    },
-  })
+  const { createRequest, showLimitModal, setShowLimitModal, planDetails } =
+    useIntroductionRequest({
+      onSuccess: () => {
+        handleCloseModal()
+      },
+    })
 
   const handleRequestIntroduction = (contact: SearchResult) => {
     setSelectedContact(contact)
@@ -156,6 +158,15 @@ function SearchPage() {
           onSubmit={handleSubmitRequest}
         />
       )}
+
+      {/* Limit Reached Modal */}
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        requestsUsed={planDetails?.requestsUsed ?? 0}
+        requestLimit={planDetails?.requestsLimit ?? 0}
+        nextResetDate={planDetails?.nextResetDate ?? null}
+      />
     </Container>
   )
 }
