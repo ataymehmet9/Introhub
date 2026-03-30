@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
-import { Notification, toast } from '@/components/ui'
+import { Button, Notification, toast } from '@/components/ui'
 import { useTRPC } from '@/integrations/trpc/react'
 
 interface CreateIntroductionRequestInput {
@@ -33,11 +34,52 @@ export function useIntroductionRequest(
     mutationFn: (data: CreateIntroductionRequestInput) =>
       trpcClient.introductionRequests.create.mutate(data),
     onSuccess: async () => {
+      // Check if user is approaching limit after successful request
+      const updatedPlanDetails = await queryClient.fetchQuery({
+        ...trpc.billing.getPlanDetails.queryOptions(),
+      })
+
+      const requestsRemaining =
+        updatedPlanDetails.requestsLimit !== null
+          ? updatedPlanDetails.requestsLimit - updatedPlanDetails.requestsUsed
+          : null
+
+      // Show success toast
       toast.push(
         <Notification type="success" title="Request sent">
           Your introduction request has been sent successfully
         </Notification>,
       )
+
+      // Show warning toast if user has 1 or fewer requests remaining
+      if (
+        requestsRemaining !== null &&
+        requestsRemaining <= 1 &&
+        updatedPlanDetails.planType === 'free'
+      ) {
+        setTimeout(() => {
+          toast.push(
+            <Notification
+              type="warning"
+              title="Running low on requests"
+              duration={8000}
+            >
+              <div className="space-y-2">
+                <p>
+                  You have {requestsRemaining} request
+                  {requestsRemaining !== 1 ? 's' : ''} remaining this month.
+                </p>
+                <Link to="/me/billing">
+                  <Button size="sm" variant="solid" className="mt-2">
+                    Upgrade to Pro
+                  </Button>
+                </Link>
+              </div>
+            </Notification>,
+            { placement: 'top-end' },
+          )
+        }, 1500)
+      }
       // Invalidate all search queries to update hasPendingRequest status
       // This will refetch any active search queries with the updated data
       await queryClient.invalidateQueries({
