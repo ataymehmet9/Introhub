@@ -80,6 +80,16 @@ export function useIntroductionRequest(
           )
         }, 1500)
       }
+      // Invalidate billing queries to update plan details in header
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0]?.[0] === 'billing'
+          )
+        },
+      })
+
       // Invalidate all search queries to update hasPendingRequest status
       // This will refetch any active search queries with the updated data
       await queryClient.invalidateQueries({

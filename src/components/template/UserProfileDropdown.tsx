@@ -4,7 +4,6 @@ import { PiSignOutDuotone, PiUserDuotone } from 'react-icons/pi'
 import { TbCrown } from 'react-icons/tb'
 import type { User } from '@/@types/auth'
 import Avatar from '@/components/ui/Avatar'
-import Badge from '@/components/ui/Badge'
 import Dropdown from '@/components/ui/Dropdown'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import { useSessionUser } from '@/store/authStore'
@@ -84,28 +83,22 @@ const UserDropdown = () => {
               {email || 'No email available'}
             </div>
             {/* Plan Badge */}
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2">
               {isPro ? (
-                <Badge
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold"
-                  innerClass="bg-amber-500 text-white"
-                >
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500 text-white">
                   <TbCrown className="text-sm" />
                   Pro
-                </Badge>
-              ) : (
-                <Badge
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold"
-                  innerClass="bg-gray-500 text-white"
-                >
-                  Free
-                </Badge>
-              )}
-              {/* Show remaining requests for free tier */}
-              {isFree && (
-                <span className="text-xs text-gray-600 dark:text-gray-400">
-                  {requestsRemaining}/{requestLimit} requests left
                 </span>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-500 text-white">
+                    Free
+                  </span>
+                  {/* Show remaining requests for free tier */}
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                    {requestsRemaining} of {requestLimit} intro requests left
+                  </span>
+                </div>
               )}
             </div>
           </div>
@@ -117,16 +110,12 @@ const UserDropdown = () => {
         <>
           <Dropdown.Item eventKey="upgrade" className="px-0">
             <Link
-              className="flex h-full w-full px-2 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20"
               to="/me/billing"
+              className="flex h-full w-full px-2 py-2 bg-success-subtle hover:bg-success-subtle/80 transition-colors rounded"
             >
-              <span className="flex gap-2 items-center w-full">
-                <span className="text-xl text-amber-600 dark:text-amber-400">
-                  <TbCrown />
-                </span>
-                <span className="font-medium text-amber-700 dark:text-amber-300">
-                  Upgrade to Pro
-                </span>
+              <span className="flex gap-2 items-center w-full text-success">
+                <TbCrown className="text-lg" />
+                <span className="font-medium">Upgrade to Pro</span>
               </span>
             </Link>
           </Dropdown.Item>
