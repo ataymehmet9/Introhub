@@ -80,29 +80,40 @@ export function useNotifications(props?: UseNotificationsProps) {
     mutationFn: (id: number) =>
       trpcClient.notifications.markAsRead.mutate({ id }),
     onMutate: async (id) => {
-      // Cancel any outgoing refetches
+      // Cancel any outgoing refetches to prevent race conditions
       await queryClient.cancelQueries({ queryKey: notificationsQueryKey })
       await queryClient.cancelQueries({ queryKey: unreadCountQueryKey })
 
-      // Snapshot the previous values
+      // Snapshot the previous values for rollback
       const previousNotifications = queryClient.getQueryData(
         notificationsQueryKey,
       )
       const previousUnreadCount = queryClient.getQueryData(unreadCountQueryKey)
 
       // Optimistically update notifications list (infinite query structure)
-      queryClient.setQueryData(notificationsQueryKey, (oldData: any) => {
-        if (!oldData?.pages) return oldData
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: page.data.map((n: any) =>
-              n.id === id ? { ...n, read: true } : n,
-            ),
-          })),
-        }
-      })
+      queryClient.setQueryData(
+        notificationsQueryKey,
+        (oldData: unknown): unknown => {
+          if (!oldData || typeof oldData !== 'object' || !('pages' in oldData))
+            return oldData
+          const data = oldData as {
+            pages: Array<{
+              data: Array<{ id: number; read: boolean; [key: string]: unknown }>
+              [key: string]: unknown
+            }>
+            [key: string]: unknown
+          }
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              data: page.data.map((n) =>
+                n.id === id ? { ...n, read: true } : n,
+              ),
+            })),
+          }
+        },
+      )
 
       // Optimistically update unread count
       queryClient.setQueryData(
@@ -118,6 +129,16 @@ export function useNotifications(props?: UseNotificationsProps) {
       )
 
       return { previousNotifications, previousUnreadCount }
+    },
+    onSuccess: () => {
+      // After successful mutation, invalidate to sync with SSE updates
+      // Use a small delay to allow SSE event to arrive first
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ['notifications', 'list'],
+          refetchType: 'active',
+        })
+      }, 100)
     },
     onError: (error: Error, _id, context) => {
       // Rollback on error
@@ -140,35 +161,44 @@ export function useNotifications(props?: UseNotificationsProps) {
         </Notification>,
       )
     },
-    // Don't invalidate on settled - let SSE handle real-time updates
-    // This prevents race conditions between optimistic updates and SSE events
   })
 
   // Mark all as read mutation
   const markAllAsReadMutation = useMutation({
     mutationFn: () => trpcClient.notifications.markAllAsRead.mutate(),
     onMutate: async () => {
-      // Cancel any outgoing refetches
+      // Cancel any outgoing refetches to prevent race conditions
       await queryClient.cancelQueries({ queryKey: notificationsQueryKey })
       await queryClient.cancelQueries({ queryKey: unreadCountQueryKey })
 
-      // Snapshot the previous values
+      // Snapshot the previous values for rollback
       const previousNotifications = queryClient.getQueryData(
         notificationsQueryKey,
       )
       const previousUnreadCount = queryClient.getQueryData(unreadCountQueryKey)
 
       // Optimistically update notifications list (infinite query structure)
-      queryClient.setQueryData(notificationsQueryKey, (oldData: any) => {
-        if (!oldData?.pages) return oldData
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: page.data.map((n: any) => ({ ...n, read: true })),
-          })),
-        }
-      })
+      queryClient.setQueryData(
+        notificationsQueryKey,
+        (oldData: unknown): unknown => {
+          if (!oldData || typeof oldData !== 'object' || !('pages' in oldData))
+            return oldData
+          const data = oldData as {
+            pages: Array<{
+              data: Array<{ read: boolean; [key: string]: unknown }>
+              [key: string]: unknown
+            }>
+            [key: string]: unknown
+          }
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              data: page.data.map((n) => ({ ...n, read: true })),
+            })),
+          }
+        },
+      )
 
       // Optimistically update unread count
       queryClient.setQueryData(unreadCountQueryKey, {
@@ -184,6 +214,15 @@ export function useNotifications(props?: UseNotificationsProps) {
           All notifications marked as read
         </Notification>,
       )
+
+      // After successful mutation, invalidate to sync with SSE updates
+      // Use a small delay to allow SSE event to arrive first
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ['notifications', 'list'],
+          refetchType: 'active',
+        })
+      }, 100)
     },
     onError: (error: Error, _variables, context) => {
       // Rollback on error
@@ -206,8 +245,6 @@ export function useNotifications(props?: UseNotificationsProps) {
         </Notification>,
       )
     },
-    // Don't invalidate on settled - let SSE handle real-time updates
-    // This prevents race conditions between optimistic updates and SSE events
   })
 
   // Delete notification mutation

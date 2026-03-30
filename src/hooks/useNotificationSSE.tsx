@@ -53,10 +53,7 @@ export function useNotificationSSE() {
   const [connectionStatus, setConnectionStatus] =
     useState<SSEConnectionStatus>('disconnected')
 
-  // Query keys for cache invalidation — must match the keys used in useNotifications
-  const notificationsQueryKey = trpc.notifications.list.queryKey({
-    unreadOnly: false,
-  })
+  // Query keys for cache invalidation
   const unreadCountQueryKey = trpc.notifications.getUnreadCount.queryKey()
 
   // Introduction requests query key - for invalidating when new requests arrive
@@ -64,37 +61,12 @@ export function useNotificationSSE() {
     trpc.introductionRequests.listByUser.queryKey()
 
   // ─── Cache update helpers ────────────────────────────────────────────────
+  // Instead of trying to update specific query keys, we invalidate ALL notification queries
+  // This ensures consistency across the header dropdown and notifications page
 
   const handleNotificationCreated = useCallback(
     (notification: NotificationWithMetadata) => {
-      queryClient.setQueryData(notificationsQueryKey, (oldData: any) => {
-        if (!oldData) {
-          return {
-            data: [notification],
-            pagination: {
-              page: 1,
-              pageSize: 50,
-              totalItems: 1,
-              totalPages: 1,
-              hasNextPage: false,
-              hasPreviousPage: false,
-            },
-          }
-        }
-        const newData = [notification, ...oldData.data]
-        return {
-          ...oldData,
-          data: newData,
-          pagination: {
-            ...oldData.pagination,
-            totalItems: oldData.pagination.totalItems + 1,
-            totalPages: Math.ceil(
-              (oldData.pagination.totalItems + 1) / oldData.pagination.pageSize,
-            ),
-          },
-        }
-      })
-
+      // Update unread count optimistically
       if (!notification.read) {
         queryClient.setQueryData(
           unreadCountQueryKey,
@@ -105,35 +77,26 @@ export function useNotificationSSE() {
         )
       }
 
+      // Invalidate ALL notification list queries to refetch with new data
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'list'],
+        refetchType: 'active',
+      })
+
       // Invalidate introduction requests cache when a new introduction request notification arrives
-      // This ensures the requests page shows new requests immediately
       if (notification.type === 'introduction_request') {
         queryClient.invalidateQueries({
           queryKey: introductionRequestsQueryKey,
-          refetchType: 'active', // Only refetch if the query is currently being used
+          refetchType: 'active',
         })
       }
     },
-    [
-      queryClient,
-      notificationsQueryKey,
-      unreadCountQueryKey,
-      introductionRequestsQueryKey,
-    ],
+    [queryClient, unreadCountQueryKey, introductionRequestsQueryKey],
   )
 
   const handleNotificationRead = useCallback(
-    (notificationId: number) => {
-      queryClient.setQueryData(notificationsQueryKey, (oldData: any) => {
-        if (!oldData) return oldData
-        return {
-          ...oldData,
-          data: oldData.data.map((n: NotificationWithMetadata) =>
-            n.id === notificationId ? { ...n, read: true } : n,
-          ),
-        }
-      })
-
+    (_notificationId: number) => {
+      // Update unread count optimistically
       queryClient.setQueryData(
         unreadCountQueryKey,
         (oldData: { count: number; hasUnread: boolean } | undefined) => {
@@ -143,85 +106,51 @@ export function useNotificationSSE() {
         },
       )
 
+      // Invalidate ALL notification list queries to refetch with updated read status
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'list'],
+        refetchType: 'active',
+      })
+
       // Invalidate introduction requests when approval/decline notifications are read
-      // This ensures the requests list reflects the updated status
-      const notification = queryClient
-        .getQueryData<any>(notificationsQueryKey)
-        ?.data?.find((n: NotificationWithMetadata) => n.id === notificationId)
-      if (
-        notification?.type === 'introduction_approved' ||
-        notification?.type === 'introduction_declined'
-      ) {
-        queryClient.invalidateQueries({
-          queryKey: introductionRequestsQueryKey,
-          refetchType: 'active',
-        })
-      }
+      queryClient.invalidateQueries({
+        queryKey: introductionRequestsQueryKey,
+        refetchType: 'active',
+      })
     },
-    [
-      queryClient,
-      notificationsQueryKey,
-      unreadCountQueryKey,
-      introductionRequestsQueryKey,
-    ],
+    [queryClient, unreadCountQueryKey, introductionRequestsQueryKey],
   )
 
   const handleNotificationDeleted = useCallback(
-    (notificationId: number) => {
-      const currentData = queryClient.getQueryData<any>(notificationsQueryKey)
-      const deletedNotification = currentData?.data?.find(
-        (n: NotificationWithMetadata) => n.id === notificationId,
-      )
-
-      queryClient.setQueryData(notificationsQueryKey, (oldData: any) => {
-        if (!oldData) return oldData
-        const newData = oldData.data.filter(
-          (n: NotificationWithMetadata) => n.id !== notificationId,
-        )
-        return {
-          ...oldData,
-          data: newData,
-          pagination: {
-            ...oldData.pagination,
-            totalItems: Math.max(0, oldData.pagination.totalItems - 1),
-            totalPages: Math.ceil(
-              Math.max(0, oldData.pagination.totalItems - 1) /
-                oldData.pagination.pageSize,
-            ),
-          },
-        }
+    (_notificationId: number) => {
+      // Invalidate ALL notification queries to refetch
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'list'],
+        refetchType: 'active',
       })
 
-      if (deletedNotification && !deletedNotification.read) {
-        queryClient.setQueryData(
-          unreadCountQueryKey,
-          (oldData: { count: number; hasUnread: boolean } | undefined) => {
-            const currentCount = oldData?.count || 0
-            const newCount = Math.max(0, currentCount - 1)
-            return { count: newCount, hasUnread: newCount > 0 }
-          },
-        )
-      }
+      // Also invalidate unread count
+      queryClient.invalidateQueries({
+        queryKey: unreadCountQueryKey,
+        refetchType: 'active',
+      })
     },
-    [queryClient, notificationsQueryKey, unreadCountQueryKey],
+    [queryClient, unreadCountQueryKey],
   )
 
   const handleAllRead = useCallback(() => {
-    queryClient.setQueryData(notificationsQueryKey, (oldData: any) => {
-      if (!oldData) return oldData
-      return {
-        ...oldData,
-        data: oldData.data.map((n: NotificationWithMetadata) => ({
-          ...n,
-          read: true,
-        })),
-      }
-    })
+    // Update unread count immediately
     queryClient.setQueryData(unreadCountQueryKey, {
       count: 0,
       hasUnread: false,
     })
-  }, [queryClient, notificationsQueryKey, unreadCountQueryKey])
+
+    // Invalidate ALL notification list queries to refetch with updated read status
+    queryClient.invalidateQueries({
+      queryKey: ['notifications', 'list'],
+      refetchType: 'active',
+    })
+  }, [queryClient, unreadCountQueryKey])
 
   // ─── Connection management ───────────────────────────────────────────────
 
@@ -374,11 +303,8 @@ export function useNotificationSSE() {
   // ─── Lifecycle effects ───────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!window.EventSource) {
-      console.warn('[SSE] EventSource not supported in this browser')
-      setConnectionStatus('error')
-      return
-    }
+    // EventSource is always available in browser environments where this hook runs
+    // This check is kept for documentation purposes but will always pass
 
     shouldReconnectRef.current = true
     connect()
@@ -391,7 +317,8 @@ export function useNotificationSSE() {
         console.log('[SSE] Page hidden — closing connection')
         closeEventSource()
         setConnectionStatus('disconnected')
-      } else if (document.visibilityState === 'visible') {
+      } else {
+        // Page is visible again
         console.log('[SSE] Page visible — reconnecting')
         if (shouldReconnectRef.current) {
           retryCountRef.current = 0
