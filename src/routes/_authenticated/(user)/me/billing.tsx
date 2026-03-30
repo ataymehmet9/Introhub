@@ -1,6 +1,12 @@
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { TbCheck, TbCreditCard, TbReceipt } from 'react-icons/tb'
+import {
+  TbCalendar,
+  TbCheck,
+  TbCreditCard,
+  TbReceipt,
+  TbTrendingUp,
+} from 'react-icons/tb'
 import { z } from 'zod'
 import { AdaptiveCard } from '@/components/shared'
 import { Button, Card, Notification, toast } from '@/components/ui'
@@ -24,6 +30,11 @@ function RouteComponent() {
 
   const { data: subscription, isLoading } = useQuery({
     ...trpc.billing.getSubscription.queryOptions(),
+  })
+
+  // Fetch detailed plan information including usage stats
+  const { data: planDetails } = useQuery({
+    ...trpc.billing.getPlanDetails.queryOptions(),
   })
 
   const checkoutMutation = useMutation({
@@ -55,7 +66,24 @@ function RouteComponent() {
   })
 
   const isPro = subscription?.plan === 'pro'
+  const isFree = !isPro
   const isMutating = checkoutMutation.isPending || portalMutation.isPending
+
+  // Format date helper
+  const formatDate = (date: Date | null) => {
+    if (!date) return 'N/A'
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date)
+  }
+
+  // Calculate usage percentage
+  const usagePercentage =
+    planDetails?.requestsLimit && planDetails.requestsLimit > 0
+      ? (planDetails.requestsUsed / planDetails.requestsLimit) * 100
+      : 0
 
   return (
     <AdaptiveCard>
@@ -72,6 +100,121 @@ function RouteComponent() {
           <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-sm font-medium">
             Checkout was canceled. No charges were made.
           </div>
+        )}
+
+        {/* Usage Stats Card - Only for Free Tier */}
+        {isFree && planDetails && (
+          <Card className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-3 mb-4">
+              <TbTrendingUp className="text-2xl text-blue-600 dark:text-blue-400" />
+              <h6 className="text-blue-900 dark:text-blue-100">
+                Current Usage
+              </h6>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* Requests Used */}
+              <div>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
+                  Requests This Month
+                </p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {planDetails.requestsUsed} / {planDetails.requestsLimit}
+                </p>
+              </div>
+
+              {/* Requests Remaining */}
+              <div>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
+                  Remaining
+                </p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {planDetails.requestsLimit !== null
+                    ? planDetails.requestsLimit - planDetails.requestsUsed
+                    : '∞'}
+                </p>
+              </div>
+
+              {/* Next Reset */}
+              <div>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
+                  Resets On
+                </p>
+                <p className="text-lg font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-1">
+                  <TbCalendar className="text-base" />
+                  {formatDate(planDetails.nextResetDate)}
+                </p>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mb-3">
+              <div className="flex items-center justify-between text-xs text-blue-700 dark:text-blue-300 mb-1">
+                <span>Usage</span>
+                <span>{Math.round(usagePercentage)}%</span>
+              </div>
+              <div className="h-3 w-full overflow-hidden rounded-full bg-blue-200 dark:bg-blue-800">
+                <div
+                  className={`h-full transition-all ${
+                    usagePercentage >= 80
+                      ? 'bg-red-500'
+                      : usagePercentage >= 60
+                        ? 'bg-amber-500'
+                        : 'bg-blue-500'
+                  }`}
+                  style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Warning Message */}
+            {usagePercentage >= 80 && (
+              <div className="mt-3 p-3 rounded-lg bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700">
+                <p className="text-sm text-amber-900 dark:text-amber-100">
+                  <strong>Heads up!</strong> You're running low on requests.
+                  Upgrade to Pro for unlimited access.
+                </p>
+              </div>
+            )}
+          </Card>
+        )}
+
+        {/* Pro Usage Stats */}
+        {isPro && planDetails && (
+          <Card className="mb-6 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <TbTrendingUp className="text-2xl text-primary" />
+              <h6>Usage Statistics</h6>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Total Requests This Cycle */}
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Requests This Month
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {planDetails.usageStats.requestsThisCycle}
+                </p>
+              </div>
+
+              {/* Average Per Month */}
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Average Per Month
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {planDetails.usageStats.averagePerMonth.toFixed(1)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+              <p className="text-sm text-green-900 dark:text-green-100">
+                ✨ You have unlimited requests with your Pro plan
+              </p>
+            </div>
+          </Card>
         )}
 
         {/* Plan Cards */}
