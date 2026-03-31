@@ -97,9 +97,7 @@ const FormItem = (props: FormItemProps) => {
           className={formLabelClass}
           style={formLabelStyle()}
         >
-          {asterisk && (
-            <span className="text-red-500 ltr:mr-1 rtl:ml-1">*</span>
-          )}
+          {asterisk && <span className="text-error ltr:mr-1 rtl:ml-1">*</span>}
           {label}
           {extra && <span>{extra}</span>}
           {label && formItemLayout !== 'vertical' && ':'}

@@ -115,7 +115,7 @@ const Notification = ({ className }: { className?: string }) => {
                 className={classNames(
                   'relative rounded-xl flex px-4 py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700',
                   {
-                    'bg-blue-50 dark:bg-blue-900/20': !notification.read,
+                    'bg-primary-subtle': !notification.read,
                   },
                 )}
                 onClick={() => onMarkAsRead(notification.id)}

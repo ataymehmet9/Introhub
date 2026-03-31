@@ -1,15 +1,25 @@
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   TbCalendar,
   TbCheck,
+  TbChevronDown,
   TbCreditCard,
   TbReceipt,
   TbTrendingUp,
 } from 'react-icons/tb'
 import { z } from 'zod'
 import { AdaptiveCard } from '@/components/shared'
-import { Button, Card, Notification, Progress, toast } from '@/components/ui'
+import {
+  Alert,
+  Button,
+  Card,
+  Notification,
+  Progress,
+  toast,
+} from '@/components/ui'
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 import { PLANS } from '@/integrations/stripe/billing-plans'
@@ -27,6 +37,7 @@ export const Route = createFileRoute('/_authenticated/(user)/me/billing')({
 function RouteComponent() {
   const trpc = useTRPC()
   const search = useSearch({ from: '/_authenticated/(user)/me/billing' })
+  const [isUsageExpanded, setIsUsageExpanded] = useState(false)
 
   const { data: subscription, isLoading } = useQuery({
     ...trpc.billing.getSubscription.queryOptions(),
@@ -104,66 +115,101 @@ function RouteComponent() {
 
         {/* Usage Stats Card - Only for Free Tier */}
         {isFree && planDetails && (
-          <Card className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
-            <div className="flex items-center gap-3 mb-4">
-              <TbTrendingUp className="text-2xl text-blue-600 dark:text-blue-400" />
-              <h6 className="text-blue-900 dark:text-blue-100">
-                Current Usage
-              </h6>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {/* Requests Used */}
-              <div>
-                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
-                  Requests This Month
-                </p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                  {planDetails.requestsUsed} / {planDetails.requestsLimit}
-                </p>
+          <Card className="mb-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-2 border-blue-200 dark:border-blue-800">
+            <button
+              onClick={() => setIsUsageExpanded(!isUsageExpanded)}
+              className="w-full p-6 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <TbTrendingUp className="text-2xl text-blue-600 dark:text-blue-400" />
+                <h6 className="text-gray-900 dark:text-gray-100 font-semibold">
+                  Current Usage
+                </h6>
               </div>
+              <motion.div
+                animate={{ rotate: isUsageExpanded ? 180 : 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <TbChevronDown className="text-xl text-gray-600 dark:text-gray-400" />
+              </motion.div>
+            </button>
 
-              {/* Requests Remaining */}
-              <div>
-                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
-                  Remaining
-                </p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                  {planDetails.requestsLimit !== null
-                    ? planDetails.requestsLimit - planDetails.requestsUsed
-                    : '∞'}
-                </p>
-              </div>
+            <AnimatePresence>
+              {isUsageExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      {/* Requests Used */}
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          Requests This Month
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {planDetails.requestsUsed} /{' '}
+                          {planDetails.requestsLimit}
+                        </p>
+                      </div>
 
-              {/* Next Reset */}
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  Resets On
-                </p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1">
-                  <TbCalendar className="text-base" />
-                  {formatDate(planDetails.nextResetDate)}
-                </p>
-              </div>
-            </div>
+                      {/* Requests Remaining */}
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          Remaining
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {planDetails.requestsLimit !== null
+                            ? planDetails.requestsLimit -
+                              planDetails.requestsUsed
+                            : '∞'}
+                        </p>
+                      </div>
 
-            {/* Progress Bar */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                <span>Usage</span>
-              </div>
-              <Progress percent={Math.min(usagePercentage, 100)} size="md" />
-            </div>
+                      {/* Next Reset */}
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          Resets On
+                        </p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1">
+                          <TbCalendar className="text-base" />
+                          {formatDate(planDetails.nextResetDate)}
+                        </p>
+                      </div>
+                    </div>
 
-            {/* Warning Message */}
-            {usagePercentage >= 80 && (
-              <div className="mt-3 p-3 rounded-lg bg-warning-subtle border border-warning">
-                <p className="text-sm text-warning">
-                  <strong>Heads up!</strong> You're running low on requests.
-                  Upgrade to Pro for unlimited access.
-                </p>
-              </div>
-            )}
+                    {/* Progress Bar */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        <span>Usage</span>
+                      </div>
+                      <Progress
+                        percent={Math.min(usagePercentage, 100)}
+                        size="md"
+                      />
+                    </div>
+
+                    {/* Warning Message */}
+                    {usagePercentage > 99 && (
+                      <Alert showIcon type="danger">
+                        Your plan has reached its limit. Please upgrade to
+                        continue using the service without any restrictions.
+                      </Alert>
+                    )}
+
+                    {usagePercentage < 100 && usagePercentage >= 80 && (
+                      <Alert showIcon type="warning">
+                        <strong>Heads up!</strong> You're running low on
+                        requests. Upgrade to Pro for unlimited access.
+                      </Alert>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         )}
 
