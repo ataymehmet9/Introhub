@@ -120,8 +120,8 @@ function RouteComponent() {
     },
   })
 
-  // Data is guaranteed to exist from loader (no optional chaining needed)
-  const isPro = subscription.plan === 'pro'
+  // Data can be undefined during refetch when switching users
+  const isPro = subscription?.plan === 'pro'
   const isFree = !isPro
   const isMutating = checkoutMutation.isPending || portalMutation.isPending
 
@@ -136,8 +136,9 @@ function RouteComponent() {
   }
 
   // Calculate usage percentage
+
   const usagePercentage =
-    planDetails.requestsLimit && planDetails.requestsLimit > 0
+    planDetails?.requestsLimit && planDetails.requestsLimit > 0
       ? (planDetails.requestsUsed / planDetails.requestsLimit) * 100
       : 0
 
@@ -159,7 +160,7 @@ function RouteComponent() {
         )}
 
         {/* Cancellation Notice */}
-        {subscription.cancelAtPeriodEnd && (
+        {subscription?.cancelAtPeriodEnd && (
           <Alert
             showIcon
             type="warning"
@@ -224,8 +225,8 @@ function RouteComponent() {
                           Requests This Month
                         </p>
                         <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                          {planDetails.requestsUsed} /{' '}
-                          {planDetails.requestsLimit}
+                          {planDetails?.requestsUsed ?? 0} /{' '}
+                          {planDetails?.requestsLimit ?? 0}
                         </p>
                       </div>
 
@@ -235,9 +236,9 @@ function RouteComponent() {
                           Remaining
                         </p>
                         <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                          {planDetails.requestsLimit !== null
-                            ? planDetails.requestsLimit -
-                              planDetails.requestsUsed
+                          {planDetails?.requestsLimit !== null
+                            ? (planDetails?.requestsLimit ?? 0) -
+                              (planDetails?.requestsUsed ?? 0)
                             : '∞'}
                         </p>
                       </div>
@@ -249,7 +250,7 @@ function RouteComponent() {
                         </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1">
                           <TbCalendar className="text-base" />
-                          {formatDate(planDetails.nextResetDate)}
+                          {formatDate(planDetails?.nextResetDate ?? null)}
                         </p>
                       </div>
                     </div>
@@ -311,7 +312,7 @@ function RouteComponent() {
                   Average Per Month
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {planDetails.usageStats.averagePerMonth.toFixed(1)}
+                  {(planDetails?.usageStats?.averagePerMonth ?? 0).toFixed(1)}
                 </p>
               </div>
             </div>

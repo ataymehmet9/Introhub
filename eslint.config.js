@@ -40,6 +40,9 @@ export default [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      // Disabled because with SSR, data can be undefined during refetches when switching users
+      // TypeScript doesn't know this at compile time, so optional chaining is necessary
+      '@typescript-eslint/no-unnecessary-condition': 'off',
     },
     settings: {
       react: {
