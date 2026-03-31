@@ -14,6 +14,7 @@ interface UseRequestsOptions {
   currentUserId?: string
   page?: number
   pageSize?: number
+  initialData?: unknown
 }
 
 export function useRequests(options: UseRequestsOptions = {}) {
@@ -25,6 +26,7 @@ export function useRequests(options: UseRequestsOptions = {}) {
     filterType = 'all',
     page = 1,
     pageSize = 10,
+    initialData,
   } = options
 
   const { selectedRequests, setSelectedRequest, setSelectAllRequests } =
@@ -39,13 +41,15 @@ export function useRequests(options: UseRequestsOptions = {}) {
     filterType,
   })
 
-  // Fetch requests with pagination - now with server-side filtering
+  // Fetch requests with pagination - now with server-side filtering and SSR support
   const { data, isFetching: isLoading } = useQuery({
     ...trpc.introductionRequests.listByUser.queryOptions({
       page,
       pageSize,
       filterType,
     }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initialData: initialData as any,
     enabled,
     refetchOnWindowFocus: true, // Refetch when user returns to the page
     staleTime: 1000 * 30, // Cache for 30 seconds - balance between freshness and performance
@@ -73,6 +77,7 @@ export function useRequests(options: UseRequestsOptions = {}) {
 
       const previousRequests = queryClient.getQueryData(queryKey)
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       queryClient.setQueryData(queryKey, (old: any) => {
         if (!old || !old.data) return old
         return {
@@ -140,6 +145,7 @@ export function useRequests(options: UseRequestsOptions = {}) {
 
       const previousRequests = queryClient.getQueryData(queryKey)
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       queryClient.setQueryData(queryKey, (old: any) => {
         if (!old || !old.data) return old
         return {
@@ -156,6 +162,7 @@ export function useRequests(options: UseRequestsOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousRequests) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         queryClient.setQueryData(queryKey, context.previousRequests as any)
       }
       toast.push(
@@ -195,6 +202,7 @@ export function useRequests(options: UseRequestsOptions = {}) {
 
       const previousRequests = queryClient.getQueryData(queryKey)
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       queryClient.setQueryData(queryKey, (old: any) => {
         if (!old || !old.data) return old
         return {
@@ -209,6 +217,7 @@ export function useRequests(options: UseRequestsOptions = {}) {
     },
     onError: (error: Error, _variables, context) => {
       if (context?.previousRequests) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         queryClient.setQueryData(queryKey, context.previousRequests as any)
       }
       toast.push(
@@ -240,8 +249,12 @@ export function useRequests(options: UseRequestsOptions = {}) {
   })
 
   // Server now handles filtering, so we can use the data directly
+  // Data can be undefined during refetch when switching tabs
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const requests = data?.data ?? []
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const pagination = data?.pagination
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const requestsTotal = pagination?.total ?? 0
 
   return {

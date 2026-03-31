@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 import { z } from 'zod'
 import { useRequests } from './-hooks/useRequests'
 import RequestsTable from './-components/RequestsTable'
@@ -9,6 +11,9 @@ import type { IntroductionRequestWithDetails } from './-store/requestStore'
 import { useSession } from '@/lib/auth-client'
 import { Tabs } from '@/components/ui'
 import { AdaptiveCard, Container } from '@/components/shared'
+import { auth } from '@/lib/auth'
+import { trpcRouter } from '@/integrations/trpc/router'
+import { db } from '@/db'
 
 const requestsSearchSchema = z.object({
   tab: z.enum(['received', 'sent']).optional().default('received'),
@@ -16,8 +21,40 @@ const requestsSearchSchema = z.object({
   pageSize: z.number().optional().default(10),
 })
 
+// Server function to fetch requests data
+const getRequestsData = createServerFn({ method: 'GET' })
+  .inputValidator(
+    (data: { tab: 'received' | 'sent'; page: number; pageSize: number }) =>
+      data,
+  )
+  .handler(async ({ data }) => {
+    const headers = getRequestHeaders()
+    const { session, user } = (await auth.api.getSession({ headers })) ?? {}
+
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
+    const context = { db, session, user }
+    const caller = trpcRouter.createCaller(context)
+
+    const requests = await caller.introductionRequests.listByUser({
+      page: data.page,
+      pageSize: data.pageSize,
+      filterType: data.tab,
+    })
+
+    return { requests }
+  })
+
 export const Route = createFileRoute('/_authenticated/(requests)/requests')({
   validateSearch: requestsSearchSchema,
+  loader: async (opts) => {
+    // Get validated search params
+    const search = requestsSearchSchema.parse(opts.location.search)
+    const { tab, page, pageSize } = search
+    return await getRequestsData({ data: { tab, page, pageSize } })
+  },
   component: RouteComponent,
 })
 
@@ -25,12 +62,16 @@ function RouteComponent() {
   const navigate = useNavigate({ from: Route.fullPath })
   const { tab, page, pageSize } = Route.useSearch()
   const { data: session } = useSession()
-  const currentUserId = session?.user?.id
+  const currentUserId = session?.user.id
+  const loaderData = Route.useLoaderData()
 
   const [acceptingRequest, setAcceptingRequest] =
     useState<IntroductionRequestWithDetails | null>(null)
   const [rejectingRequest, setRejectingRequest] =
     useState<IntroductionRequestWithDetails | null>(null)
+
+  // Only use initialData when search params match loader params (default: received, page 1, pageSize 10)
+  const isDefaultParams = tab === 'received' && page === 1 && pageSize === 10
 
   // Use the custom hook for requests management
   const { acceptRequest, rejectRequest, requests, requestsTotal, isLoading } =
@@ -41,6 +82,7 @@ function RouteComponent() {
       currentUserId,
       page,
       pageSize,
+      initialData: isDefaultParams ? loaderData.requests : undefined,
     })
 
   const handleAcceptRequest = async (customMessage: string) => {
