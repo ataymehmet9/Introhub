@@ -114,7 +114,7 @@ function RouteComponent() {
           change={stats?.changes.totalContacts}
           icon={<HiUsers />}
           loading={statsLoading}
-          className="bg-primary-subtle"
+          className="bg-sky-100 dark:bg-sky/75"
           variant="light"
         />
         <StatCard
@@ -123,7 +123,7 @@ function RouteComponent() {
           change={stats?.changes.requestsMade}
           icon={<HiPaperAirplane />}
           loading={statsLoading}
-          className="bg-success-subtle"
+          className="bg-emerald-100 dark:bg-emerald/75"
           variant="light"
         />
         <StatCard
@@ -132,7 +132,7 @@ function RouteComponent() {
           change={stats?.changes.requestsReceived}
           icon={<HiInbox />}
           loading={statsLoading}
-          className="bg-info-subtle"
+          className="bg-purple-100 dark:bg-purple/75"
           variant="light"
         />
         <StatCard
