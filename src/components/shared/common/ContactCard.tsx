@@ -70,7 +70,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
     {
       key: 'delete',
       label: (
-        <div className="flex items-center gap-2 text-red-600">
+        <div className="flex items-center gap-2 text-error">
           <HiTrash className="text-lg" />
           <span>Delete</span>
         </div>
@@ -144,7 +144,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
             <HiEnvelope className="text-gray-400 flex-shrink-0" />
             <a
               href={`mailto:${contact.email}`}
-              className="text-blue-600 dark:text-blue-400 hover:underline truncate"
+              className="text-primary hover:underline truncate"
             >
               {contact.email}
             </a>
@@ -164,12 +164,12 @@ const ContactCard: React.FC<ContactCardProps> = ({
 
           {contact.linkedinUrl && (
             <div className="flex items-center gap-2 text-sm">
-              <FaLinkedin className="text-blue-600 flex-shrink-0" />
+              <FaLinkedin className="text-primary flex-shrink-0" />
               <a
                 href={contact.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline truncate"
+                className="text-primary hover:underline truncate"
               >
                 LinkedIn Profile
               </a>
