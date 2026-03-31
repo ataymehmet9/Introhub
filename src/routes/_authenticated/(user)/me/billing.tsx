@@ -9,7 +9,7 @@ import {
 } from 'react-icons/tb'
 import { z } from 'zod'
 import { AdaptiveCard } from '@/components/shared'
-import { Button, Card, Notification, toast } from '@/components/ui'
+import { Button, Card, Notification, Progress, toast } from '@/components/ui'
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 import { PLANS } from '@/integrations/stripe/billing-plans'
@@ -151,20 +151,8 @@ function RouteComponent() {
             <div className="mb-3">
               <div className="flex items-center justify-between text-xs text-blue-700 dark:text-blue-300 mb-1">
                 <span>Usage</span>
-                <span>{Math.round(usagePercentage)}%</span>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-blue-200 dark:bg-blue-800">
-                <div
-                  className={`h-full transition-all ${
-                    usagePercentage >= 80
-                      ? 'bg-red-500'
-                      : usagePercentage >= 60
-                        ? 'bg-amber-500'
-                        : 'bg-blue-500'
-                  }`}
-                  style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-                />
-              </div>
+              <Progress percent={Math.min(usagePercentage, 100)} size="md" />
             </div>
 
             {/* Warning Message */}
