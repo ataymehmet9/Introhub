@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useMemo } from 'react'
 import {
   useInfiniteQuery,
@@ -12,6 +13,8 @@ import { Notification, toast } from '@/components/ui'
 
 type UseNotificationsProps = Omit<GetNotifications, 'page'> & {
   enabled?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialData?: any
 }
 
 /**
@@ -22,7 +25,12 @@ type UseNotificationsProps = Omit<GetNotifications, 'page'> & {
 export function useNotifications(props?: UseNotificationsProps) {
   const trpc = useTRPC()
   const queryClient = useQueryClient()
-  const { pageSize = 5, unreadOnly = false, enabled = true } = props || {}
+  const {
+    pageSize = 5,
+    unreadOnly = false,
+    enabled = true,
+    initialData,
+  } = props || {}
 
   // Fetch notifications list with infinite query (no polling, updated via SSE)
   const {
@@ -46,7 +54,15 @@ export function useNotifications(props?: UseNotificationsProps) {
         : undefined
     },
     initialPageParam: 1,
+    // Use SSR data as initial data for the first page
+    initialData: initialData
+      ? {
+          pages: [initialData],
+          pageParams: [1],
+        }
+      : undefined,
     refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled,
   })
 

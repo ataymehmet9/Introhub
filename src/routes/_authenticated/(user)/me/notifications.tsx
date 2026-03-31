@@ -1,31 +1,53 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 import SettingsNotificationAction from './-components/notifications/SettingsNotificationAction'
 import SettingsNotifications from './-components/notifications/SettingsNotifications'
 import { AdaptiveCard } from '@/components/shared'
 import { useNotifications } from '@/hooks/useNotifications'
 import { notificationSearchSchema } from '@/schemas'
-import { trpcClient } from '@/integrations/tanstack-query/root-provider'
+import { auth } from '@/lib/auth'
+import { trpcRouter } from '@/integrations/trpc/router'
+import { db } from '@/db'
+
+// Server function to fetch first page of notifications
+// Server function to fetch first page of notifications
+const getNotificationsData = createServerFn({ method: 'GET' })
+  .inputValidator(
+    (data: { page: number; pageSize: number; unreadOnly: boolean }) => data,
+  )
+  .handler(async ({ data }) => {
+    const headers = getRequestHeaders()
+    const { session, user } = (await auth.api.getSession({ headers })) ?? {}
+
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
+    const context = { db, session, user }
+    const caller = trpcRouter.createCaller(context)
+
+    const notifications = await caller.notifications.list({
+      page: data.page,
+      pageSize: data.pageSize,
+      unreadOnly: data.unreadOnly,
+    })
+
+    return { notifications }
+  })
 
 export const Route = createFileRoute('/_authenticated/(user)/me/notifications')(
   {
     validateSearch: notificationSearchSchema,
-    loader: async ({ context, location }) => {
+    loader: async ({ location }) => {
       const search = notificationSearchSchema.parse(location.search)
-      // Prefetch first page for infinite query
-      await context.queryClient.prefetchInfiniteQuery({
-        queryKey: [
-          'notifications',
-          'list',
-          { pageSize: search.c, unreadOnly: search.unreadOnly },
-        ],
-        queryFn: async () => {
-          return trpcClient.notifications.list.query({
-            page: 1,
-            pageSize: search.c,
-            unreadOnly: search.unreadOnly,
-          })
+      // Fetch first page on server
+      return await getNotificationsData({
+        data: {
+          page: 1,
+          pageSize: search.c ?? 10,
+          unreadOnly: search.unreadOnly ?? false,
         },
-        initialPageParam: 1,
       })
     },
     component: RouteComponent,
@@ -37,6 +59,7 @@ function RouteComponent() {
     from: '/_authenticated/(user)/me/notifications',
   })
   const navigate = useNavigate()
+  const loaderData = Route.useLoaderData()
 
   const {
     notifications,
@@ -46,8 +69,10 @@ function RouteComponent() {
     fetchNextPage,
     markAsRead,
   } = useNotifications({
-    pageSize: searchParams.c,
-    unreadOnly: searchParams.unreadOnly,
+    pageSize: searchParams.c ?? 10,
+    unreadOnly: searchParams.unreadOnly ?? false,
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    initialData: loaderData?.notifications,
   })
 
   const handleFilterChange = (unreadOnly: boolean) => {
@@ -91,3 +116,5 @@ function RouteComponent() {
     </AdaptiveCard>
   )
 }
+
+// Made with Bob

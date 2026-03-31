@@ -30,6 +30,7 @@ Use 'bd' for task tracking
 
 ## Best Practices
 
+- **Documentation**: ALWAYS use Context7 MCP (if it is available) to check the latest documentation for third-party libraries before implementation. This ensures we use the most up-to-date APIs and patterns.
 - **Errors**: Implement Error Boundaries for routes.
 - **Performance**: Use `React.Suspense` for loading states [9].
 - **Formatting**: {Link: Prettier } for linting/formatting [13].

@@ -14,7 +14,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { user as userTable } from '@/db/schema'
 import { PLAN_TYPES } from '@/configs/subscription.config'
-import { calculateNextResetDate } from '@/services/subscription.service'
+import { calculateNextResetDate } from '@/utils/subscription.utils'
 
 interface ResetResult {
   totalProcessed: number
