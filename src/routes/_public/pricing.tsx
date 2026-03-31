@@ -17,8 +17,8 @@ function RouteComponent() {
       period: 'forever',
       description: 'Perfect for getting started',
       features: [
-        'Up to 50 contacts',
-        '10 introduction requests per month',
+        'Unlimited contacts',
+        '5 introduction requests per month',
         'Basic analytics',
         'Email support',
       ],

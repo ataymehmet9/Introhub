@@ -4,7 +4,7 @@ export const PLANS = {
     price: 0,
     priceId: null,
     features: [
-      'Up to 50 contacts',
+      'Unlimited contacts',
       '5 introduction requests per month',
       'Basic support',
     ],
