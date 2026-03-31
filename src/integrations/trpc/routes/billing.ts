@@ -52,6 +52,14 @@ export const billingRouter = {
       throw new TRPCError({ code: 'UNAUTHORIZED' })
     }
 
+    // Validate Stripe Price ID is configured
+    if (!process.env.STRIPE_PRO_PRICE_ID) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Stripe is not properly configured. Please contact support.',
+      })
+    }
+
     const [dbUser] = await db
       .select()
       .from(userTable)
@@ -73,16 +81,36 @@ export const billingRouter = {
         .where(eq(userTable.id, user.id))
     }
 
+    // Create checkout session with proper line_items structure
+    // According to Stripe API docs, each line item must have either:
+    // - price: A Price ID (recommended for recurring subscriptions)
+    // - price_data: An object to create a price on the fly
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID!, quantity: 1 }],
+      line_items: [
+        {
+          price: process.env.STRIPE_PRO_PRICE_ID,
+          quantity: 1,
+        },
+      ],
       success_url: `${process.env.APP_URL}/me/billing?success=true`,
       cancel_url: `${process.env.APP_URL}/me/billing?canceled=true`,
+      // Allow promotion codes
+      allow_promotion_codes: false,
+      // Collect billing address
+      billing_address_collection: 'auto',
     })
 
-    return { url: session.url! }
+    if (!session.url) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to create checkout session',
+      })
+    }
+
+    return { url: session.url }
   }),
 
   createPortalSession: protectedProcedure.mutation(async ({ ctx }) => {

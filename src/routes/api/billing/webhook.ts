@@ -19,14 +19,23 @@ export const Route = createFileRoute('/api/billing/webhook')({
           })
         }
 
+        // Validate webhook secret is configured
+        if (!process.env.STRIPE_WEBHOOK_SECRET) {
+          console.error('STRIPE_WEBHOOK_SECRET is not configured')
+          return new Response('Webhook configuration error', {
+            status: 500,
+          })
+        }
+
         let event: Stripe.Event
         try {
           event = stripe.webhooks.constructEvent(
             body,
             signature,
-            process.env.STRIPE_WEBHOOK_SECRET!,
+            process.env.STRIPE_WEBHOOK_SECRET,
           )
-        } catch {
+        } catch (err) {
+          console.error('Webhook signature verification failed:', err)
           return new Response('Webhook signature verification failed', {
             status: 400,
           })
