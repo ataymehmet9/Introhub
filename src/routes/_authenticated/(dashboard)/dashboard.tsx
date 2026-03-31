@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 import { Suspense } from 'react'
 import {
   HiCheckCircle,
@@ -24,26 +26,86 @@ import {
 } from './-utils/exportData'
 import { Notification, Spinner, toast } from '@/components/ui'
 import { Container } from '@/components/shared'
+import { auth } from '@/lib/auth'
+import { trpcRouter } from '@/integrations/trpc/router'
+import { db } from '@/db'
+
+// Helper to get default date range (last 30 days)
+function getDefaultDateRange() {
+  const end = new Date()
+  end.setHours(23, 59, 59, 999)
+
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  start.setDate(start.getDate() - 29) // Last 30 days including today
+
+  return { start, end }
+}
+
+// Server function to fetch all dashboard data
+const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+  const headers = getRequestHeaders()
+  const { session, user } = (await auth.api.getSession({ headers })) ?? {}
+
+  if (!user) {
+    throw new Error('Unauthorized')
+  }
+
+  const context = { db, session, user }
+  const caller = trpcRouter.createCaller(context)
+
+  // Get default date range
+  const { start, end } = getDefaultDateRange()
+
+  // Fetch all dashboard data in parallel
+  const [stats, trends, topContacts] = await Promise.all([
+    caller.dashboard.getStats({
+      startDate: start,
+      endDate: end,
+      granularity: undefined,
+    }),
+    caller.dashboard.getTrendData({
+      startDate: start,
+      endDate: end,
+      granularity: undefined,
+    }),
+    caller.dashboard.getTopContacts({
+      startDate: start,
+      endDate: end,
+      granularity: undefined,
+      limit: 10,
+    }),
+  ])
+
+  return { stats, trends, topContacts }
+})
 
 export const Route = createFileRoute('/_authenticated/(dashboard)/dashboard')({
+  loader: async () => await getDashboardData(),
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { data: statsData, isLoading: statsLoading } = useDashboardStats()
-  const { data: trendsData, isLoading: trendsLoading } = useDashboardTrends()
-  const { data: topContactsData, isLoading: topContactsLoading } =
-    useTopContacts(10)
+  const loaderData = Route.useLoaderData()
 
-  const stats = statsData?.data.stats
-  const statusBreakdown = statsData?.data.statusBreakdown
+  const { data: statsData, isLoading: statsLoading } = useDashboardStats(
+    loaderData.stats,
+  )
+  const { data: trendsData, isLoading: trendsLoading } = useDashboardTrends(
+    loaderData.trends,
+  )
+  const { data: topContactsData, isLoading: topContactsLoading } =
+    useTopContacts(10, loaderData.topContacts)
+
+  const stats = statsData.data.stats
+  const statusBreakdown = statsData.data.statusBreakdown
 
   const handleExportData = () => {
     try {
       const csvContent = exportDashboardToCSV(
-        statsData?.data,
-        trendsData?.data,
-        topContactsData?.data,
+        statsData.data,
+        trendsData.data,
+        topContactsData.data,
       )
 
       if (!csvContent) {
@@ -74,7 +136,7 @@ function RouteComponent() {
 
   const handleExportTopContacts = () => {
     try {
-      const csvContent = exportTopContactsToCSV(topContactsData?.data)
+      const csvContent = exportTopContactsToCSV(topContactsData.data)
 
       if (!csvContent || csvContent === 'No data to export') {
         toast.push(
@@ -110,8 +172,8 @@ function RouteComponent() {
       <div className="mb-4 sm:mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         <StatCard
           title="Total Contacts"
-          value={stats?.current.totalContacts ?? 0}
-          change={stats?.changes.totalContacts}
+          value={stats.current.totalContacts}
+          change={stats.changes.totalContacts}
           icon={<HiUsers />}
           loading={statsLoading}
           className="bg-sky-100 dark:bg-sky/75"
@@ -119,8 +181,8 @@ function RouteComponent() {
         />
         <StatCard
           title="Requests Made"
-          value={stats?.current.requestsMade ?? 0}
-          change={stats?.changes.requestsMade}
+          value={stats.current.requestsMade}
+          change={stats.changes.requestsMade}
           icon={<HiPaperAirplane />}
           loading={statsLoading}
           className="bg-emerald-100 dark:bg-emerald/75"
@@ -128,8 +190,8 @@ function RouteComponent() {
         />
         <StatCard
           title="Requests Received"
-          value={stats?.current.requestsReceived ?? 0}
-          change={stats?.changes.requestsReceived}
+          value={stats.current.requestsReceived}
+          change={stats.changes.requestsReceived}
           icon={<HiInbox />}
           loading={statsLoading}
           className="bg-purple-100 dark:bg-purple/75"
@@ -137,22 +199,22 @@ function RouteComponent() {
         />
         <StatCard
           title="Approval Rate"
-          value={`${stats?.current.approvalRate.toFixed(1) ?? 0}%`}
-          change={stats?.changes.approvalRate}
+          value={`${stats.current.approvalRate.toFixed(1)}%`}
+          change={stats.changes.approvalRate}
           icon={<HiCheckCircle />}
           loading={statsLoading}
         />
         <StatCard
           title="Rejection Rate"
-          value={`${stats?.current.rejectionRate.toFixed(1) ?? 0}%`}
-          change={stats?.changes.rejectionRate}
+          value={`${stats.current.rejectionRate.toFixed(1)}%`}
+          change={stats.changes.rejectionRate}
           icon={<HiXCircle />}
           loading={statsLoading}
         />
         <StatCard
           title="Avg Response Time"
-          value={stats?.current.avgResponseTimeReceived?.formatted ?? 'N/A'}
-          change={stats?.changes.avgResponseTimeReceived}
+          value={stats.current.avgResponseTimeReceived?.formatted ?? 'N/A'}
+          change={stats.changes.avgResponseTimeReceived}
           icon={<HiClock />}
           loading={statsLoading}
           description="Your response time to requests"
@@ -168,7 +230,7 @@ function RouteComponent() {
             </div>
           }
         >
-          <TrendChart data={trendsData?.data} loading={trendsLoading} />
+          <TrendChart data={trendsData.data} loading={trendsLoading} />
         </Suspense>
       </div>
 
@@ -192,7 +254,7 @@ function RouteComponent() {
           }
         >
           <TopContactsTable
-            data={topContactsData?.data}
+            data={topContactsData.data}
             loading={topContactsLoading}
             onExport={handleExportTopContacts}
           />
