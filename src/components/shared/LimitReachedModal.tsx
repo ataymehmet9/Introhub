@@ -27,7 +27,7 @@ export function LimitReachedModal({
   }
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} width={500}>
+    <Dialog isOpen={isOpen} onClose={onClose} width={500} closable={false}>
       <div className="flex flex-col">
         {/* Header */}
         <div className="flex items-start p-6 pb-4">
