@@ -6,8 +6,8 @@
  */
 
 import { and, count, eq, gte, lte, sql } from 'drizzle-orm'
-import { calculateNextResetDate } from './subscription.service'
 import type { UsageStats } from '@/types/subscription.types'
+import { calculateNextResetDate } from '@/utils/subscription.utils'
 import { db } from '@/db'
 import { introductionRequests, user as userTable } from '@/db/schema'
 
@@ -127,7 +127,7 @@ export async function getUsersApproachingLimit(threshold: number = 4) {
 /**
  * Track a request creation event (for analytics)
  */
-export async function trackRequestCreation(
+export function trackRequestCreation(
   userId: string,
   targetContactId: number,
   metadata?: Record<string, unknown>,
