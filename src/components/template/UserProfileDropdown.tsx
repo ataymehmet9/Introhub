@@ -85,7 +85,7 @@ const UserDropdown = () => {
             {/* Plan Badge */}
             <div className="mt-2">
               {isPro ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500 text-white">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary text-white">
                   <TbCrown className="text-sm" />
                   Pro
                 </span>

@@ -16,24 +16,24 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   const getIcon = () => {
     switch (variant) {
       case 'danger':
-        return <HiExclamationCircle className="text-red-500 text-5xl" />
+        return <HiExclamationCircle className="text-error text-5xl" />
       case 'warning':
-        return <HiExclamationCircle className="text-yellow-500 text-5xl" />
+        return <HiExclamationCircle className="text-warning text-5xl" />
       case 'info':
-        return <HiInformationCircle className="text-blue-500 text-5xl" />
+        return <HiInformationCircle className="text-info text-5xl" />
       default:
-        return <HiInformationCircle className="text-blue-500 text-5xl" />
+        return <HiInformationCircle className="text-info text-5xl" />
     }
   }
 
   const getConfirmButtonVariant = () => {
     switch (variant) {
       case 'danger':
-        return 'bg-red-600 hover:bg-red-700 text-white'
+        return 'bg-error hover:opacity-90 text-white'
       case 'warning':
-        return 'bg-yellow-600 hover:bg-yellow-700 text-white'
+        return 'bg-warning hover:opacity-90 text-white'
       default:
-        return 'bg-blue-600 hover:bg-blue-700 text-white'
+        return 'bg-primary hover:opacity-90 text-white'
     }
   }
 
