@@ -12,7 +12,6 @@ import {
 } from 'react-icons/tb'
 import { z } from 'zod'
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { AdaptiveCard } from '@/components/shared'
 import {
   Alert,
@@ -25,9 +24,7 @@ import {
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 import { PLANS } from '@/integrations/stripe/billing-plans'
-import { auth } from '@/lib/auth'
-import { trpcRouter } from '@/integrations/trpc/router'
-import { db } from '@/db'
+import { createServerCaller } from '@/integrations/trpc/server-context'
 
 const billingSearchSchema = z.object({
   success: z.boolean().optional(),
@@ -37,15 +34,7 @@ const billingSearchSchema = z.object({
 // Server function to fetch billing data
 // This runs ONLY on the server and returns serializable data
 const getBillingData = createServerFn().handler(async () => {
-  const headers = getRequestHeaders()
-  const { session, user } = (await auth.api.getSession({ headers })) ?? {}
-
-  if (!user) {
-    throw new Error('Unauthorized')
-  }
-
-  const context = { db, session, user }
-  const caller = trpcRouter.createCaller(context)
+  const caller = await createServerCaller()
 
   // Fetch both subscription and plan details in parallel on the server
   const [subscription, planDetails] = await Promise.all([

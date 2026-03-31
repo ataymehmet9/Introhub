@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { z } from 'zod'
 import { useRequests } from './-hooks/useRequests'
 import RequestsTable from './-components/RequestsTable'
@@ -11,9 +10,7 @@ import type { IntroductionRequestWithDetails } from './-store/requestStore'
 import { useSession } from '@/lib/auth-client'
 import { Tabs } from '@/components/ui'
 import { AdaptiveCard, Container } from '@/components/shared'
-import { auth } from '@/lib/auth'
-import { trpcRouter } from '@/integrations/trpc/router'
-import { db } from '@/db'
+import { createServerCaller } from '@/integrations/trpc/server-context'
 
 const requestsSearchSchema = z.object({
   tab: z.enum(['received', 'sent']).optional().default('received'),
@@ -28,15 +25,7 @@ const getRequestsData = createServerFn({ method: 'GET' })
       data,
   )
   .handler(async ({ data }) => {
-    const headers = getRequestHeaders()
-    const { session, user } = (await auth.api.getSession({ headers })) ?? {}
-
-    if (!user) {
-      throw new Error('Unauthorized')
-    }
-
-    const context = { db, session, user }
-    const caller = trpcRouter.createCaller(context)
+    const caller = await createServerCaller()
 
     const requests = await caller.introductionRequests.listByUser({
       page: data.page,

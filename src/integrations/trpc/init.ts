@@ -5,16 +5,24 @@ import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import { auth } from '@/lib/auth'
 import { db } from '@/db'
 
-export const createContext = async ({ req }: CreateNextContextOptions) => {
-  const { session, user } =
-    (await auth.api.getSession({
-      headers: req.headers,
-    })) ?? {}
+/**
+ * Creates TRPC context from request headers
+ * Used by both HTTP adapter and direct server-side calls
+ */
+export async function createContextFromHeaders(headers: Headers) {
+  const { session, user } = (await auth.api.getSession({ headers })) ?? {}
   return {
     db,
     session,
     user,
   }
+}
+
+/**
+ * HTTP adapter context creator (for client-side TRPC calls)
+ */
+export const createContext = async ({ req }: CreateNextContextOptions) => {
+  return createContextFromHeaders(req.headers)
 }
 
 const t = initTRPC.context<typeof createContext>().create({

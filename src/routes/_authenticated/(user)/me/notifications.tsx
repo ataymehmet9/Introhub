@@ -1,31 +1,19 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import SettingsNotificationAction from './-components/notifications/SettingsNotificationAction'
 import SettingsNotifications from './-components/notifications/SettingsNotifications'
 import { AdaptiveCard } from '@/components/shared'
 import { useNotifications } from '@/hooks/useNotifications'
 import { notificationSearchSchema } from '@/schemas'
-import { auth } from '@/lib/auth'
-import { trpcRouter } from '@/integrations/trpc/router'
-import { db } from '@/db'
+import { createServerCaller } from '@/integrations/trpc/server-context'
 
-// Server function to fetch first page of notifications
 // Server function to fetch first page of notifications
 const getNotificationsData = createServerFn({ method: 'GET' })
   .inputValidator(
     (data: { page: number; pageSize: number; unreadOnly: boolean }) => data,
   )
   .handler(async ({ data }) => {
-    const headers = getRequestHeaders()
-    const { session, user } = (await auth.api.getSession({ headers })) ?? {}
-
-    if (!user) {
-      throw new Error('Unauthorized')
-    }
-
-    const context = { db, session, user }
-    const caller = trpcRouter.createCaller(context)
+    const caller = await createServerCaller()
 
     const notifications = await caller.notifications.list({
       page: data.page,
@@ -71,7 +59,7 @@ function RouteComponent() {
   } = useNotifications({
     pageSize: searchParams.c ?? 10,
     unreadOnly: searchParams.unreadOnly ?? false,
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     initialData: loaderData?.notifications,
   })
 

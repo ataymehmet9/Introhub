@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { Suspense } from 'react'
 import {
   HiCheckCircle,
@@ -27,9 +26,7 @@ import {
 } from './-utils/exportData'
 import { Notification, Spinner, toast } from '@/components/ui'
 import { Container } from '@/components/shared'
-import { auth } from '@/lib/auth'
-import { trpcRouter } from '@/integrations/trpc/router'
-import { db } from '@/db'
+import { createServerCaller } from '@/integrations/trpc/server-context'
 
 // Helper to get default date range (last 30 days)
 function getDefaultDateRange() {
@@ -45,15 +42,7 @@ function getDefaultDateRange() {
 
 // Server function to fetch all dashboard data
 const getDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
-  const headers = getRequestHeaders()
-  const { session, user } = (await auth.api.getSession({ headers })) ?? {}
-
-  if (!user) {
-    throw new Error('Unauthorized')
-  }
-
-  const context = { db, session, user }
-  const caller = trpcRouter.createCaller(context)
+  const caller = await createServerCaller()
 
   // Get default date range
   const { start, end } = getDefaultDateRange()
