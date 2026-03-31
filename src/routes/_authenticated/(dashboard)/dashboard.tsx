@@ -18,6 +18,7 @@ import { TopContactsTable } from './-components/TopContactsTable'
 import { useDashboardStats } from './-hooks/useDashboardStats'
 import { useDashboardTrends } from './-hooks/useDashboardTrends'
 import { useTopContacts } from './-hooks/useTopContacts'
+import { useDashboardStore } from './-store/dashboardStore'
 import {
   downloadCSV,
   exportDashboardToCSV,
@@ -87,15 +88,25 @@ export const Route = createFileRoute('/_authenticated/(dashboard)/dashboard')({
 
 function RouteComponent() {
   const loaderData = Route.useLoaderData()
+  const { dateRange } = useDashboardStore()
+
+  // Get the default date range that was used in the loader
+  const defaultDateRange = getDefaultDateRange()
+
+  // Only use initialData if the current date range matches the loader's date range
+  // This ensures the filter works correctly when users change the date range
+  const isDefaultDateRange =
+    dateRange.start.getTime() === defaultDateRange.start.getTime() &&
+    dateRange.end.getTime() === defaultDateRange.end.getTime()
 
   const { data: statsData, isLoading: statsLoading } = useDashboardStats(
-    loaderData.stats,
+    isDefaultDateRange ? loaderData.stats : undefined,
   )
   const { data: trendsData, isLoading: trendsLoading } = useDashboardTrends(
-    loaderData.trends,
+    isDefaultDateRange ? loaderData.trends : undefined,
   )
   const { data: topContactsData, isLoading: topContactsLoading } =
-    useTopContacts(10, loaderData.topContacts)
+    useTopContacts(10, isDefaultDateRange ? loaderData.topContacts : undefined)
 
   const stats = statsData.data.stats
   const statusBreakdown = statsData.data.statusBreakdown
