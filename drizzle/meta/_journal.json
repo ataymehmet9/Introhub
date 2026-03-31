@@ -36,6 +36,20 @@
       "when": 1774525570095,
       "tag": "0004_cold_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1774842665549,
+      "tag": "0005_melodic_wind_dancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774850659176,
+      "tag": "0006_orange_scarecrow",
+      "breakpoints": true
     }
   ]
 }

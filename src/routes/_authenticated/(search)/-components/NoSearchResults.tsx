@@ -20,12 +20,12 @@ const NoSearchResults = ({ query }: NoSearchResultsProps) => {
         <span className="font-semibold">"{query}"</span>
       </p>
 
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-md">
+      <div className="bg-info-subtle border border-info rounded-lg p-4 max-w-md">
         <div className="flex items-start gap-3">
-          <TbInfoCircle className="text-xl text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-900 dark:text-blue-100">
+          <TbInfoCircle className="text-xl text-info flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-gray-900 dark:text-gray-100">
             <p className="font-semibold mb-2">Tips for finding connections:</p>
-            <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Try different keywords or spellings</li>
               <li>Use broader search terms</li>
               <li>Check for typos in your query</li>

@@ -63,7 +63,7 @@ Feel free to take it from here and connect directly.`
 
   // Watch message field for character count
   const messageValue = watch('customMessage')
-  const remainingChars = maxChars - (messageValue?.length || 0)
+  const remainingChars = maxChars - (messageValue.length || 0)
 
   // Reset form with default message when modal opens
   useEffect(() => {
@@ -99,14 +99,14 @@ Feel free to take it from here and connect directly.`
         </h2>
 
         {/* Email Preview */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <div className="bg-info-subtle border border-info rounded-lg p-4 mb-6">
           <div className="flex items-start gap-3">
-            <TbMail className="text-blue-600 dark:text-blue-400 text-xl mt-0.5 flex-shrink-0" />
+            <TbMail className="text-info text-xl mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Email Recipients:
               </p>
-              <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
+              <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
                 <p>
                   <strong>TO:</strong> {request.targetContactName} (
                   {request.targetContactEmail})
@@ -144,7 +144,7 @@ Feel free to take it from here and connect directly.`
                       {request.targetContactCompany}
                     </p>
                   )}
-                <p className="text-xs text-blue-600 dark:text-blue-400">
+                <p className="text-xs text-primary">
                   {request.targetContactEmail}
                 </p>
               </div>
@@ -153,9 +153,7 @@ Feel free to take it from here and connect directly.`
                 {request.requesterCompany && (
                   <p className="text-xs">at {request.requesterCompany}</p>
                 )}
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  {request.requesterEmail}
-                </p>
+                <p className="text-xs text-primary">{request.requesterEmail}</p>
               </div>
               <p className="italic text-gray-600 dark:text-gray-400">
                 [Your custom message will appear here]
@@ -182,14 +180,14 @@ Feel free to take it from here and connect directly.`
                     rows={8}
                     maxLength={maxChars}
                     placeholder="Add your personal introduction message..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
                   />
                 )}
               />
               <span
                 className={`text-xs text-right block mt-1 ${
                   remainingChars < 500
-                    ? 'text-red-500'
+                    ? 'text-error'
                     : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
@@ -197,8 +195,8 @@ Feel free to take it from here and connect directly.`
               </span>
             </FormItem>
 
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 mb-4">
-              <p className="text-xs text-green-900 dark:text-green-100">
+            <div className="bg-success-subtle border border-success rounded-lg p-3 mb-4">
+              <p className="text-xs text-gray-900 dark:text-gray-100">
                 <strong>Note:</strong> This will send an introduction email to
                 both {request.targetContactName} (TO) and{' '}
                 {request.requesterName} (CC), introducing them to each other

@@ -213,12 +213,12 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
       </div>
 
       {/* Download Template */}
-      <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-info-subtle rounded-lg">
         <div>
-          <p className="font-medium text-blue-900 dark:text-blue-100">
+          <p className="font-medium text-gray-900 dark:text-gray-100">
             Need a template?
           </p>
-          <p className="text-sm text-blue-700 dark:text-blue-300">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Download our CSV template to get started
           </p>
         </div>
@@ -247,7 +247,7 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
             htmlFor="csv-upload"
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary hover:bg-primary-subtle transition-colors"
           >
             <HiCloudArrowUp className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" />
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -322,50 +322,50 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
 
           {/* Statistics */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <div className="p-4 bg-success-subtle rounded-lg">
               <div className="flex items-center justify-between">
-                <HiCheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-                <span className="text-2xl font-bold text-green-900 dark:text-green-100">
+                <HiCheckCircle className="w-6 h-6 text-success" />
+                <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {result.imported}
                 </span>
               </div>
-              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                 Imported
               </p>
             </div>
 
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="p-4 bg-info-subtle rounded-lg">
               <div className="flex items-center justify-between">
-                <HiCheckCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                <span className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                <HiCheckCircle className="w-6 h-6 text-info" />
+                <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {result.updated}
                 </span>
               </div>
-              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                 Updated
               </p>
             </div>
 
-            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+            <div className="p-4 bg-warning-subtle rounded-lg">
               <div className="flex items-center justify-between">
-                <HiCheckCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-                <span className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+                <HiCheckCircle className="w-6 h-6 text-warning" />
+                <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {result.skipped}
                 </span>
               </div>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                 Skipped
               </p>
             </div>
 
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <div className="p-4 bg-error-subtle rounded-lg">
               <div className="flex items-center justify-between">
-                <HiXCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
-                <span className="text-2xl font-bold text-red-900 dark:text-red-100">
+                <HiXCircle className="w-6 h-6 text-error" />
+                <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {result.errors.length}
                 </span>
               </div>
-              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                 Errors
               </p>
             </div>
@@ -374,14 +374,14 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
           {/* Error Details */}
           {result.errors.length > 0 && (
             <div className="mt-4">
-              <h4 className="font-medium text-red-900 dark:text-red-100 mb-2">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Import Errors:
               </h4>
               <div className="max-h-40 overflow-y-auto space-y-1">
                 {result.errors.map((err, idx) => (
                   <div
                     key={idx}
-                    className="text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-2 rounded"
+                    className="text-sm text-gray-700 dark:text-gray-300 bg-error-subtle p-2 rounded"
                   >
                     Row {err.row}: {err.message}
                   </div>

@@ -53,7 +53,7 @@ const IntroductionRequestModal = ({
 
     return `Hi ${contact.ownerName},
 
-I'm ${user.name || '[Your Name]'}${userWithDetails?.company ? ` from ${userWithDetails.company}` : ''}${userWithDetails?.position ? `, working as ${userWithDetails.position}` : ''}.
+I'm ${user.name || '[Your Name]'}${userWithDetails.company ? ` from ${userWithDetails.company}` : ''}${userWithDetails.position ? `, working as ${userWithDetails.position}` : ''}.
 
 I would like to request an introduction to ${contact.name}${contact.company ? ` at ${contact.company}` : ''}.
 
@@ -82,7 +82,7 @@ ${user.name || '[Your Name]'}`
 
   // Watch message field for character count
   const messageValue = watch('message')
-  const remainingChars = maxChars - (messageValue?.length || 0)
+  const remainingChars = maxChars - (messageValue.length || 0)
 
   // Reset form with default message when modal opens, clear when it closes
   useEffect(() => {
@@ -127,7 +127,7 @@ ${user.name || '[Your Name]'}`
               style={{ backgroundColor: stringToColor(contact.name) }}
               className="text-white font-semibold text-xl flex-shrink-0 p-4"
             >
-              {contact.name?.charAt(0) || 'U'}
+              {contact.name.charAt(0) || 'U'}
             </Avatar>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -188,14 +188,14 @@ ${user.name || '[Your Name]'}`
                     {...field}
                     rows={12}
                     maxLength={maxChars}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
                   />
                 )}
               />
               <span
                 className={`text-xs text-right block ${
                   remainingChars < 100
-                    ? 'text-red-500'
+                    ? 'text-error'
                     : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
@@ -203,8 +203,8 @@ ${user.name || '[Your Name]'}`
               </span>
             </FormItem>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
-              <p className="text-xs text-blue-900 dark:text-blue-100">
+            <div className="bg-info-subtle border border-info rounded-lg p-3 mb-4">
+              <p className="text-xs text-gray-900 dark:text-gray-100">
                 <strong>Note:</strong> This message will be sent to{' '}
                 {contact.ownerName}, who can then decide whether to introduce
                 you to {contact.name}.

@@ -69,7 +69,7 @@ const SearchBar = ({
         className="w-full"
       />
       {localQuery.length > 0 && localQuery.length < 2 && (
-        <p className="text-xs text-red-500 mt-1">
+        <p className="text-xs text-error mt-1">
           Please enter at least 2 characters to find connections
         </p>
       )}

@@ -22,6 +22,12 @@ import {
 import { notificationEmitter } from '@/lib/notification-emitter'
 import { trackServerEvent } from '@/integrations/posthog'
 import { extractEmailBodyContent } from '@/utils/extractEmailBodyContent'
+import {
+  canCreateRequest,
+  getRemainingRequests,
+  incrementRequestCount,
+} from '@/services/subscription.service'
+import { SUBSCRIPTION_CONFIG } from '@/configs/subscription.config'
 
 const createIntroductionRequestSchema = insertIntroductionRequestSchema
   .omit({
@@ -102,6 +108,15 @@ export const introductionRequestRouter = {
         })
       }
 
+      // Check subscription limits
+      const limitCheck = await canCreateRequest(currentUser.id)
+      if (!limitCheck.allowed) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: limitCheck.reason || 'Request limit reached',
+        })
+      }
+
       // Create the introduction request
       const newRequest = await db
         .insert(introductionRequests)
@@ -113,6 +128,35 @@ export const introductionRequestRouter = {
           status: 'pending',
         })
         .returning()
+
+      // Increment usage counter for free tier users
+      await incrementRequestCount(currentUser.id)
+
+      // Check remaining requests and send warnings if needed
+      const remaining = await getRemainingRequests(currentUser.id)
+      if (
+        remaining !== Infinity &&
+        remaining <= SUBSCRIPTION_CONFIG.NOTIFICATIONS.WARN_AT_REMAINING
+      ) {
+        // Send warning notification
+        try {
+          await db.insert(notifications).values({
+            userId: currentUser.id,
+            type: 'unknown',
+            title:
+              remaining === 0
+                ? 'Monthly Limit Reached'
+                : `${remaining} Request${remaining === 1 ? '' : 's'} Remaining`,
+            message:
+              remaining === 0
+                ? "You've used all 5 introduction requests for this month. Upgrade to Pro for unlimited requests."
+                : `You have ${remaining} introduction request${remaining === 1 ? '' : 's'} remaining this month.`,
+            read: false,
+          })
+        } catch (error) {
+          console.error('Failed to create limit warning notification:', error)
+        }
+      }
 
       // Track successful request creation
       trackServerEvent(currentUser.id, 'introduction_request_create_success', {

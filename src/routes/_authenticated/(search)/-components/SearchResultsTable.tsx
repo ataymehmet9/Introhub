@@ -30,7 +30,7 @@ const NameColumn = ({ row }: { row: SearchResult }) => {
         style={{ backgroundColor: avatarColor }}
         className="text-white font-semibold flex-shrink-0 p-4"
       >
-        {row.name?.charAt(0) || 'U'}
+        {row.name.charAt(0) || 'U'}
       </Avatar>
       <div>
         <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -71,7 +71,7 @@ const ActionColumn = ({
   if (row.hasPendingRequest) {
     return (
       <Tooltip title="You have a pending request for this contact">
-        <Badge className="bg-yellow-100 text-yellow-800" content="Pending" />
+        <Badge className="bg-gray-300 text-gray-800" content="Pending" />
       </Tooltip>
     )
   }
@@ -102,7 +102,7 @@ const SearchResultsTable = ({
 
   // Sort results on the client side
   const sortedResults = useMemo(() => {
-    if (!sortConfig || !sortConfig.key || !sortConfig.order) {
+    if (!sortConfig.key || !sortConfig.order) {
       return results
     }
 

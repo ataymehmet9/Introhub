@@ -22,6 +22,13 @@ export const user = pgTable('user', {
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
   stripeSubscriptionStatus: text('stripe_subscription_status'),
+  // Subscription plan fields
+  planType: varchar('plan_type', { length: 20 }).default('free').notNull(),
+  freeTierStartDate: timestamp('free_tier_start_date').defaultNow(),
+  requestsUsedThisCycle: integer('requests_used_this_cycle')
+    .default(0)
+    .notNull(),
+  currentCycleStartDate: timestamp('current_cycle_start_date').defaultNow(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()

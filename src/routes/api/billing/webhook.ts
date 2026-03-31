@@ -3,7 +3,8 @@ import { eq } from 'drizzle-orm'
 import type Stripe from 'stripe'
 import { stripe } from '@/integrations/stripe/init'
 import { db } from '@/db'
-import { user as userTable } from '@/db/schema'
+import { notifications, user as userTable } from '@/db/schema'
+import { downgradeToFree, upgradeToPro } from '@/services/subscription.service'
 
 export const Route = createFileRoute('/api/billing/webhook')({
   server: {
@@ -47,13 +48,28 @@ export const Route = createFileRoute('/api/billing/webhook')({
                 typeof session.subscription === 'string'
                   ? session.subscription
                   : session.subscription.id
-              await db
-                .update(userTable)
-                .set({
-                  stripeSubscriptionId: subscriptionId,
-                  stripeSubscriptionStatus: 'active',
-                })
+
+              // Get user ID from customer
+              const users = await db
+                .select({ id: userTable.id })
+                .from(userTable)
                 .where(eq(userTable.stripeCustomerId, customerId))
+                .limit(1)
+
+              if (users.length > 0) {
+                // Upgrade user to Pro
+                await upgradeToPro(users[0].id, subscriptionId)
+
+                // Send success notification
+                await db.insert(notifications).values({
+                  userId: users[0].id,
+                  type: 'unknown',
+                  title: 'Welcome to Pro!',
+                  message:
+                    "You're now on the Pro plan with unlimited introduction requests. Thank you for subscribing!",
+                  read: false,
+                })
+              }
             }
             break
           }
@@ -64,10 +80,32 @@ export const Route = createFileRoute('/api/billing/webhook')({
               typeof subscription.customer === 'string'
                 ? subscription.customer
                 : subscription.customer.id
+
+            // Update subscription status
             await db
               .update(userTable)
               .set({ stripeSubscriptionStatus: subscription.status })
               .where(eq(userTable.stripeCustomerId, customerId))
+
+            // Handle status changes
+            if (subscription.status === 'past_due') {
+              const users = await db
+                .select({ id: userTable.id })
+                .from(userTable)
+                .where(eq(userTable.stripeCustomerId, customerId))
+                .limit(1)
+
+              if (users.length > 0) {
+                await db.insert(notifications).values({
+                  userId: users[0].id,
+                  type: 'unknown',
+                  title: 'Payment Failed',
+                  message:
+                    "We couldn't process your payment. Please update your payment method to continue your Pro subscription.",
+                  read: false,
+                })
+              }
+            }
             break
           }
 
@@ -77,13 +115,73 @@ export const Route = createFileRoute('/api/billing/webhook')({
               typeof subscription.customer === 'string'
                 ? subscription.customer
                 : subscription.customer.id
-            await db
-              .update(userTable)
-              .set({
-                stripeSubscriptionId: null,
-                stripeSubscriptionStatus: null,
-              })
+
+            // Get user ID
+            const users = await db
+              .select({ id: userTable.id })
+              .from(userTable)
               .where(eq(userTable.stripeCustomerId, customerId))
+              .limit(1)
+
+            if (users.length > 0) {
+              // Downgrade user to Free
+              await downgradeToFree(users[0].id)
+
+              // Send downgrade notification
+              await db.insert(notifications).values({
+                userId: users[0].id,
+                type: 'unknown',
+                title: 'Subscription Canceled',
+                message:
+                  'Your Pro subscription has been canceled. You now have 5 introduction requests per month on the Free plan.',
+                read: false,
+              })
+            }
+            break
+          }
+
+          case 'invoice.payment_failed': {
+            const invoice = event.data.object
+            const customerId =
+              typeof invoice.customer === 'string'
+                ? invoice.customer
+                : invoice.customer?.id
+
+            if (customerId) {
+              const users = await db
+                .select({ id: userTable.id })
+                .from(userTable)
+                .where(eq(userTable.stripeCustomerId, customerId))
+                .limit(1)
+
+              if (users.length > 0) {
+                await db.insert(notifications).values({
+                  userId: users[0].id,
+                  type: 'unknown',
+                  title: 'Payment Failed',
+                  message:
+                    'Your payment failed. Please update your payment method to avoid service interruption.',
+                  read: false,
+                })
+              }
+            }
+            break
+          }
+
+          case 'invoice.payment_succeeded': {
+            const invoice = event.data.object
+            const customerId =
+              typeof invoice.customer === 'string'
+                ? invoice.customer
+                : invoice.customer?.id
+
+            if (customerId) {
+              // Ensure subscription is active
+              await db
+                .update(userTable)
+                .set({ stripeSubscriptionStatus: 'active' })
+                .where(eq(userTable.stripeCustomerId, customerId))
+            }
             break
           }
         }

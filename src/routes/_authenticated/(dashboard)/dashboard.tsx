@@ -35,8 +35,8 @@ function RouteComponent() {
   const { data: topContactsData, isLoading: topContactsLoading } =
     useTopContacts(10)
 
-  const stats = statsData?.data?.stats
-  const statusBreakdown = statsData?.data?.statusBreakdown
+  const stats = statsData?.data.stats
+  const statusBreakdown = statsData?.data.statusBreakdown
 
   const handleExportData = () => {
     try {
@@ -114,7 +114,7 @@ function RouteComponent() {
           change={stats?.changes.totalContacts}
           icon={<HiUsers />}
           loading={statsLoading}
-          className="bg-sky-100 dark:bg-sky/75"
+          className="bg-primary-subtle"
           variant="light"
         />
         <StatCard
@@ -123,7 +123,7 @@ function RouteComponent() {
           change={stats?.changes.requestsMade}
           icon={<HiPaperAirplane />}
           loading={statsLoading}
-          className="bg-emerald-100 dark:bg-emerald/75"
+          className="bg-success-subtle"
           variant="light"
         />
         <StatCard
@@ -132,7 +132,7 @@ function RouteComponent() {
           change={stats?.changes.requestsReceived}
           icon={<HiInbox />}
           loading={statsLoading}
-          className="bg-purple-100 dark:bg-purple/75"
+          className="bg-info-subtle"
           variant="light"
         />
         <StatCard

@@ -87,9 +87,9 @@ export const IntroductionRequestEmail = ({
           </Text>
 
           {/* Message */}
-          <Section style={createMessageBox('blue')}>
-            <Text style={createMessageTitle('blue')}>Message:</Text>
-            <Text style={createMessageText('blue')}>{message}</Text>
+          <Section style={createMessageBox('primary')}>
+            <Text style={createMessageTitle('primary')}>Message:</Text>
+            <Text style={createMessageText('primary')}>{message}</Text>
           </Section>
 
           {/* CTA Button */}

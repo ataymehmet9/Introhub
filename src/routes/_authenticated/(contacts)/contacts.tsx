@@ -139,7 +139,7 @@ function RouteComponent() {
                 }}
                 className="text-white font-semibold text-2xl flex-shrink-0 p-4"
               >
-                {viewingContact.name?.charAt(0) || 'U'}
+                {viewingContact.name.charAt(0) || 'U'}
               </Avatar>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -182,7 +182,7 @@ function RouteComponent() {
                     href={viewingContact.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-primary hover:underline"
                   >
                     {viewingContact.linkedinUrl}
                   </a>

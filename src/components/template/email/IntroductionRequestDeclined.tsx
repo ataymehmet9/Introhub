@@ -54,22 +54,24 @@ export const IntroductionRequestDeclinedEmail = ({
 
           {/* Response Message */}
           {responseMessage && (
-            <Section style={createMessageBox('yellow')}>
-              <Text style={createMessageTitle('yellow')}>
+            <Section style={createMessageBox('primary')}>
+              <Text style={createMessageTitle('primary')}>
                 Message from {approverName}:
               </Text>
-              <Text style={createMessageText('yellow')}>{responseMessage}</Text>
+              <Text style={createMessageText('primary')}>
+                {responseMessage}
+              </Text>
             </Section>
           )}
 
           {/* Encouragement */}
-          <Section style={createMessageBox('blue')}>
-            <Text style={createMessageTitle('blue')}>Keep Networking!</Text>
-            <Text style={createMessageText('blue')}>
+          <Section style={createMessageBox('primary')}>
+            <Text style={createMessageTitle('primary')}>Keep Networking!</Text>
+            <Text style={createMessageText('primary')}>
               While this particular introduction didn't work out, we encourage
               you to continue building your network. Here are some suggestions:
             </Text>
-            <Text style={createMessageText('blue')}>
+            <Text style={createMessageText('primary')}>
               • Try connecting with other professionals in your field
               <br />
               • Attend industry events and conferences
