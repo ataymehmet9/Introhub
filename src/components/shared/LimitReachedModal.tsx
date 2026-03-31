@@ -1,4 +1,4 @@
-import { TbCrown, TbX } from 'react-icons/tb'
+import { TbCrown } from 'react-icons/tb'
 import { Link } from '@tanstack/react-router'
 import { Button, Dialog } from '@/components/ui'
 
@@ -30,10 +30,10 @@ export function LimitReachedModal({
     <Dialog isOpen={isOpen} onClose={onClose} width={500}>
       <div className="flex flex-col">
         {/* Header */}
-        <div className="flex items-start justify-between p-6 pb-4">
+        <div className="flex items-start p-6 pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-              <TbCrown className="text-2xl text-amber-600 dark:text-amber-400" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-subtle">
+              <TbCrown className="text-2xl text-primary" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -44,13 +44,6 @@ export function LimitReachedModal({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            aria-label="Close"
-          >
-            <TbX className="text-xl" />
-          </button>
         </div>
 
         {/* Body */}
@@ -66,7 +59,7 @@ export function LimitReachedModal({
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
               <div
-                className="h-full bg-amber-500 transition-all"
+                className="h-full bg-primary transition-all"
                 style={{ width: '100%' }}
               />
             </div>
@@ -82,15 +75,15 @@ export function LimitReachedModal({
             </h4>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <TbCrown className="mt-0.5 shrink-0 text-amber-500" />
+                <TbCrown className="mt-0.5 shrink-0 text-primary" />
                 <span>Unlimited introduction requests</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <TbCrown className="mt-0.5 shrink-0 text-amber-500" />
+                <TbCrown className="mt-0.5 shrink-0 text-primary" />
                 <span>Priority support</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <TbCrown className="mt-0.5 shrink-0 text-amber-500" />
+                <TbCrown className="mt-0.5 shrink-0 text-primary" />
                 <span>Advanced analytics</span>
               </li>
             </ul>
@@ -101,10 +94,10 @@ export function LimitReachedModal({
             <Link to="/me/billing" className="flex-1">
               <Button
                 variant="solid"
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                block
+                icon={<TbCrown />}
                 onClick={onClose}
               >
-                <TbCrown className="mr-2" />
                 Upgrade to Pro
               </Button>
             </Link>
