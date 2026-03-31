@@ -16,7 +16,12 @@ export const billingRouter = {
     const { user, db } = ctx
 
     if (!user) {
-      return { plan: 'free' as const, status: null, currentPeriodEnd: null }
+      return {
+        plan: 'free' as const,
+        status: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      }
     }
 
     const [dbUser] = await db
@@ -26,22 +31,40 @@ export const billingRouter = {
       .limit(1)
 
     if (!dbUser.stripeSubscriptionId) {
-      return { plan: 'free' as const, status: null, currentPeriodEnd: null }
+      return {
+        plan: 'free' as const,
+        status: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      }
     }
 
     const subscription: Stripe.Subscription =
-      await stripe.subscriptions.retrieve(dbUser.stripeSubscriptionId)
+      await stripe.subscriptions.retrieve(dbUser.stripeSubscriptionId, {
+        expand: ['latest_invoice', 'customer'],
+      })
 
     // As of March 31, 2025, current_period_end is accessed via subscription items
     // See: https://docs.stripe.com/billing/subscriptions/billing-cycle
     const currentPeriodEnd =
       subscription.items.data[0]?.current_period_end ?? null
 
+    // User is considered Pro if subscription is active OR trialing
+    // Even if cancel_at_period_end is true, they keep access until period ends
+    const isPro =
+      subscription.status === 'active' || subscription.status === 'trialing'
+
+    // Check if subscription is scheduled to cancel
+    // Stripe uses either cancel_at_period_end OR cancel_at (timestamp)
+    const isCanceled =
+      subscription.cancel_at_period_end || subscription.cancel_at !== null
+
     return {
-      plan:
-        subscription.status === 'active' ? ('pro' as const) : ('free' as const),
+      plan: isPro ? ('pro' as const) : ('free' as const),
       status: subscription.status,
       currentPeriodEnd,
+      cancelAtPeriodEnd: isCanceled,
+      cancelAt: subscription.cancel_at,
     }
   }),
 

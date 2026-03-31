@@ -113,6 +113,34 @@ function RouteComponent() {
           </div>
         )}
 
+        {/* Cancellation Notice */}
+        {subscription?.cancelAtPeriodEnd && (
+          <Alert
+            showIcon
+            type="warning"
+            className="mb-6"
+            title="Subscription Cancellation Scheduled"
+          >
+            <div>
+              <p>
+                Your Pro subscription will be canceled on{' '}
+                {formatDate(
+                  subscription.cancelAt
+                    ? new Date(subscription.cancelAt * 1000)
+                    : subscription.currentPeriodEnd
+                      ? new Date(subscription.currentPeriodEnd * 1000)
+                      : null,
+                )}
+                .
+              </p>
+              <p>
+                You'll continue to have Pro access until then. You can
+                reactivate your subscription anytime before this date.
+              </p>
+            </div>
+          </Alert>
+        )}
+
         {/* Usage Stats Card - Only for Free Tier */}
         {isFree && planDetails && (
           <Card className="mb-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-2 border-blue-200 dark:border-blue-800">

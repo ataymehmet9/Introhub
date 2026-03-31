@@ -96,21 +96,54 @@ export const Route = createFileRoute('/api/billing/webhook')({
               .set({ stripeSubscriptionStatus: subscription.status })
               .where(eq(userTable.stripeCustomerId, customerId))
 
-            // Handle status changes
-            if (subscription.status === 'past_due') {
-              const users = await db
-                .select({ id: userTable.id })
-                .from(userTable)
-                .where(eq(userTable.stripeCustomerId, customerId))
-                .limit(1)
+            // Get user for notifications
+            const users = await db
+              .select({ id: userTable.id })
+              .from(userTable)
+              .where(eq(userTable.stripeCustomerId, customerId))
+              .limit(1)
 
-              if (users.length > 0) {
+            if (users.length === 0) break
+
+            const userId = users[0].id
+
+            // Handle different subscription status changes
+            if (subscription.status === 'past_due') {
+              await db.insert(notifications).values({
+                userId,
+                type: 'unknown',
+                title: 'Payment Failed',
+                message:
+                  "We couldn't process your payment. Please update your payment method to continue your Pro subscription.",
+                read: false,
+              })
+            } else if (
+              subscription.cancel_at_period_end ||
+              subscription.cancel_at
+            ) {
+              // Subscription is canceled but still active until period end
+              // Stripe uses either cancel_at_period_end OR cancel_at (timestamp)
+              await db.insert(notifications).values({
+                userId,
+                type: 'unknown',
+                title: 'Subscription Cancellation Scheduled',
+                message: `Your Pro subscription will be canceled at the end of your billing period. You'll continue to have Pro access until then.`,
+                read: false,
+              })
+            } else if (subscription.status === 'active') {
+              // Check if this is a reactivation (was previously set to cancel)
+              // This happens when user resubscribes before period ends
+              const previousSubscription = event.data.previous_attributes
+              if (
+                previousSubscription &&
+                previousSubscription.cancel_at_period_end === true
+              ) {
                 await db.insert(notifications).values({
-                  userId: users[0].id,
+                  userId,
                   type: 'unknown',
-                  title: 'Payment Failed',
+                  title: 'Subscription Reactivated',
                   message:
-                    "We couldn't process your payment. Please update your payment method to continue your Pro subscription.",
+                    'Your Pro subscription has been reactivated and will continue automatically.',
                   read: false,
                 })
               }
