@@ -77,12 +77,12 @@ export function useNotifications(props?: UseNotificationsProps) {
 
   // Extract and flatten notifications from all pages - memoized to prevent infinite loops
   const notifications = useMemo(
-    () => data?.pages.flatMap((page) => page.data) || [],
-    [data?.pages],
+    () => (data ? data.pages.flatMap((page) => page.data) : []),
+    [data],
   )
 
   // Get pagination info from the last page
-  const lastPage = data?.pages[data.pages.length - 1]
+  const lastPage = data ? data.pages[data.pages.length - 1] : undefined
   const pagination = lastPage?.pagination
 
   // Fetch unread count (no polling, updated via SSE)
@@ -123,8 +123,10 @@ export function useNotifications(props?: UseNotificationsProps) {
             ...data,
             pages: data.pages.map((page) => ({
               ...page,
-              data: page.data.map((n) =>
-                n.id === id ? { ...n, read: true } : n,
+              data: page.data.map((notification) =>
+                notification.id === id
+                  ? { ...notification, read: true }
+                  : notification,
               ),
             })),
           }
@@ -210,7 +212,10 @@ export function useNotifications(props?: UseNotificationsProps) {
             ...data,
             pages: data.pages.map((page) => ({
               ...page,
-              data: page.data.map((n) => ({ ...n, read: true })),
+              data: page.data.map((notification) => ({
+                ...notification,
+                read: true,
+              })),
             })),
           }
         },
