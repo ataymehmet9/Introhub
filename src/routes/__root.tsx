@@ -23,7 +23,6 @@ import { NotFound } from '@/components/NotFound'
 
 interface MyRouterContext {
   queryClient: QueryClient
-
   trpc: TRPCOptionsProxy<TRPCRouter>
 }
 

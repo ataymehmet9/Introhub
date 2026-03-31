@@ -11,6 +11,8 @@ import {
   TbTrendingUp,
 } from 'react-icons/tb'
 import { z } from 'zod'
+import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 import { AdaptiveCard } from '@/components/shared'
 import {
   Alert,
@@ -23,14 +25,48 @@ import {
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 import { PLANS } from '@/integrations/stripe/billing-plans'
+import { auth } from '@/lib/auth'
+import { trpcRouter } from '@/integrations/trpc/router'
+import { db } from '@/db'
 
 const billingSearchSchema = z.object({
   success: z.boolean().optional(),
   canceled: z.boolean().optional(),
 })
 
+// Server function to fetch billing data
+// This runs ONLY on the server and returns serializable data
+const getBillingData = createServerFn().handler(async () => {
+  const headers = getRequestHeaders()
+  const { session, user } = (await auth.api.getSession({ headers })) ?? {}
+
+  if (!user) {
+    throw new Error('Unauthorized')
+  }
+
+  const context = { db, session, user }
+  const caller = trpcRouter.createCaller(context)
+
+  // Fetch both subscription and plan details in parallel on the server
+  const [subscription, planDetails] = await Promise.all([
+    caller.billing.getSubscription(),
+    caller.billing.getPlanDetails(),
+  ])
+
+  // Return only serializable data (no functions)
+  return {
+    subscription,
+    planDetails,
+  }
+})
+
 export const Route = createFileRoute('/_authenticated/(user)/me/billing')({
   validateSearch: billingSearchSchema,
+  // SSR loader: Pre-fetch billing data on the server
+  // Uses streaming SSR (default) to avoid hydration mismatches with client-side state
+  loader: async () => {
+    return await getBillingData()
+  },
   component: RouteComponent,
 })
 
@@ -39,13 +75,21 @@ function RouteComponent() {
   const search = useSearch({ from: '/_authenticated/(user)/me/billing' })
   const [isUsageExpanded, setIsUsageExpanded] = useState(false)
 
-  const { data: subscription, isLoading } = useQuery({
+  // Get initial data from SSR loader
+  const loaderData = Route.useLoaderData()
+
+  // Keep queries active for background updates and cache invalidation
+  // initialData prevents refetch on mount since we have fresh data from SSR
+  const { data: subscription } = useQuery({
     ...trpc.billing.getSubscription.queryOptions(),
+    initialData: loaderData.subscription,
+    staleTime: 5 * 60 * 1000, // 5 minutes - billing data doesn't change frequently
   })
 
-  // Fetch detailed plan information including usage stats
   const { data: planDetails } = useQuery({
     ...trpc.billing.getPlanDetails.queryOptions(),
+    initialData: loaderData.planDetails,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   const checkoutMutation = useMutation({
@@ -76,7 +120,8 @@ function RouteComponent() {
     },
   })
 
-  const isPro = subscription?.plan === 'pro'
+  // Data is guaranteed to exist from loader (no optional chaining needed)
+  const isPro = subscription.plan === 'pro'
   const isFree = !isPro
   const isMutating = checkoutMutation.isPending || portalMutation.isPending
 
@@ -92,7 +137,7 @@ function RouteComponent() {
 
   // Calculate usage percentage
   const usagePercentage =
-    planDetails?.requestsLimit && planDetails.requestsLimit > 0
+    planDetails.requestsLimit && planDetails.requestsLimit > 0
       ? (planDetails.requestsUsed / planDetails.requestsLimit) * 100
       : 0
 
@@ -114,7 +159,7 @@ function RouteComponent() {
         )}
 
         {/* Cancellation Notice */}
-        {subscription?.cancelAtPeriodEnd && (
+        {subscription.cancelAtPeriodEnd && (
           <Alert
             showIcon
             type="warning"
@@ -142,7 +187,7 @@ function RouteComponent() {
         )}
 
         {/* Usage Stats Card - Only for Free Tier */}
-        {isFree && planDetails && (
+        {isFree && (
           <Card className="mb-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 border-2 border-blue-200 dark:border-blue-800">
             <button
               onClick={() => setIsUsageExpanded(!isUsageExpanded)}
@@ -242,7 +287,7 @@ function RouteComponent() {
         )}
 
         {/* Pro Usage Stats */}
-        {isPro && planDetails && (
+        {isPro && (
           <Card className="mb-6 p-6">
             <div className="flex items-center gap-3 mb-4">
               <TbTrendingUp className="text-2xl text-primary" />
@@ -332,30 +377,29 @@ function RouteComponent() {
                 </li>
               ))}
             </ul>
-            {!isLoading &&
-              (isPro ? (
-                <Button
-                  variant="solid"
-                  size="sm"
-                  className="w-full"
-                  loading={portalMutation.isPending}
-                  disabled={isMutating}
-                  onClick={() => portalMutation.mutate()}
-                >
-                  Manage subscription
-                </Button>
-              ) : (
-                <Button
-                  variant="solid"
-                  size="sm"
-                  className="w-full"
-                  loading={checkoutMutation.isPending}
-                  disabled={isMutating}
-                  onClick={() => checkoutMutation.mutate()}
-                >
-                  Upgrade to Pro
-                </Button>
-              ))}
+            {isPro ? (
+              <Button
+                variant="solid"
+                size="sm"
+                className="w-full"
+                loading={portalMutation.isPending}
+                disabled={isMutating}
+                onClick={() => portalMutation.mutate()}
+              >
+                Manage subscription
+              </Button>
+            ) : (
+              <Button
+                variant="solid"
+                size="sm"
+                className="w-full"
+                loading={checkoutMutation.isPending}
+                disabled={isMutating}
+                onClick={() => checkoutMutation.mutate()}
+              >
+                Upgrade to Pro
+              </Button>
+            )}
           </Card>
         </div>
 
