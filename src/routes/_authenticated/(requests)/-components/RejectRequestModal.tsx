@@ -68,7 +68,7 @@ ${user.name}`
 
   // Watch message field for character count
   const messageValue = watch('customMessage')
-  const remainingChars = maxChars - (messageValue?.length || 0)
+  const remainingChars = maxChars - (messageValue.length || 0)
 
   // Reset form with default message when modal opens
   useEffect(() => {
@@ -140,14 +140,14 @@ ${user.name}`
                     rows={12}
                     maxLength={maxChars}
                     placeholder="Edit the rejection message..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
                   />
                 )}
               />
               <span
                 className={`text-xs text-right block mt-1 ${
                   remainingChars < 500
-                    ? 'text-red-500'
+                    ? 'text-error'
                     : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
@@ -155,8 +155,8 @@ ${user.name}`
               </span>
             </FormItem>
 
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4">
-              <p className="text-xs text-red-900 dark:text-red-100">
+            <div className="bg-error-subtle border border-error rounded-lg p-3 mb-4">
+              <p className="text-xs text-gray-900 dark:text-gray-100">
                 <strong>Note:</strong> This will send a rejection email to{' '}
                 {request.requesterName} explaining that you cannot make this
                 introduction. The contact details will NOT be shared.
@@ -180,7 +180,7 @@ ${user.name}`
               type="submit"
               disabled={isSubmitting}
               loading={isSubmitting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-error hover:opacity-90"
             >
               Reject Request
             </Button>

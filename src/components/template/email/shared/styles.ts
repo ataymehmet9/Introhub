@@ -1,5 +1,6 @@
 // Shared email styles for IntroHub
 // These styles are used across all email templates for consistency
+// Using brand colors: primary (#fb732c), primaryDeep (#cc5c24), primaryMild (#fc8f56)
 
 export const emailStyles = {
   // Main container styles
@@ -80,7 +81,7 @@ export const emailStyles = {
   },
 
   cardEmail: {
-    color: '#2563eb',
+    color: '#fb732c', // Brand primary color
     fontSize: '14px',
     margin: '8px 0 0',
   },
@@ -112,7 +113,7 @@ export const emailStyles = {
   },
 
   button: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#fb732c', // Brand primary color
     borderRadius: '8px',
     color: '#ffffff',
     fontSize: '16px',
@@ -125,7 +126,7 @@ export const emailStyles = {
 
   // Link styles
   link: {
-    color: '#2563eb',
+    color: '#fb732c', // Brand primary color
     textDecoration: 'underline',
   },
 
@@ -148,22 +149,28 @@ export const emailStyles = {
   },
 }
 
-// Color variants for different email types
+// Color variants for different email types - using brand colors
 export const headerColors = {
-  primary: '#2563eb', // Blue - for requests and general
-  success: '#10b981', // Green - for approvals and introductions
+  primary: '#fb732c', // Brand primary - for requests and general
+  success: '#10b981', // Keep green for success/approvals
   neutral: '#6b7280', // Gray - for declined/neutral
-  warning: '#f59e0b', // Orange - for warnings
-  info: '#0ea5e9', // Light blue - for informational
+  warning: '#fb732c', // Use brand primary for warnings too
+  info: '#fb732c', // Use brand primary for informational
 }
 
-// Message box color variants
+// Message box color variants - using brand colors
 export const messageBoxColors = {
+  primary: {
+    backgroundColor: '#fb732c1a', // Brand primarySubtle
+    border: '1px solid #fc8f56', // Brand primaryMild
+    titleColor: '#cc5c24', // Brand primaryDeep
+    textColor: '#cc5c24', // Brand primaryDeep
+  },
   blue: {
-    backgroundColor: '#eff6ff',
-    border: '1px solid #bfdbfe',
-    titleColor: '#1e40af',
-    textColor: '#1e3a8a',
+    backgroundColor: '#fb732c1a', // Brand primarySubtle
+    border: '1px solid #fc8f56', // Brand primaryMild
+    titleColor: '#cc5c24', // Brand primaryDeep
+    textColor: '#cc5c24', // Brand primaryDeep
   },
   green: {
     backgroundColor: '#ecfdf5',
@@ -172,10 +179,10 @@ export const messageBoxColors = {
     textColor: '#064e3b',
   },
   yellow: {
-    backgroundColor: '#fef3c7',
-    border: '1px solid #fde68a',
-    titleColor: '#92400e',
-    textColor: '#78350f',
+    backgroundColor: '#fb732c1a', // Brand primarySubtle for warnings
+    border: '1px solid #fc8f56', // Brand primaryMild
+    titleColor: '#cc5c24', // Brand primaryDeep
+    textColor: '#cc5c24', // Brand primaryDeep
   },
   gray: {
     backgroundColor: '#f3f4f6',
@@ -193,7 +200,7 @@ export const createHeader = (color: string) => ({
 
 // Helper function to create a colored message box
 export const createMessageBox = (
-  variant: keyof typeof messageBoxColors = 'blue',
+  variant: keyof typeof messageBoxColors = 'primary',
 ) => ({
   ...emailStyles.messageBox,
   backgroundColor: messageBoxColors[variant].backgroundColor,
@@ -202,7 +209,7 @@ export const createMessageBox = (
 
 // Helper function to create message title with color
 export const createMessageTitle = (
-  variant: keyof typeof messageBoxColors = 'blue',
+  variant: keyof typeof messageBoxColors = 'primary',
 ) => ({
   ...emailStyles.messageTitle,
   color: messageBoxColors[variant].titleColor,
@@ -210,8 +217,10 @@ export const createMessageTitle = (
 
 // Helper function to create message text with color
 export const createMessageText = (
-  variant: keyof typeof messageBoxColors = 'blue',
+  variant: keyof typeof messageBoxColors = 'primary',
 ) => ({
   ...emailStyles.messageText,
   color: messageBoxColors[variant].textColor,
 })
+
+// Made with Bob

@@ -60,12 +60,12 @@ export const WelcomeEmail = ({
           </Section>
 
           {/* Getting Started */}
-          <Section style={createMessageBox('blue')}>
-            <Text style={createMessageTitle('blue')}>Getting Started</Text>
-            <Text style={createMessageText('blue')}>
+          <Section style={createMessageBox('primary')}>
+            <Text style={createMessageTitle('primary')}>Getting Started</Text>
+            <Text style={createMessageText('primary')}>
               Here's how to make the most of IntroHub:
             </Text>
-            <Text style={createMessageText('blue')}>
+            <Text style={createMessageText('primary')}>
               1. <strong>Add Your Contacts</strong> - Import your professional
               network
               <br />

@@ -58,7 +58,7 @@ const RequesterColumn = ({
         style={{ backgroundColor: avatarColor }}
         className="text-white font-semibold flex-shrink-0 p-4"
       >
-        {displayName?.charAt(0) || 'U'}
+        {displayName.charAt(0) || 'U'}
       </Avatar>
       <div>
         <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -91,13 +91,12 @@ const ContactColumn = ({ row }: { row: IntroductionRequestWithDetails }) => {
 
 const StatusColumn = ({ status }: { status: string }) => {
   const statusConfig = {
-    pending: { color: 'bg-yellow-100 text-yellow-800', label: 'Pending' },
-    approved: { color: 'bg-green-100 text-green-800', label: 'Approved' },
-    declined: { color: 'bg-red-100 text-red-800', label: 'Declined' },
+    pending: { color: 'bg-gray-300 text-gray-800', label: 'Pending' },
+    approved: { color: 'bg-success-subtle text-success', label: 'Approved' },
+    declined: { color: 'bg-error-subtle text-error', label: 'Declined' },
   }
 
-  const config =
-    statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
+  const config = statusConfig[status as keyof typeof statusConfig]
 
   return <Badge className={config.color} content={config.label} />
 }
@@ -119,7 +118,7 @@ const ActionColumn = ({
       <div className="flex items-center gap-3">
         <Tooltip title="Accept">
           <div
-            className="text-xl cursor-pointer select-none font-semibold text-green-600 hover:text-green-700"
+            className="text-xl cursor-pointer select-none font-semibold text-success hover:opacity-80"
             role="button"
             onClick={onAccept}
           >
@@ -128,7 +127,7 @@ const ActionColumn = ({
         </Tooltip>
         <Tooltip title="Reject">
           <div
-            className="text-xl cursor-pointer select-none font-semibold text-red-600 hover:text-red-700"
+            className="text-xl cursor-pointer select-none font-semibold text-error hover:opacity-80"
             role="button"
             onClick={onReject}
           >
@@ -179,7 +178,7 @@ const RequestsTable = ({
 
   // Sort requests on the client side
   const sortedRequests = useMemo(() => {
-    if (!sortConfig || !sortConfig.key || !sortConfig.order) {
+    if (!sortConfig.key || !sortConfig.order) {
       return requests
     }
 

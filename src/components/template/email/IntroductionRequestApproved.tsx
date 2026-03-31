@@ -88,9 +88,9 @@ export const IntroductionRequestApprovedEmail = ({
           )}
 
           {/* Next Steps */}
-          <Section style={createMessageBox('blue')}>
-            <Text style={createMessageTitle('blue')}>Next Steps:</Text>
-            <Text style={createMessageText('blue')}>
+          <Section style={createMessageBox('primary')}>
+            <Text style={createMessageTitle('primary')}>Next Steps:</Text>
+            <Text style={createMessageText('primary')}>
               1. Reach out to {contactName} via email
               <br />
               2. Mention that {approverName} connected you
