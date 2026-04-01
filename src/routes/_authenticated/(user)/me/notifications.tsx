@@ -49,6 +49,9 @@ function RouteComponent() {
   const navigate = useNavigate()
   const loaderData = Route.useLoaderData()
 
+  // Only use initial data if the filter matches what was loaded on the server
+  const shouldUseInitialData = (searchParams.unreadOnly ?? false) === false
+
   const {
     notifications,
     isLoading,
@@ -59,8 +62,7 @@ function RouteComponent() {
   } = useNotifications({
     pageSize: searchParams.c ?? 10,
     unreadOnly: searchParams.unreadOnly ?? false,
-
-    initialData: loaderData?.notifications,
+    initialData: shouldUseInitialData ? loaderData?.notifications : undefined,
   })
 
   const handleFilterChange = (unreadOnly: boolean) => {
