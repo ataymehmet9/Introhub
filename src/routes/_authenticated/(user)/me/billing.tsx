@@ -153,10 +153,10 @@ function RouteComponent() {
           <Alert
             showIcon
             type="warning"
-            className="mb-6"
+            className="mb-6 text-xs sm:text-sm"
             title="Subscription Cancellation Scheduled"
           >
-            <div>
+            <div className="text-xs sm:text-sm">
               <p>
                 Your Pro subscription will be canceled on{' '}
                 {formatDate(
@@ -278,36 +278,36 @@ function RouteComponent() {
 
         {/* Pro Usage Stats */}
         {isPro && (
-          <Card className="mb-6 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <TbTrendingUp className="text-2xl text-primary" />
-              <h6>Usage Statistics</h6>
+          <Card className="mb-8 sm:mb-6 p-3 sm:p-6">
+            <div className="flex items-center gap-2 mb-2 sm:mb-4">
+              <TbTrendingUp className="text-lg sm:text-2xl text-primary" />
+              <h6 className="text-sm sm:text-lg">Usage Statistics</h6>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
               {/* Total Requests This Cycle */}
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Requests This Month
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {planDetails.usageStats.requestsThisCycle}
                 </p>
               </div>
 
               {/* Average Per Month */}
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Average Per Month
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {(planDetails?.usageStats?.averagePerMonth ?? 0).toFixed(1)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-4 p-3 rounded-lg bg-success-subtle border border-success">
-              <p className="text-sm text-success">
+            <div className="mt-2 sm:mt-4 p-2 sm:p-3 rounded-lg bg-success-subtle border border-success">
+              <p className="text-xs sm:text-sm text-success">
                 ✨ You have unlimited requests with your Pro plan
               </p>
             </div>
@@ -394,14 +394,14 @@ function RouteComponent() {
         </div>
 
         {/* Payment Method */}
-        <Card className="mb-4 p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <TbCreditCard className="text-xl" />
-            <h6>Payment method</h6>
+        <Card className="mb-4 p-3 sm:p-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            <TbCreditCard className="text-base sm:text-xl" />
+            <h6 className="text-sm sm:text-lg">Payment method</h6>
           </div>
           {isPro ? (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+              <p className="text-xs sm:text-sm text-gray-500 sm:flex-1">
                 Manage your payment method via the billing portal.
               </p>
               <Button
@@ -409,24 +409,27 @@ function RouteComponent() {
                 loading={portalMutation.isPending}
                 disabled={isMutating}
                 onClick={() => portalMutation.mutate()}
+                className="w-full sm:w-auto sm:shrink-0"
               >
                 Open portal
               </Button>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No payment method on file.</p>
+            <p className="text-xs sm:text-sm text-gray-500">
+              No payment method on file.
+            </p>
           )}
         </Card>
 
         {/* Billing History */}
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <TbReceipt className="text-xl" />
-            <h6>Billing history</h6>
+        <Card className="p-3 sm:p-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            <TbReceipt className="text-base sm:text-xl" />
+            <h6 className="text-sm sm:text-lg">Billing history</h6>
           </div>
           {isPro ? (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+              <p className="text-xs sm:text-sm text-gray-500 sm:flex-1">
                 View past invoices in the billing portal.
               </p>
               <Button
@@ -434,12 +437,13 @@ function RouteComponent() {
                 loading={portalMutation.isPending}
                 disabled={isMutating}
                 onClick={() => portalMutation.mutate()}
+                className="w-full sm:w-auto sm:shrink-0"
               >
                 View invoices
               </Button>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No invoices yet.</p>
+            <p className="text-xs sm:text-sm text-gray-500">No invoices yet.</p>
           )}
         </Card>
       </div>
