@@ -31,13 +31,13 @@ export function StatCard({
 
   if (loading) {
     return (
-      <Card className="p-6 h-full">
+      <Card className="p-4 sm:p-6 h-full">
         <div className="animate-pulse">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-3 sm:mb-4 flex items-center justify-between">
             <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
-            <div className="h-10 w-10 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
           </div>
-          <div className="mb-2 h-8 w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mb-2 h-6 sm:h-8 w-24 sm:w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
           <div className="h-3 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
       </Card>
@@ -47,7 +47,7 @@ export function StatCard({
   return (
     <Card
       className={classNames(
-        'p-6 transition-shadow hover:shadow-lg h-full',
+        'p-4 sm:p-6 transition-shadow hover:shadow-lg h-full',
         className,
       )}
     >
@@ -55,7 +55,7 @@ export function StatCard({
         <div className="flex-1">
           <p
             className={classNames(
-              'mb-1 text-sm font-medium',
+              'mb-1 text-xs sm:text-sm font-medium',
               isLightVariant
                 ? 'text-gray-700 dark:text-gray-800'
                 : 'text-gray-600 dark:text-gray-400',
@@ -65,7 +65,7 @@ export function StatCard({
           </p>
           <h3
             className={classNames(
-              'mb-2 text-3xl font-bold',
+              'mb-2 text-2xl sm:text-3xl font-bold',
               isLightVariant
                 ? 'text-gray-900 dark:text-gray-950'
                 : 'text-gray-900 dark:text-gray-100',
@@ -75,11 +75,15 @@ export function StatCard({
           </h3>
           {hasChange && (
             <div className="flex items-center gap-1">
-              {isPositive && <HiTrendingUp className="text-lg text-success" />}
-              {isNegative && <HiTrendingDown className="text-lg text-error" />}
+              {isPositive && (
+                <HiTrendingUp className="text-base sm:text-lg text-success" />
+              )}
+              {isNegative && (
+                <HiTrendingDown className="text-base sm:text-lg text-error" />
+              )}
               <span
                 className={classNames(
-                  'text-sm font-medium',
+                  'text-xs sm:text-sm font-medium',
                   isPositive && 'text-success',
                   isNegative && 'text-error',
                   !isPositive &&
@@ -94,7 +98,7 @@ export function StatCard({
               </span>
               <span
                 className={classNames(
-                  'text-sm',
+                  'text-xs sm:text-sm',
                   isLightVariant
                     ? 'text-gray-600 dark:text-gray-700'
                     : 'text-gray-500 dark:text-gray-400',
@@ -118,7 +122,7 @@ export function StatCard({
           )}
         </div>
         {icon && (
-          <div className="flex items-center justify-center min-h-12 min-w-12 max-h-12 max-w-12 bg-gray-900 text-white rounded-full text-2xl">
+          <div className="flex items-center justify-center min-h-10 min-w-10 max-h-10 max-w-10 sm:min-h-12 sm:min-w-12 sm:max-h-12 sm:max-w-12 bg-gray-900 text-white rounded-full text-xl sm:text-2xl">
             {icon}
           </div>
         )}

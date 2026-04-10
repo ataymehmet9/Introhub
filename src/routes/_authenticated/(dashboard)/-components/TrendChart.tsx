@@ -54,22 +54,22 @@ export function TrendChart({
 
   if (loading) {
     return (
-      <Card className="p-6">
-        <div className="mb-4">
-          <div className="h-6 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+      <Card className="p-3 sm:p-6">
+        <div className="mb-2 sm:mb-4">
+          <div className="h-5 sm:h-6 w-32 sm:w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
-        <div className="h-80 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="h-56 sm:h-80 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
       </Card>
     )
   }
 
   if (!data || chartData.series.length === 0) {
     return (
-      <Card className="p-6">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <Card className="p-3 sm:p-6">
+        <h3 className="mb-2 sm:mb-4 text-sm sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
           {title}
         </h3>
-        <div className="flex h-80 items-center justify-center text-gray-500 dark:text-gray-400">
+        <div className="flex h-56 sm:h-80 items-center justify-center text-xs sm:text-base text-gray-500 dark:text-gray-400">
           No data available for the selected period
         </div>
       </Card>
@@ -77,15 +77,15 @@ export function TrendChart({
   }
 
   return (
-    <Card className="p-6">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+    <Card className="p-3 sm:p-6">
+      <h3 className="mb-2 sm:mb-4 text-sm sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
         {title}
       </h3>
       <Chart
         type="area"
         series={chartData.series}
         xAxis={chartData.categories}
-        height={320}
+        height={280}
         customOptions={{
           chart: {
             toolbar: {
@@ -119,7 +119,20 @@ export function TrendChart({
           },
           legend: {
             position: 'top',
-            horizontalAlign: 'right',
+            horizontalAlign: 'center',
+            floating: false,
+            fontSize: '11px',
+            fontWeight: 500,
+            offsetY: 0,
+            markers: {
+              width: 7,
+              height: 7,
+              radius: 12,
+            },
+            itemMargin: {
+              horizontal: 6,
+              vertical: 0,
+            },
           },
           tooltip: {
             shared: true,
