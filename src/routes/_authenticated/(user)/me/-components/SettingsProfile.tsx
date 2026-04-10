@@ -63,17 +63,17 @@ const SettingsProfile = () => {
 
   return (
     <>
-      <h4 className="mb-8">Personal information</h4>
+      <h4 className="mb-6">Personal information</h4>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-8">
+        <div className="mb-6">
           <Controller
             name="image"
             control={control}
             render={({ field }) => (
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Avatar
                   size={90}
-                  className="border-4 border-white bg-gray-100 text-gray-300 shadow-lg"
+                  className="border-4 border-white bg-gray-100 text-gray-300 shadow-lg shrink-0"
                   icon={<HiOutlineUser />}
                   src={generateFileCloudUrl(field.value)}
                 />
@@ -116,7 +116,6 @@ const SettingsProfile = () => {
           />
         </div>
         <FormItem
-          className="w-full"
           label="Name"
           invalid={Boolean(errors.name)}
           errorMessage={errors.name?.message}
@@ -192,11 +191,12 @@ const SettingsProfile = () => {
             />
           </FormItem>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-6">
           <Button
             variant="solid"
             type="submit"
             loading={isSubmitting || isUploading || isUpdating}
+            className="w-full sm:w-auto"
           >
             Save
           </Button>
