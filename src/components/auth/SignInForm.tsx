@@ -8,7 +8,7 @@ import type { CommonProps } from '@/@types/common'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { Form, FormItem } from '@/components/ui/Form'
-import { signIn } from '@/lib/auth-client'
+import { useSecureSignIn } from '@/lib/auth-wrapper'
 
 const signInSchema = z.object({
   email: z.email('Invalid email address'),
@@ -35,6 +35,7 @@ const SignInForm = (props: SignInFormProps) => {
 
   const [isSubmitting, setSubmitting] = useState<boolean>(false)
   const posthog = usePostHog()
+  const { signIn } = useSecureSignIn()
 
   const {
     handleSubmit,
@@ -49,7 +50,7 @@ const SignInForm = (props: SignInFormProps) => {
 
     if (!disableSubmit) {
       setSubmitting(true)
-      const { error } = await signIn.email({ email, password })
+      const { error } = await signIn({ email, password })
 
       setSubmitting(false)
 

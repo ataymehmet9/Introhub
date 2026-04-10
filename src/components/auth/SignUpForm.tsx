@@ -7,7 +7,7 @@ import type { UserSignup } from '@/schemas'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { Form, FormItem } from '@/components/ui/Form'
-import { signUp } from '@/lib/auth-client'
+import { useSecureSignUp } from '@/lib/auth-wrapper'
 import { userSignupSchema } from '@/schemas'
 
 interface SignUpFormProps extends CommonProps {
@@ -26,6 +26,7 @@ const SignUpForm = (props: SignUpFormProps) => {
 
   const [isSubmitting, setSubmitting] = useState<boolean>(false)
   const posthog = usePostHog()
+  const { signUp } = useSecureSignUp()
 
   const {
     handleSubmit,
@@ -40,7 +41,7 @@ const SignUpForm = (props: SignUpFormProps) => {
 
     if (!disableSubmit) {
       setSubmitting(true)
-      const { error } = await signUp.email({
+      const { error } = await signUp({
         email,
         password,
         name,

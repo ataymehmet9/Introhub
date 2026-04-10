@@ -7,6 +7,7 @@ import PageContainer from '@/components/template/PageContainer'
 import { useThemeStore } from '@/store/themeStore'
 import { useSession } from '@/lib/auth-client'
 import { usePostHogIdentify } from '@/hooks/usePostHogIdentify'
+import { useClearCacheOnAuth } from '@/lib/auth-wrapper'
 
 export const Route = createFileRoute('/_authenticated')({
   component: RouteComponent,
@@ -23,6 +24,9 @@ export const Route = createFileRoute('/_authenticated')({
 function RouteComponent() {
   const layoutType = useThemeStore((state) => state.layout.type)
   const { data: session, isPending } = useSession()
+
+  // Clear cache on auth state changes (especially OAuth redirects)
+  useClearCacheOnAuth()
 
   // Identify user in PostHog on session start
   usePostHogIdentify()

@@ -1,7 +1,7 @@
 import { usePostHog } from '@posthog/react'
 import Button from '@/components/ui/Button'
 import appConfig from '@/configs/app.config'
-import { signIn } from '@/lib/auth-client'
+import { useSecureSignIn } from '@/lib/auth-wrapper'
 
 type OauthSignInProps = {
   setMessage?: (message: string) => void
@@ -10,6 +10,7 @@ type OauthSignInProps = {
 
 const OauthSignIn = (_props: OauthSignInProps) => {
   const posthog = usePostHog()
+  const { signInSocial } = useSecureSignIn()
 
   const handleSocialSignIn = async (
     provider: 'linkedin' | 'microsoft' | 'google',
@@ -20,7 +21,7 @@ const OauthSignIn = (_props: OauthSignInProps) => {
       timestamp: new Date().toISOString(),
     })
 
-    await signIn.social({
+    await signInSocial({
       provider,
       callbackURL: appConfig.authenticatedEntryPath,
     })

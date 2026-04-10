@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { usePostHog } from '@posthog/react'
+import { useRouter } from '@tanstack/react-router'
 import { signOut } from './auth-client'
 
 /**
@@ -16,6 +17,7 @@ import { signOut } from './auth-client'
 export const useLogout = () => {
   const queryClient = useQueryClient()
   const posthog = usePostHog()
+  const router = useRouter()
 
   const logout = async () => {
     try {
@@ -35,14 +37,24 @@ export const useLogout = () => {
       // Step 5: Clear mutation cache as well
       queryClient.getMutationCache().clear()
 
-      console.log('Logout complete: All caches cleared')
+      // Step 6: Clear TanStack Router loader cache - THIS IS CRITICAL FOR SSR DATA
+      router.invalidate()
+
+      // Step 7: Clear session tracking to force cache clear on next login
+      sessionStorage.removeItem('lastClearedSession')
+
+      console.log(
+        'Logout complete: All caches cleared including router loaders',
+      )
     } catch (error) {
       console.error('Error during logout:', error)
       // Even if there's an error, still try to clear the cache
       queryClient.clear()
       queryClient.removeQueries()
       queryClient.getMutationCache().clear()
+      router.invalidate()
       posthog.reset()
+      sessionStorage.removeItem('lastClearedSession')
       throw error
     }
   }
