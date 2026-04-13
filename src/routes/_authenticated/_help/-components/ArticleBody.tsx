@@ -9,7 +9,7 @@ const ArticleBody = ({ content }: ArticleBodyProps) => {
   if (!content) return null
 
   return (
-    <article className="prose dark:prose-invert max-w-none">
+    <article className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
       <h1>{content.title}</h1>
       {content.sections.map((section) => (
         <section key={section.id} id={section.id}>
