@@ -11,7 +11,9 @@ const SettingsLogAction = ({
 }: SettingsLogActionProps) => {
   return (
     <div className="flex items-center gap-2">
-      <span className="font-semibold">Show unread only?</span>
+      <span className="text-sm sm:text-base font-semibold">
+        Show unread only?
+      </span>
       <Switcher checked={showUnreadOnly} onChange={onFilterChange} />
     </div>
   )

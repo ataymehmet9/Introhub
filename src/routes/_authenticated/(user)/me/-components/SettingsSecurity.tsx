@@ -17,12 +17,15 @@ const validationSchema = z
   .object({
     password: z
       .string()
+      .min(1, { message: 'Current password is required' })
       .min(8, { message: 'Password must be at least 8 characters' }),
     newPassword: z
       .string()
+      .min(1, { message: 'New password is required' })
       .min(8, { message: 'New password must be at least 8 characters' }),
     confirmPassword: z
       .string()
+      .min(1, { message: 'Confirm password is required' })
       .min(8, { message: 'Confirm password must be at least 8 characters' }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -46,6 +49,11 @@ const SettingsSecurity = () => {
     reset,
   } = useForm<PasswordSchema>({
     resolver: zodResolver(validationSchema),
+    defaultValues: {
+      password: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
   })
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -148,7 +156,7 @@ const SettingsSecurity = () => {
           />
         </FormItem>
         <div className="flex justify-end">
-          <Button variant="solid" type="submit">
+          <Button variant="solid" type="submit" className="w-full sm:w-auto">
             Update
           </Button>
         </div>

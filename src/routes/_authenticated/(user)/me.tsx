@@ -19,7 +19,7 @@ function RouteComponent() {
             <SettingsMenu />
           </div>
         )}
-        <div className="xl:ltr:pl-6 xl:rtl:pr-6 flex-1 py-2">
+        <div className="xl:ltr:pl-6 xl:rtl:pr-6 flex-1 px-4 py-4 xl:px-0 xl:py-2">
           {smaller.xl && (
             <div className="mb-6">
               <SettingMobileMenu />

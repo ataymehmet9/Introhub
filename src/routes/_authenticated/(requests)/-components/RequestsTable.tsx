@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TbCheck, TbTrash, TbX } from 'react-icons/tb'
 import { useRequestStore } from '../-store/requestStore'
-import type { ColumnDef, OnSortParam, Row } from '@/components/shared/DataTable'
+import type { ColumnDef, OnSortParam } from '@/components/shared/DataTable'
 import type { IntroductionRequestWithDetails } from '../-store/requestStore'
 import {
   Avatar,
@@ -165,13 +165,7 @@ const RequestsTable = ({
   const [deletingRequest, setDeletingRequest] =
     useState<IntroductionRequestWithDetails | null>(null)
 
-  const {
-    setSelectAllRequests,
-    setSelectedRequest,
-    selectedRequests,
-    sortConfig,
-    setSortConfig,
-  } = useRequestStore()
+  const { sortConfig, setSortConfig } = useRequestStore()
 
   const queryClient = useQueryClient()
   const trpc = useTRPC()
@@ -325,25 +319,6 @@ const RequestsTable = ({
     setSortConfig(String(sort.key), sort.order)
   }
 
-  const handleRowSelect = (
-    checked: boolean,
-    row: IntroductionRequestWithDetails,
-  ) => {
-    setSelectedRequest(checked, row)
-  }
-
-  const handleAllRowSelect = (
-    checked: boolean,
-    rows: Array<Row<IntroductionRequestWithDetails>>,
-  ) => {
-    if (checked) {
-      const originalRows = rows.map((row) => row.original)
-      setSelectAllRequests(originalRows)
-    } else {
-      setSelectAllRequests([])
-    }
-  }
-
   const handleDeletingDialogClose = () => {
     setDeletingRequest(null)
   }
@@ -357,19 +332,13 @@ const RequestsTable = ({
   return (
     <>
       <DataTable
-        selectable
         columns={columns}
         data={sortedRequests}
         noData={!isLoading && sortedRequests.length === 0}
         skeletonAvatarColumns={[0]}
         skeletonAvatarProps={{ width: 28, height: 28 }}
         loading={isLoading}
-        checkboxChecked={(row) =>
-          selectedRequests.some((selected) => selected.id === row.id)
-        }
         onSort={handleSort}
-        onCheckBoxChange={handleRowSelect}
-        onIndeterminateCheckBoxChange={handleAllRowSelect}
         pagingData={pagingData}
         onPaginationChange={onPaginationChange}
         onSelectChange={onPageSizeChange}

@@ -30,22 +30,22 @@ export function StatusDonutChart({
 
   if (loading) {
     return (
-      <Card className="p-6">
-        <div className="mb-4">
-          <div className="h-6 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+      <Card className="p-3 sm:p-6">
+        <div className="mb-2 sm:mb-4">
+          <div className="h-5 sm:h-6 w-32 sm:w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
-        <div className="h-80 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="h-56 sm:h-80 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
       </Card>
     )
   }
 
   if (!data || data.total === 0) {
     return (
-      <Card className="p-6">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <Card className="p-3 sm:p-6">
+        <h3 className="mb-2 sm:mb-4 text-sm sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
           {title}
         </h3>
-        <div className="flex h-80 items-center justify-center text-gray-500 dark:text-gray-400">
+        <div className="flex h-56 sm:h-80 items-center justify-center text-xs sm:text-base text-gray-500 dark:text-gray-400">
           No requests in the selected period
         </div>
       </Card>
@@ -53,8 +53,8 @@ export function StatusDonutChart({
   }
 
   return (
-    <Card className="p-6">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+    <Card className="p-3 sm:p-6">
+      <h3 className="mb-2 sm:mb-4 text-sm sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
         {title}
       </h3>
       <div className="flex flex-col items-center">
@@ -108,10 +108,12 @@ export function StatusDonutChart({
             },
           }}
         />
-        <div className="mt-4 grid w-full grid-cols-3 gap-4 text-center">
+        <div className="mt-3 sm:mt-4 grid w-full grid-cols-3 gap-2 sm:gap-4 text-center">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
-            <p className="text-lg font-semibold text-warning-600 dark:text-warning-400">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Pending
+            </p>
+            <p className="text-base sm:text-lg font-semibold text-warning-600 dark:text-warning-400">
               {data.pending}
             </p>
             <p className="text-xs text-gray-500">
@@ -119,8 +121,10 @@ export function StatusDonutChart({
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Approved</p>
-            <p className="text-lg font-semibold text-success-600 dark:text-success-400">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Approved
+            </p>
+            <p className="text-base sm:text-lg font-semibold text-success-600 dark:text-success-400">
               {data.approved}
             </p>
             <p className="text-xs text-gray-500">
@@ -128,8 +132,10 @@ export function StatusDonutChart({
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Declined</p>
-            <p className="text-lg font-semibold text-danger-600 dark:text-danger-400">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Declined
+            </p>
+            <p className="text-base sm:text-lg font-semibold text-danger-600 dark:text-danger-400">
               {data.declined}
             </p>
             <p className="text-xs text-gray-500">
