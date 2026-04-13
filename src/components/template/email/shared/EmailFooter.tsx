@@ -26,7 +26,9 @@ export const EmailFooter = ({ text }: EmailFooterProps) => (
 
     <Section style={emailStyles.footerDivider} />
 
-    <Text style={emailStyles.footerCopyright}>IntroHub Copyright © 2024</Text>
+    <Text style={emailStyles.footerCopyright}>
+      IntroHub Copyright © {`${new Date().getFullYear()}`}
+    </Text>
   </Section>
 )
 
