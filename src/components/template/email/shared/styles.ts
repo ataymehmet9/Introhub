@@ -5,57 +5,136 @@
 export const emailStyles = {
   // Main container styles
   main: {
-    backgroundColor: '#f6f9fc',
+    backgroundColor: '#f8f8f9',
     fontFamily:
-      '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+      'Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif',
+    margin: '0',
+    padding: '0',
+  },
+
+  topContainer: {
+    backgroundColor: '#ffffff',
+    margin: '0 auto',
   },
 
   container: {
     backgroundColor: '#ffffff',
     margin: '0 auto',
-    padding: '20px 0 48px',
-    marginBottom: '64px',
-    maxWidth: '600px',
+    maxWidth: '640px',
   },
 
-  // Header styles
-  header: {
-    padding: '32px 48px',
+  // Top brand stripe
+  topStripe: {
+    backgroundColor: '#fb732c',
+    height: '4px',
   },
 
+  // Logo section
+  logoSection: {
+    backgroundColor: '#ffffff',
+    padding: '22px 0 25px',
+    textAlign: 'center' as const,
+    borderBottom: '1px solid #e3e3e3',
+  },
+
+  logo: {
+    maxWidth: '149px',
+    height: 'auto',
+  },
+
+  // Spacer
+  spacer: {
+    backgroundColor: '#f8f8f9',
+    padding: '20px 0',
+  },
+
+  // Hero section (with image/icon)
+  heroSection: {
+    backgroundColor: '#ffffff',
+    padding: '60px 40px 50px',
+    textAlign: 'center' as const,
+  },
+
+  heroImage: {
+    maxWidth: '352px',
+    width: '100%',
+    height: 'auto',
+  },
+
+  // Main heading
   h1: {
-    color: '#ffffff',
-    fontSize: '28px',
+    color: '#2b303a',
+    fontSize: '30px',
     fontWeight: 'bold',
-    margin: '0',
-    padding: '0',
-  },
-
-  // Content area
-  content: {
-    padding: '0 48px',
+    lineHeight: '1.2',
+    margin: '50px 0 0',
+    textAlign: 'center' as const,
   },
 
   h2: {
-    color: '#1f2937',
+    color: '#2b303a',
     fontSize: '24px',
     fontWeight: 'bold',
-    margin: '32px 0 24px',
+    lineHeight: '1.2',
+    margin: '30px 0 20px',
+    textAlign: 'center' as const,
   },
 
+  // Content area with brand accent
+  contentBox: {
+    backgroundColor: '#f3fafa',
+    border: '30px solid #ffffff',
+    padding: '0',
+  },
+
+  contentBoxTopStripe: {
+    backgroundColor: '#fb732c',
+    height: '4px',
+  },
+
+  contentBoxInner: {
+    padding: '35px 30px 40px',
+  },
+
+  // Avatar/Profile image
+  avatar: {
+    width: '72px',
+    height: '72px',
+    borderRadius: '50%',
+    margin: '0 auto',
+  },
+
+  // Name in content box
+  contentName: {
+    color: '#2b303a',
+    fontSize: '18px',
+    fontWeight: 'bold',
+    lineHeight: '1.2',
+    margin: '15px 0 20px',
+    textAlign: 'center' as const,
+  },
+
+  // Body text
   text: {
-    color: '#374151',
-    fontSize: '16px',
-    lineHeight: '24px',
-    margin: '16px 0',
+    color: '#2b303a',
+    fontSize: '15px',
+    lineHeight: '1.5',
+    margin: '0 0 15px',
   },
 
-  // Card styles
+  textSmall: {
+    color: '#2b303a',
+    fontSize: '14px',
+    lineHeight: '1.5',
+    margin: '0',
+  },
+
+  // Card styles (for contact info, etc.)
   card: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#f3fafa',
     borderRadius: '8px',
-    padding: '24px',
-    margin: '24px 0',
+    padding: '20px 30px',
+    margin: '20px 0',
   },
 
   cardTitle: {
@@ -68,83 +147,145 @@ export const emailStyles = {
   },
 
   cardName: {
-    color: '#1f2937',
-    fontSize: '20px',
+    color: '#2b303a',
+    fontSize: '18px',
     fontWeight: 'bold',
     margin: '0 0 4px',
   },
 
   cardDetail: {
-    color: '#4b5563',
-    fontSize: '14px',
+    color: '#2b303a',
+    fontSize: '15px',
     margin: '4px 0',
   },
 
   cardEmail: {
-    color: '#fb732c', // Brand primary color
-    fontSize: '14px',
+    color: '#fb732c',
+    fontSize: '15px',
     margin: '8px 0 0',
   },
 
   // Message box styles
   messageBox: {
     borderRadius: '8px',
-    padding: '20px',
-    margin: '24px 0',
+    padding: '20px 30px',
+    margin: '20px 0',
   },
 
   messageTitle: {
-    fontSize: '14px',
+    fontSize: '15px',
     fontWeight: 'bold',
-    margin: '0 0 12px',
+    margin: '0 0 12px 0',
+    padding: '0',
   },
 
   messageText: {
-    fontSize: '14px',
-    lineHeight: '20px',
+    fontSize: '15px',
+    lineHeight: '22px',
     margin: '0',
-    whiteSpace: 'pre-wrap' as const,
+    padding: '0',
+    whiteSpace: 'normal' as const,
   },
 
   // Button styles
   buttonContainer: {
+    backgroundColor: '#ffffff',
+    padding: '40px 10px 60px',
     textAlign: 'center' as const,
-    margin: '32px 0',
   },
 
   button: {
-    backgroundColor: '#fb732c', // Brand primary color
-    borderRadius: '8px',
+    backgroundColor: '#fb732c',
+    borderRadius: '60px',
     color: '#ffffff',
     fontSize: '16px',
     fontWeight: 'bold',
     textDecoration: 'none',
     textAlign: 'center' as const,
     display: 'inline-block',
-    padding: '12px 32px',
+    padding: '15px 30px',
+    letterSpacing: 'normal',
   },
 
   // Link styles
   link: {
-    color: '#fb732c', // Brand primary color
+    color: '#fb732c',
     textDecoration: 'underline',
   },
 
-  // Divider
+  // Spacer between sections
+  sectionSpacer: {
+    backgroundColor: '#f8f8f9',
+    padding: '20px 0',
+  },
+
+  // Footer
+  footerSection: {
+    backgroundColor: '#2b303a',
+  },
+
+  footerTopStripe: {
+    backgroundColor: '#fb732c',
+    height: '4px',
+  },
+
+  footerImage: {
+    maxWidth: '640px',
+    width: '100%',
+    height: 'auto',
+  },
+
+  footerLogo: {
+    maxWidth: '149px',
+    height: 'auto',
+    margin: '40px auto 0',
+  },
+
+  footerSocial: {
+    padding: '28px 10px 10px',
+    textAlign: 'center' as const,
+  },
+
+  footerText: {
+    color: '#95979c',
+    fontSize: '12px',
+    lineHeight: '1.5',
+    margin: '15px 40px 10px',
+  },
+
+  footerDivider: {
+    borderTop: '1px solid #555961',
+    margin: '25px 40px 10px 40px',
+    width: 'auto',
+  },
+
+  footerCopyright: {
+    color: '#95979c',
+    fontSize: '12px',
+    lineHeight: '1.2',
+    margin: '20px 40px 30px',
+  },
+
+  // Content section (for backward compatibility)
+  content: {
+    padding: '0 30px',
+  },
+
+  // Divider (for backward compatibility)
   hr: {
     borderColor: '#e5e7eb',
     margin: '32px 0',
   },
 
-  // Footer
+  // Footer (for backward compatibility)
   footer: {
-    padding: '0 48px',
+    padding: '0 40px',
   },
 
-  footerText: {
-    color: '#6b7280',
+  footerTextCompat: {
+    color: '#95979c',
     fontSize: '12px',
-    lineHeight: '16px',
+    lineHeight: '1.5',
     margin: '0',
   },
 }
@@ -158,45 +299,39 @@ export const headerColors = {
   info: '#fb732c', // Use brand primary for informational
 }
 
-// Message box color variants - using brand colors
+// Message box color variants - using brand colors with new structure
 export const messageBoxColors = {
   primary: {
-    backgroundColor: '#fb732c1a', // Brand primarySubtle
-    border: '1px solid #fc8f56', // Brand primaryMild
+    backgroundColor: '#fff5f0', // Light orange background
+    border: '2px solid #fb732c', // Brand primary border
     titleColor: '#cc5c24', // Brand primaryDeep
-    textColor: '#cc5c24', // Brand primaryDeep
+    textColor: '#2b303a', // Dark text for readability
   },
   blue: {
-    backgroundColor: '#fb732c1a', // Brand primarySubtle
-    border: '1px solid #fc8f56', // Brand primaryMild
+    backgroundColor: '#fff5f0', // Light orange background
+    border: '2px solid #fb732c', // Brand primary border
     titleColor: '#cc5c24', // Brand primaryDeep
-    textColor: '#cc5c24', // Brand primaryDeep
+    textColor: '#2b303a', // Dark text for readability
   },
   green: {
     backgroundColor: '#ecfdf5',
-    border: '1px solid #a7f3d0',
+    border: '2px solid #10b981',
     titleColor: '#065f46',
-    textColor: '#064e3b',
+    textColor: '#2b303a',
   },
   yellow: {
-    backgroundColor: '#fb732c1a', // Brand primarySubtle for warnings
-    border: '1px solid #fc8f56', // Brand primaryMild
+    backgroundColor: '#fff5f0', // Light orange for warnings
+    border: '2px solid #fb732c', // Brand primary border
     titleColor: '#cc5c24', // Brand primaryDeep
-    textColor: '#cc5c24', // Brand primaryDeep
+    textColor: '#2b303a', // Dark text for readability
   },
   gray: {
     backgroundColor: '#f3f4f6',
-    border: '1px solid #d1d5db',
+    border: '2px solid #d1d5db',
     titleColor: '#374151',
-    textColor: '#1f2937',
+    textColor: '#2b303a',
   },
 }
-
-// Helper function to create a colored header
-export const createHeader = (color: string) => ({
-  ...emailStyles.header,
-  backgroundColor: color,
-})
 
 // Helper function to create a colored message box
 export const createMessageBox = (
@@ -221,6 +356,13 @@ export const createMessageText = (
 ) => ({
   ...emailStyles.messageText,
   color: messageBoxColors[variant].textColor,
+})
+
+// Helper function to create header section (kept for backward compatibility)
+export const createHeader = (color: string) => ({
+  backgroundColor: color,
+  padding: '32px 48px',
+  textAlign: 'center' as const,
 })
 
 // Made with Bob

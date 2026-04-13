@@ -4,20 +4,20 @@ import {
   Container,
   Head,
   Heading,
-  Hr,
   Html,
   Link,
   Section,
   Text,
 } from '@react-email/components'
 import {
-  createHeader,
   createMessageBox,
   createMessageText,
   createMessageTitle,
   emailStyles,
-  headerColors,
 } from './shared/styles'
+import { EmailHeader } from './shared/EmailHeader'
+import { EmailBody } from './shared/EmailBody'
+import { EmailFooter } from './shared/EmailFooter'
 
 type IntroductionRequestEmailProps = {
   approverName: string
@@ -45,51 +45,65 @@ export const IntroductionRequestEmail = ({
   <Html lang="en">
     <Head />
     <Body style={emailStyles.main}>
-      <Container style={emailStyles.container}>
-        {/* Header */}
-        <Section style={createHeader(headerColors.primary)}>
-          <Heading style={emailStyles.h1}>IntroHub</Heading>
-        </Section>
+      <Container style={emailStyles.topContainer}>
+        <EmailHeader />
 
-        {/* Main Content */}
-        <Section style={emailStyles.content}>
-          <Heading style={emailStyles.h2}>New Introduction Request</Heading>
-
-          <Text style={emailStyles.text}>Hi {approverName},</Text>
-
-          <Text style={emailStyles.text}>
-            You have received a new introduction request!
-          </Text>
-
-          {/* Requester Info Card */}
-          <Section style={emailStyles.card}>
-            <Text style={emailStyles.cardTitle}>FROM:</Text>
-            <Text style={emailStyles.cardName}>{requesterName}</Text>
-            {requesterPosition && requesterCompany && (
-              <Text style={emailStyles.cardDetail}>
-                {requesterPosition} at {requesterCompany}
-              </Text>
-            )}
-            {requesterPosition && !requesterCompany && (
-              <Text style={emailStyles.cardDetail}>{requesterPosition}</Text>
-            )}
-            {!requesterPosition && requesterCompany && (
-              <Text style={emailStyles.cardDetail}>{requesterCompany}</Text>
-            )}
-            <Text style={emailStyles.cardEmail}>{requesterEmail}</Text>
+        <EmailBody>
+          {/* Hero Section */}
+          <Section style={emailStyles.heroSection}>
+            <Heading style={emailStyles.h1}>New Introduction Request</Heading>
           </Section>
 
-          {/* Contact Info */}
-          <Text style={emailStyles.text}>
-            <strong>They would like to meet:</strong>
-            <br />
-            {contactName} ({contactEmail})
-          </Text>
+          {/* Content Box */}
+          <Section style={emailStyles.contentBox}>
+            <Section style={emailStyles.contentBoxTopStripe} />
+            <Section style={emailStyles.contentBoxInner}>
+              <Text style={emailStyles.text}>Hi {approverName},</Text>
 
-          {/* Message */}
-          <Section style={createMessageBox('primary')}>
-            <Text style={createMessageTitle('primary')}>Message:</Text>
-            <Text style={createMessageText('primary')}>{message}</Text>
+              <Text style={emailStyles.text}>
+                You have received a new introduction request!
+              </Text>
+
+              {/* Requester Info Card */}
+              <Section style={emailStyles.card}>
+                <Text style={emailStyles.cardTitle}>FROM:</Text>
+                <Text style={emailStyles.cardName}>{requesterName}</Text>
+                {requesterPosition && requesterCompany && (
+                  <Text style={emailStyles.cardDetail}>
+                    {requesterPosition} at {requesterCompany}
+                  </Text>
+                )}
+                {requesterPosition && !requesterCompany && (
+                  <Text style={emailStyles.cardDetail}>
+                    {requesterPosition}
+                  </Text>
+                )}
+                {!requesterPosition && requesterCompany && (
+                  <Text style={emailStyles.cardDetail}>{requesterCompany}</Text>
+                )}
+                <Text style={emailStyles.cardEmail}>{requesterEmail}</Text>
+              </Section>
+
+              {/* Contact Info */}
+              <Text style={emailStyles.text}>
+                <strong>They would like to meet:</strong>
+                <br />
+                {contactName} ({contactEmail})
+              </Text>
+
+              {/* Message */}
+              <Section style={createMessageBox('primary')}>
+                <Text style={createMessageTitle('primary')}>Message:</Text>
+                <Text style={createMessageText('primary')}>{message}</Text>
+              </Section>
+
+              <Text style={emailStyles.text}>
+                Or visit your dashboard:{' '}
+                <Link href={dashboardUrl} style={emailStyles.link}>
+                  {dashboardUrl}
+                </Link>
+              </Text>
+            </Section>
           </Section>
 
           {/* CTA Button */}
@@ -99,23 +113,14 @@ export const IntroductionRequestEmail = ({
             </Button>
           </Section>
 
-          <Text style={emailStyles.text}>
-            Or visit your dashboard:{' '}
-            <Link href={dashboardUrl} style={emailStyles.link}>
-              {dashboardUrl}
-            </Link>
-          </Text>
-        </Section>
+          {/* Spacer */}
+          <Section style={emailStyles.sectionSpacer} />
 
-        {/* Footer */}
-        <Hr style={emailStyles.hr} />
-        <Section style={emailStyles.footer}>
-          <Text style={emailStyles.footerText}>
-            This email was sent by IntroHub. If you have any questions, please
-            contact support.
-          </Text>
-        </Section>
+          <EmailFooter text="This email was sent by IntroHub. If you have any questions, please contact support." />
+        </EmailBody>
       </Container>
     </Body>
   </Html>
 )
+
+// Made with Bob
