@@ -100,9 +100,9 @@ function SearchPage() {
 
       {showResults && (
         <Card>
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {isLoading ? (
-              <div className="text-center py-12">
+              <div className="text-center py-8 sm:py-12">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 <p className="mt-4 text-gray-600 dark:text-gray-400">
                   Finding connections...
@@ -110,11 +110,11 @@ function SearchPage() {
               </div>
             ) : hasResults ? (
               <>
-                <div className="mb-4">
-                  <h2 className="text-xl font-semibold">
+                <div className="mb-3 sm:mb-4">
+                  <h2 className="text-lg sm:text-xl font-semibold">
                     Available Connections ({total})
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     Found {total} contact
                     {total !== 1 ? 's' : ''} matching "{searchQuery}"
                   </p>
@@ -139,10 +139,12 @@ function SearchPage() {
 
       {!showResults && (
         <Card>
-          <div className="p-12 text-center">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold mb-2">Find New Connections</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+          <div className="p-8 sm:p-12 text-center">
+            <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">
+              Find New Connections
+            </h3>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Enter at least 2 characters to find contacts by name, company, or
               position
             </p>
