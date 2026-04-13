@@ -363,7 +363,7 @@ function DataTable<T>(props: DataTableProps<T>) {
           </TBody>
         )}
       </Table>
-      <div className="flex items-center justify-between mt-4">
+      <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-3 sm:gap-0 mt-4">
         <Pagination
           pageSize={pageSize}
           currentPage={pageIndex}

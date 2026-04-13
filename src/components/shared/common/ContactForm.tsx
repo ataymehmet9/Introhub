@@ -85,7 +85,10 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
 
     return (
       <FormContainer>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4 sm:space-y-5"
+        >
           <FormItem
             label="Name"
             invalid={!!errors.name}
@@ -127,7 +130,7 @@ const ContactForm = forwardRef<ContactFormHandle, ContactFormProps>(
             />
           </FormItem>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <FormItem
               label="Company"
               invalid={!!errors.company}
