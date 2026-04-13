@@ -16,6 +16,7 @@ import {
 import { EmailHeader } from './shared/EmailHeader'
 import { EmailBody } from './shared/EmailBody'
 import { EmailFooter } from './shared/EmailFooter'
+import { formatMessageWithLineBreaks } from './shared/formatMessage'
 
 type IntroductionRequestApprovedEmailProps = {
   requesterName: string
@@ -88,7 +89,7 @@ export const IntroductionRequestApprovedEmail = ({
                     Message from {approverName}:
                   </Text>
                   <Text style={createMessageText('green')}>
-                    {responseMessage}
+                    {formatMessageWithLineBreaks(responseMessage)}
                   </Text>
                 </Section>
               )}

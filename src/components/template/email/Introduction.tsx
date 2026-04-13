@@ -15,6 +15,7 @@ import {
 import { EmailHeader } from './shared/EmailHeader'
 import { EmailBody } from './shared/EmailBody'
 import { EmailFooter } from './shared/EmailFooter'
+import { formatMessageWithLineBreaks } from './shared/formatMessage'
 
 type IntroductionEmailProps = {
   approverName: string
@@ -111,7 +112,7 @@ export const IntroductionEmail = ({
               {customMessage && (
                 <Section style={createMessageBox('green')}>
                   <Text style={createMessageText('green')}>
-                    {customMessage}
+                    {formatMessageWithLineBreaks(customMessage)}
                   </Text>
                 </Section>
               )}

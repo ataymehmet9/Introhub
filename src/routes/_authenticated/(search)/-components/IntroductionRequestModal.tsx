@@ -1,8 +1,15 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { TbBriefcase, TbBuilding, TbMail, TbSend, TbUser } from 'react-icons/tb'
+import {
+  TbBriefcase,
+  TbBuilding,
+  TbEdit,
+  TbMail,
+  TbSend,
+  TbUser,
+} from 'react-icons/tb'
 import type { SearchResult } from '@/schemas'
 import {
   Avatar,
@@ -39,6 +46,7 @@ const IntroductionRequestModal = ({
   onSubmit,
 }: IntroductionRequestModalProps) => {
   const { user } = useSessionUser()
+  const [isEditing, setIsEditing] = useState(false)
 
   const maxChars = 1000
 
@@ -56,8 +64,6 @@ const IntroductionRequestModal = ({
 I'm ${user.name || '[Your Name]'}${userWithDetails.company ? ` from ${userWithDetails.company}` : ''}${userWithDetails.position ? `, working as ${userWithDetails.position}` : ''}.
 
 I would like to request an introduction to ${contact.name}${contact.company ? ` at ${contact.company}` : ''}.
-
-[Please explain why you'd like to connect and what value you can provide]
 
 Thank you for considering my request!
 
@@ -88,8 +94,10 @@ ${user.name || '[Your Name]'}`
   useEffect(() => {
     if (isOpen && defaultMessage) {
       reset({ message: defaultMessage })
+      setIsEditing(false)
     } else if (!isOpen) {
       reset({ message: '' })
+      setIsEditing(false)
     }
   }, [isOpen, defaultMessage, reset])
 
@@ -106,6 +114,7 @@ ${user.name || '[Your Name]'}`
 
   const handleClose = () => {
     reset()
+    setIsEditing(false)
     onClose()
   }
 
@@ -180,27 +189,49 @@ ${user.name || '[Your Name]'}`
               invalid={!!errors.message}
               errorMessage={errors.message?.message}
             >
-              <Controller
-                name="message"
-                control={control}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={12}
-                    maxLength={maxChars}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
+              {!isEditing ? (
+                <div>
+                  <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 whitespace-pre-wrap min-h-[200px]">
+                    {messageValue}
+                  </div>
+                  <div className="flex justify-end mt-2">
+                    <Button
+                      type="button"
+                      variant="plain"
+                      size="sm"
+                      icon={<TbEdit />}
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Edit Message
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <Controller
+                    name="message"
+                    control={control}
+                    render={({ field }) => (
+                      <textarea
+                        {...field}
+                        rows={12}
+                        maxLength={maxChars}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
+                        autoFocus
+                      />
+                    )}
                   />
-                )}
-              />
-              <span
-                className={`text-xs text-right block ${
-                  remainingChars < 100
-                    ? 'text-error'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}
-              >
-                {remainingChars} characters remaining
-              </span>
+                  <span
+                    className={`text-xs text-right block mt-2 ${
+                      remainingChars < 100
+                        ? 'text-error'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}
+                  >
+                    {remainingChars} characters remaining
+                  </span>
+                </div>
+              )}
             </FormItem>
 
             <div className="bg-info-subtle border border-info rounded-lg p-3 mb-4">

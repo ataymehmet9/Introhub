@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { TbCheck, TbMail } from 'react-icons/tb'
+import { TbCheck, TbEdit, TbMail } from 'react-icons/tb'
 import type { IntroductionRequestWithDetails } from '../-store/requestStore'
 import { Button, Dialog, FormContainer, FormItem } from '@/components/ui'
 import { useSessionUser } from '@/store/authStore'
@@ -32,6 +32,7 @@ const AcceptRequestModal = ({
   onSubmit,
 }: AcceptRequestModalProps) => {
   const { user } = useSessionUser()
+  const [isEditing, setIsEditing] = useState(false)
 
   const maxChars = 5000
 
@@ -69,8 +70,10 @@ Feel free to take it from here and connect directly.`
   useEffect(() => {
     if (isOpen && defaultMessage) {
       reset({ customMessage: defaultMessage })
+      setIsEditing(false)
     } else if (!isOpen) {
       reset({ customMessage: '' })
+      setIsEditing(false)
     }
   }, [isOpen, defaultMessage, reset])
 
@@ -86,6 +89,7 @@ Feel free to take it from here and connect directly.`
 
   const handleClose = () => {
     reset()
+    setIsEditing(false)
     onClose()
   }
 
@@ -171,28 +175,50 @@ Feel free to take it from here and connect directly.`
               invalid={!!errors.customMessage}
               errorMessage={errors.customMessage?.message}
             >
-              <Controller
-                name="customMessage"
-                control={control}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={8}
-                    maxLength={maxChars}
-                    placeholder="Add your personal introduction message..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
+              {!isEditing ? (
+                <div>
+                  <div className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 whitespace-pre-wrap min-h-[150px]">
+                    {messageValue}
+                  </div>
+                  <div className="flex justify-end mt-2">
+                    <Button
+                      type="button"
+                      variant="plain"
+                      size="sm"
+                      icon={<TbEdit />}
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Edit Message
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <Controller
+                    name="customMessage"
+                    control={control}
+                    render={({ field }) => (
+                      <textarea
+                        {...field}
+                        rows={8}
+                        maxLength={maxChars}
+                        placeholder="Add your personal introduction message..."
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-100 resize-none"
+                        autoFocus
+                      />
+                    )}
                   />
-                )}
-              />
-              <span
-                className={`text-xs text-right block mt-1 ${
-                  remainingChars < 500
-                    ? 'text-error'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}
-              >
-                {remainingChars} characters remaining
-              </span>
+                  <span
+                    className={`text-xs text-right block mt-2 ${
+                      remainingChars < 500
+                        ? 'text-error'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}
+                  >
+                    {remainingChars} characters remaining
+                  </span>
+                </div>
+              )}
             </FormItem>
 
             <div className="bg-success-subtle border border-success rounded-lg p-3 mb-4">
