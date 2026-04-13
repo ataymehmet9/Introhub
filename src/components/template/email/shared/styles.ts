@@ -20,7 +20,7 @@ export const emailStyles = {
   container: {
     backgroundColor: '#ffffff',
     margin: '0 auto',
-    maxWidth: '640px',
+    width: '640px',
   },
 
   // Top brand stripe
@@ -256,7 +256,7 @@ export const emailStyles = {
   footerDivider: {
     borderTop: '1px solid #555961',
     margin: '25px 40px 10px 40px',
-    width: 'auto',
+    width: '560px',
   },
 
   footerCopyright: {
