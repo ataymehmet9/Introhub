@@ -286,6 +286,7 @@ function DataTable<T>(props: DataTableProps<T>) {
                     {header.isPlaceholder ? null : (
                       <div
                         className={classNames(
+                          'flex items-center gap-1 whitespace-nowrap',
                           header.column.getCanSort() &&
                             'cursor-pointer select-none point',
                           loading && 'pointer-events-none',
