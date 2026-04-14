@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, desc, eq, gte, lte, sql } from 'drizzle-orm'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../init'
-import { contacts, crmIntegrations } from '@/db/schema'
+import { contacts, crmIntegrations, syncLogs } from '@/db/schema'
 import { queueHubSpotSync } from '@/services/sync-queue.service'
 
 export const crmRouter = createTRPCRouter({
@@ -194,6 +194,101 @@ export const crmRouter = createTRPCRouter({
         .where(eq(crmIntegrations.id, integration.id))
 
       return { success: true }
+    }),
+
+  // Get sync analytics for dashboard
+  getSyncAnalytics: protectedProcedure
+    .input(
+      z.object({
+        provider: z.enum(['hubspot']).optional(),
+        startDate: z.date(),
+        endDate: z.date(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { provider, startDate, endDate } = input
+
+      // Build where conditions
+      const whereConditions = [
+        eq(syncLogs.userId, ctx.user!.id),
+        gte(syncLogs.startedAt, startDate),
+        lte(syncLogs.startedAt, endDate),
+      ]
+
+      if (provider) {
+        whereConditions.push(eq(syncLogs.provider, provider))
+      }
+
+      // Get all sync logs in the date range
+      const logs = await ctx.db.query.syncLogs.findMany({
+        where: and(...whereConditions),
+        orderBy: [desc(syncLogs.startedAt)],
+      })
+
+      // Calculate metrics
+      const totalSyncs = logs.length
+      const completedSyncs = logs.filter(
+        (log) => log.status === 'completed',
+      ).length
+      const failedSyncs = logs.filter((log) => log.status === 'failed').length
+      const successRate =
+        totalSyncs > 0 ? (completedSyncs / totalSyncs) * 100 : 0
+
+      // Calculate average sync time (only for completed syncs)
+      const completedLogsWithTime = logs.filter(
+        (log) => log.status === 'completed' && log.completedAt && log.startedAt,
+      )
+      const avgSyncTimeMs =
+        completedLogsWithTime.length > 0
+          ? completedLogsWithTime.reduce((sum, log) => {
+              const duration =
+                log.completedAt!.getTime() - log.startedAt.getTime()
+              return sum + duration
+            }, 0) / completedLogsWithTime.length
+          : 0
+
+      // Format average sync time
+      const avgSyncTimeSeconds = Math.round(avgSyncTimeMs / 1000)
+      const avgSyncTimeFormatted =
+        avgSyncTimeSeconds < 60
+          ? `${avgSyncTimeSeconds}s`
+          : `${Math.round(avgSyncTimeSeconds / 60)}m ${avgSyncTimeSeconds % 60}s`
+
+      // Get last sync details
+      const lastSync = logs[0] // Already ordered by startedAt desc
+      let lastSyncStatus = null
+      if (lastSync) {
+        const timeSinceSync = Date.now() - lastSync.startedAt.getTime()
+        const hoursAgo = Math.floor(timeSinceSync / (1000 * 60 * 60))
+        const minutesAgo = Math.floor(
+          (timeSinceSync % (1000 * 60 * 60)) / (1000 * 60),
+        )
+
+        const timeAgo =
+          hoursAgo > 0
+            ? `${hoursAgo} hour${hoursAgo > 1 ? 's' : ''} ago`
+            : `${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`
+
+        lastSyncStatus = {
+          status: lastSync.status,
+          timestamp: lastSync.startedAt,
+          timeAgo,
+          successCount: lastSync.successCount,
+          errorCount: lastSync.errorCount,
+          updatedCount: lastSync.updatedCount,
+          skippedCount: lastSync.skippedCount,
+        }
+      }
+
+      return {
+        totalSyncs,
+        successRate: Math.round(successRate * 10) / 10, // Round to 1 decimal
+        avgSyncTime: avgSyncTimeMs,
+        avgSyncTimeFormatted,
+        lastSyncStatus,
+        completedSyncs,
+        failedSyncs,
+      }
     }),
 })
 
