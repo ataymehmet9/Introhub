@@ -42,9 +42,6 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
           const hubspotService = new HubSpotService()
           const tokens = await hubspotService.exchangeCodeForTokens(code)
 
-          // Store tokens using token storage service
-          await tokenStorage.storeTokens(session.user.id, 'hubspot', tokens)
-
           // Check if integration already exists
           const existingIntegration = await db.query.crmIntegrations.findFirst({
             where: and(
@@ -54,7 +51,7 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
           })
 
           if (existingIntegration) {
-            // Update existing integration status
+            // Update existing integration
             await db
               .update(crmIntegrations)
               .set({
@@ -63,6 +60,9 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
                 updatedAt: new Date(),
               })
               .where(eq(crmIntegrations.id, existingIntegration.id))
+          } else {
+            // Create new integration - this was missing!
+            await tokenStorage.storeTokens(session.user.id, 'hubspot', tokens)
           }
 
           // Redirect back to CRM integrations page with success
