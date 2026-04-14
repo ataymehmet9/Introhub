@@ -158,6 +158,9 @@ export const crmIntegrations = pgTable(
     refreshToken: text('refresh_token'), // Encrypted
     expiresAt: timestamp('expires_at'),
     status: crmIntegrationStatusEnum('status').default('active').notNull(),
+    syncFrequency: varchar('sync_frequency', { length: 20 })
+      .default('24h')
+      .notNull(), // Options: 6h, 12h, 24h, weekly
     lastSyncedAt: timestamp('last_synced_at'),
     connectedAt: timestamp('connected_at').defaultNow().notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -244,6 +247,10 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'introduction_request',
   'introduction_approved',
   'introduction_declined',
+  'crm_sync_started',
+  'crm_sync_completed',
+  'crm_sync_failed',
+  'crm_oauth_expired',
   'unknown',
 ])
 

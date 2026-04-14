@@ -19,6 +19,7 @@ export const insertCrmIntegrationSchema = createInsertSchema(crmIntegrations, {
   accessToken: z.string().min(1, 'Access token is required'),
   refreshToken: z.string().optional().nullable(),
   status: z.enum(['active', 'inactive', 'error']).default('active'),
+  syncFrequency: z.enum(['6h', '12h', '24h', 'weekly']).default('24h'),
 })
 
 /**
@@ -29,6 +30,7 @@ export const updateCrmIntegrationSchema = createUpdateSchema(crmIntegrations, {
   accessToken: z.string().min(1, 'Access token is required').optional(),
   refreshToken: z.string().optional().nullable(),
   status: z.enum(['active', 'inactive', 'error']).optional(),
+  syncFrequency: z.enum(['6h', '12h', '24h', 'weekly']).optional(),
   expiresAt: z.date().optional().nullable(),
   lastSyncedAt: z.date().optional().nullable(),
 })
