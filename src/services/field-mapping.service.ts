@@ -5,7 +5,7 @@
  * Handles field transformations and stores unmapped fields in metadata.
  */
 
-import type { SimplePublicObjectWithAssociations } from '@hubspot/api-client/lib/codegen/crm/contacts'
+import type { HubSpotContact } from './hubspot.service'
 
 /**
  * HubSpot contact properties we want to fetch
@@ -56,7 +56,7 @@ export interface MappedContact {
  * @returns Mapped contact data ready for database insertion
  */
 export function mapHubSpotContactToDb(
-  hubspotContact: SimplePublicObjectWithAssociations,
+  hubspotContact: HubSpotContact,
 ): MappedContact | null {
   const props = hubspotContact.properties
 
@@ -130,7 +130,7 @@ export function mapHubSpotContactToDb(
  * @returns Array of mapped contacts (excluding any that failed validation)
  */
 export function mapHubSpotContactsBatch(
-  hubspotContacts: Array<SimplePublicObjectWithAssociations>,
+  hubspotContacts: Array<HubSpotContact>,
 ): Array<MappedContact> {
   const mappedContacts: Array<MappedContact> = []
 
@@ -183,9 +183,7 @@ export function filterValidContacts(
  * @param hubspotContacts - Array of HubSpot contacts
  * @returns Statistics about the mapping process
  */
-export function getMappingStats(
-  hubspotContacts: Array<SimplePublicObjectWithAssociations>,
-): {
+export function getMappingStats(hubspotContacts: Array<HubSpotContact>): {
   total: number
   withEmail: number
   withPhone: number
