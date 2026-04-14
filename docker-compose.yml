@@ -22,6 +22,24 @@ services:
     networks:
       - intro-hub-network
 
+  # Redis (for BullMQ job queue)
+  redis:
+    image: redis:7-alpine
+    container_name: intro-hub-redis
+    restart: unless-stopped
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intro-hub-network
+
   # Application
   app:
     build:
@@ -38,6 +56,9 @@ services:
 
       # Database
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-introhub}
+
+      # Redis
+      REDIS_URL: redis://redis:6379
 
       # Better Auth
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
@@ -74,8 +95,18 @@ services:
 
       # Billing (Stripe)
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+
+      # CRM Integrations
+      HUBSPOT_CLIENT_ID: ${HUBSPOT_CLIENT_ID}
+      HUBSPOT_CLIENT_SECRET: ${HUBSPOT_CLIENT_SECRET}
+      HUBSPOT_REDIRECT_URI: ${HUBSPOT_REDIRECT_URI}
+
+      # Encryption
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - intro-hub-network
@@ -85,6 +116,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  redis_data:
     driver: local
 
 networks:

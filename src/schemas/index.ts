@@ -160,3 +160,29 @@ export {
   type DashboardStats,
   type ExportData,
 } from './dashboard.schema'
+
+// CRM Integration schemas
+export {
+  crmIntegrationSchema,
+  insertCrmIntegrationSchema,
+  updateCrmIntegrationSchema,
+  oauthTokenSchema,
+  type CrmIntegration,
+  type InsertCrmIntegration,
+  type UpdateCrmIntegration,
+  type OAuthToken,
+} from './crm-integration.schema'
+
+// Sync Log schemas
+export {
+  syncLogSchema,
+  insertSyncLogSchema,
+  updateSyncLogSchema,
+  syncErrorSchema,
+  syncResultSchema,
+  type SyncLog,
+  type InsertSyncLog,
+  type UpdateSyncLog,
+  type SyncError,
+  type SyncResult,
+} from './sync-log.schema'
