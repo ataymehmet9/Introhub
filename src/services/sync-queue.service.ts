@@ -11,9 +11,10 @@ import { eq } from 'drizzle-orm'
 import { hubspotService } from './hubspot.service'
 import { mapHubSpotContactsBatch } from './field-mapping.service'
 import { syncContactsBatch } from './contact-sync.service'
+import { sendCRMSyncFailureEmail } from './email.functions'
 import type { Job } from 'bullmq'
 import { db } from '@/db'
-import { crmIntegrations, syncLogs } from '@/db/schema'
+import { crmIntegrations, syncLogs, user } from '@/db/schema'
 
 /**
  * Job data for HubSpot contact sync
@@ -282,6 +283,32 @@ export const hubspotSyncWorker = new Worker<
           syncStartedAt: null,
         })
         .where(eq(crmIntegrations.id, integrationId))
+
+      // Send failure notification email to user
+      try {
+        const userRecord = await db.query.user.findFirst({
+          where: eq(user.id, userId),
+        })
+
+        if (userRecord?.email && userRecord?.name) {
+          await sendCRMSyncFailureEmail({
+            data: {
+              to: userRecord.email,
+              userName: userRecord.name,
+              provider: provider,
+              errorMessage,
+              syncStartedAt: syncLog.startedAt.toLocaleString('en-US', {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              }),
+              crmIntegrationsUrl: `${process.env.VITE_APP_URL}/crm-integrations`,
+            },
+          })
+        }
+      } catch (emailError) {
+        // Log email error but don't fail the job
+        console.error('Failed to send sync failure email:', emailError)
+      }
 
       throw error
     }

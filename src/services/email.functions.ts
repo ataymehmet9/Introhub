@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { pretty, render, toPlainText } from '@react-email/render'
 import {
+  CRMSyncFailureEmail,
   ForgotPasswordEmail,
   IntroductionEmail,
   IntroductionRequestApprovedEmail,
@@ -9,6 +10,7 @@ import {
   WelcomeEmail,
 } from '@/components/template/email'
 import {
+  crmSyncFailureEmailSchema,
   forgotPasswordEmailSchema,
   introductionEmailSchema,
   introductionRequestEmailSchema,
@@ -408,6 +410,88 @@ export const sendWelcomeEmail = createServerFn({ method: 'POST' })
         error,
         to,
         userName,
+        timestamp: new Date().toISOString(),
+      })
+
+      return {
+        success: false,
+        message: 'Unknown error sending email',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  })
+
+/**
+ * Send CRM sync failure email to user
+ * Used when a CRM contact sync fails
+ */
+export const sendCRMSyncFailureEmail = createServerFn({ method: 'POST' })
+  .inputValidator(crmSyncFailureEmailSchema)
+  .handler(async ({ data }) => {
+    const {
+      to,
+      userName,
+      provider,
+      errorMessage,
+      syncStartedAt,
+      crmIntegrationsUrl,
+      from,
+    } = data
+
+    const resend = getResendInstance()
+
+    try {
+      const emailHtml = await pretty(
+        await render(
+          CRMSyncFailureEmail({
+            userName,
+            provider,
+            errorMessage,
+            syncStartedAt,
+            crmIntegrationsUrl,
+          }),
+        ),
+      )
+      const plainText = toPlainText(emailHtml)
+
+      const providerName = provider === 'hubspot' ? 'HubSpot' : provider
+
+      const { data: emailData, error } = await resend.emails.send({
+        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
+        to: [to],
+        subject: `${providerName} Sync Failed`,
+        html: emailHtml,
+        text: plainText,
+      })
+
+      if (error) {
+        console.error('Error sending CRM sync failure email:', {
+          error,
+          to,
+          provider,
+          timestamp: new Date().toISOString(),
+        })
+
+        return { success: false, message: 'Failed to send email', error }
+      }
+
+      console.log('CRM sync failure email sent successfully:', {
+        emailId: emailData.id,
+        to,
+        provider,
+        timestamp: new Date().toISOString(),
+      })
+
+      return {
+        success: true,
+        message: 'Email sent successfully',
+        emailId: emailData.id,
+      }
+    } catch (error) {
+      console.error('Error sending CRM sync failure email:', {
+        error,
+        to,
+        provider,
         timestamp: new Date().toISOString(),
       })
 

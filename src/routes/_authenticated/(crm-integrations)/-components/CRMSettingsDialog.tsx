@@ -31,8 +31,10 @@ export default function CRMSettingsDialog({
 
   // Update settings mutation
   const updateSettingsMutation = useMutation({
-    mutationFn: (data: { provider: 'hubspot'; syncFrequency: string }) =>
-      trpcClient.crm.updateSettings.mutate(data),
+    mutationFn: (data: {
+      provider: 'hubspot'
+      syncFrequency: '6h' | '12h' | '24h' | 'weekly'
+    }) => trpcClient.crm.updateSettings.mutate(data),
     onSuccess: () => {
       toast.push(
         <Notification type="success" title="Settings Updated">

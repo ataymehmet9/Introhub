@@ -87,11 +87,13 @@ export {
   introductionResponseEmailSchema,
   introductionEmailSchema,
   welcomeEmailSchema,
+  crmSyncFailureEmailSchema,
   type ForgotPasswordEmail,
   type IntroductionRequestEmail,
   type IntroductionResponseEmail,
   type IntroductionEmail,
   type WelcomeEmail,
+  type CRMSyncFailureEmail,
 } from './email.schema'
 
 // Search schemas

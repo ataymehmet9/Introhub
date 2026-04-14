@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { SiHubspot } from 'react-icons/si'
 import { HiCheckCircle, HiClock } from 'react-icons/hi2'
+import { useCRMSyncStatus } from '../-hooks/useCRMSyncStatus'
 import HubSpotConnectDialog from './HubSpotConnectDialog'
 import CRMSettingsDialog from './CRMSettingsDialog'
 import CRMDisconnectDialog from './CRMDisconnectDialog'
@@ -47,7 +48,43 @@ export default function CRMIntegrationsList() {
   const integrationsQuery = useQuery({
     ...trpc.crm.list.queryOptions(),
   })
+
+  // Type for integration with real-time sync status
+  type IntegrationWithSyncStatus = CrmIntegration & {
+    syncStatus: 'idle' | 'syncing' | 'completed' | 'failed'
+    lastSyncError: string | null
+    syncStartedAt: Date | null
+  }
   const integrations = integrationsQuery.data ?? []
+
+  // Real-time sync status via SSE
+  const { syncStatus } = useCRMSyncStatus()
+
+  // Refetch integrations when sync completes or fails
+  useEffect(() => {
+    Object.values(syncStatus).forEach((status) => {
+      if (status.syncStatus === 'completed' || status.syncStatus === 'failed') {
+        // Refetch to get updated lastSyncedAt
+        queryClient.invalidateQueries({ queryKey: trpc.crm.list.queryKey() })
+
+        // Show notification
+        if (status.syncStatus === 'completed') {
+          toast.push(
+            <Notification type="success" title="Sync Completed">
+              {status.provider === 'hubspot' ? 'HubSpot' : status.provider}{' '}
+              contacts synced successfully
+            </Notification>,
+          )
+        } else if (status.syncStatus === 'failed') {
+          toast.push(
+            <Notification type="danger" title="Sync Failed">
+              {status.lastSyncError || 'Failed to sync contacts'}
+            </Notification>,
+          )
+        }
+      }
+    })
+  }, [syncStatus, queryClient, trpc.crm.list])
 
   // Sync Now mutation
   const syncNowMutation = useMutation({
@@ -93,11 +130,36 @@ export default function CRMIntegrationsList() {
     )
   }
 
-  // Get integration for a platform
-  const getIntegration = (platformId: string) => {
-    return integrations.find(
+  // Get integration for a platform with real-time sync status
+  const getIntegration = (
+    platformId: string,
+  ): IntegrationWithSyncStatus | undefined => {
+    const integration = integrations.find(
       (int: CrmIntegration) => int.provider === platformId,
     )
+
+    // Merge with real-time sync status if available
+    if (integration && syncStatus[platformId]) {
+      return {
+        ...integration,
+        syncStatus: syncStatus[platformId].syncStatus as
+          | 'idle'
+          | 'syncing'
+          | 'completed'
+          | 'failed',
+        lastSyncError: syncStatus[platformId].lastSyncError,
+        syncStartedAt: syncStatus[platformId].syncStartedAt,
+      }
+    }
+
+    return integration
+      ? {
+          ...integration,
+          syncStatus: integration.syncStatus,
+          lastSyncError: integration.lastSyncError,
+          syncStartedAt: integration.syncStartedAt,
+        }
+      : undefined
   }
 
   // Separate connected and available platforms

@@ -95,3 +95,25 @@ export const welcomeEmailSchema = z.object({
 })
 
 export type WelcomeEmail = z.infer<typeof welcomeEmailSchema>
+
+/**
+ * CRM Sync Failure Email Schema
+ * Email sent to users when their CRM contact sync fails
+ */
+export const crmSyncFailureEmailSchema = z.object({
+  to: z.email({ message: 'Valid email address required' }),
+  userName: z.string().min(1, { message: 'User name is required' }),
+  provider: z.enum(['hubspot', 'salesforce'], {
+    message: 'Provider must be hubspot or salesforce',
+  }),
+  errorMessage: z.string().min(1, { message: 'Error message is required' }),
+  syncStartedAt: z
+    .string()
+    .min(1, { message: 'Sync started time is required' }),
+  crmIntegrationsUrl: z
+    .string()
+    .url({ message: 'Valid CRM integrations URL required' }),
+  from: z.email().optional(),
+})
+
+export type CRMSyncFailureEmail = z.infer<typeof crmSyncFailureEmailSchema>
