@@ -6,8 +6,8 @@ Use 'bd' for task tracking
 
 - **TypeScript First**: Strict mode, no implicit any.
 - **Explicit > Implicit**: Prioritize clear, direct code over complex magic [10].
-- **Server-First**: Use {Link: tRPC https://trpc.io/docs/} for API calls, data mutations, and database access [9].
-- **Type Safety**: Use {Link: Zod https://ai-sdk.dev/docs/getting-started/tanstack-start} for validation and end-to-end type safety [9].
+- **Server-First**: Use {Link: tRPC https://trpc.io/docs/ } for API calls, data mutations, and database access [9].
+- **Type Safety**: Use {Link: Zod https://ai-sdk.dev/docs/getting-started/tanstack-start } for validation and end-to-end type safety [9].
 
 ## Project Structure (File-based Routing)
 
@@ -18,15 +18,15 @@ Use 'bd' for task tracking
 
 ## Data Management
 
-- **{Link: TanStack Query https://tanstack.com/query/latest/docs/framework/react/overview}**: Use `useQuery` and `useMutation` for client-side state.
+- **{Link: TanStack Query https://tanstack.com/query/latest/docs/framework/react/overview }**: Use `useQuery` and `useMutation` for client-side state.
 - **Server Functions**: Use these for mutations and fetching, replacing REST/TRPC endpoints [9].
 - **Caching**: Use proper query keys and staleTime/gcTime configurations [14].
 
 ## Styling and Components
 
-- **Styling**: {Link: Tailwind CSS https://github.com/tailwindlabs/tailwindcss} with `cn()` utility for class merging.
-- **UI**: {Link: Ecme https://ecme-react.themenate.net/guide/documentation/introduction} for components and the UI components are in `src/components/ui/`.
-- **Rendering**: {Link: Markdown https://tanstack.com/start/latest/docs/framework/react/guide/rendering-markdown} should be rendered using `html-react-parser` [12].
+- **Styling**: {Link: Tailwind CSS https://github.com/tailwindlabs/tailwindcss } with `cn()` utility for class merging.
+- **UI**: {Link: Ecme https://ecme-react.themenate.net/guide/documentation/introduction } for components and the UI components are in `src/components/ui/`.
+- **Rendering**: {Link: Markdown https://tanstack.com/start/latest/docs/framework/react/guide/rendering-markdown } should be rendered using `html-react-parser` [12].
 
 ## Best Practices
 
