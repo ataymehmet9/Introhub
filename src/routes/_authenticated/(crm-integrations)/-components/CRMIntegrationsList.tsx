@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { SiHubspot } from 'react-icons/si'
 import { HiCheckCircle, HiClock } from 'react-icons/hi2'
 import HubSpotConnectDialog from './HubSpotConnectDialog'
 import type { CrmIntegration } from '@/schemas'
 import { AdaptiveCard } from '@/components/shared'
-import { Badge, Button } from '@/components/ui'
+import { Badge, Button, Notification, toast } from '@/components/ui'
 import { useTRPC } from '@/integrations/trpc/react'
+import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 
 interface CRMPlatform {
   id: string
@@ -35,8 +37,38 @@ export default function CRMIntegrationsList() {
 
   // Fetch connected integrations
   const trpc = useTRPC()
-  const integrationsQuery = trpc.crm.list.useQuery()
+  const queryClient = useQueryClient()
+  const integrationsQuery = useQuery({
+    ...trpc.crm.list.queryOptions(),
+  })
   const integrations = integrationsQuery.data ?? []
+
+  // Sync Now mutation
+  const syncNowMutation = useMutation({
+    mutationFn: (provider: 'hubspot') =>
+      trpcClient.crm.syncNow.mutate({ provider }),
+    onSuccess: () => {
+      toast.push(
+        <Notification type="success" title="Sync Started">
+          Contact sync has been initiated. You'll be notified when it completes.
+        </Notification>,
+      )
+      // Refetch integrations to show updated sync status
+      queryClient.invalidateQueries({ queryKey: trpc.crm.list.queryKey() })
+    },
+    onError: (error: Error) => {
+      const errorMessage =
+        error?.message || 'Failed to start sync. Please try again.'
+      toast.push(
+        <Notification type="danger" title="Sync Failed">
+          {errorMessage}
+        </Notification>,
+      )
+    },
+  })
+  const handleSyncNow = (platformId: string) => {
+    syncNowMutation.mutate(platformId as 'hubspot')
+  }
 
   const handleConnect = (platformId: string) => {
     setConnectingPlatform(platformId)
@@ -81,10 +113,23 @@ export default function CRMIntegrationsList() {
                     {/* Platform Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className={`${platform.color}`}>{platform.icon}</div>
-                      <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
-                        <HiCheckCircle />
-                        Connected
-                      </Badge>
+                      <div className="flex gap-2">
+                        {integration?.syncStatus === 'syncing' && (
+                          <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1 animate-pulse">
+                            <HiClock />
+                            Syncing...
+                          </Badge>
+                        )}
+                        {integration?.syncStatus === 'failed' && (
+                          <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
+                            Error
+                          </Badge>
+                        )}
+                        <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
+                          <HiCheckCircle />
+                          Connected
+                        </Badge>
+                      </div>
                     </div>
 
                     {/* Platform Info */}
@@ -119,8 +164,22 @@ export default function CRMIntegrationsList() {
 
                     {/* Action Buttons */}
                     <div className="mt-6 flex gap-2">
-                      <Button variant="solid" className="flex-1">
-                        Sync Now
+                      <Button
+                        variant="solid"
+                        className="flex-1"
+                        onClick={() => handleSyncNow(platform.id)}
+                        loading={
+                          syncNowMutation.isPending ||
+                          integration?.syncStatus === 'syncing'
+                        }
+                        disabled={
+                          syncNowMutation.isPending ||
+                          integration?.syncStatus === 'syncing'
+                        }
+                      >
+                        {integration?.syncStatus === 'syncing'
+                          ? 'Syncing...'
+                          : 'Sync Now'}
                       </Button>
                       <Button variant="plain" className="flex-1">
                         Settings

@@ -227,10 +227,14 @@ export const hubspotSyncWorker = new Worker<
         })
         .where(eq(syncLogs.id, syncLog.id))
 
-      // Update integration's last synced timestamp
+      // Update integration's last synced timestamp and sync status
       await db
         .update(crmIntegrations)
-        .set({ lastSyncedAt: new Date() })
+        .set({
+          lastSyncedAt: new Date(),
+          syncStatus: 'completed',
+          syncStartedAt: null,
+        })
         .where(eq(crmIntegrations.id, integrationId))
 
       // Final progress update
@@ -256,19 +260,28 @@ export const hubspotSyncWorker = new Worker<
         errors: errors.length > 0 ? errors : undefined,
       }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
+
       // Update sync log with error
       await db
         .update(syncLogs)
         .set({
           status: 'failed',
-          errors: JSON.stringify([
-            {
-              error: error instanceof Error ? error.message : 'Unknown error',
-            },
-          ]),
+          errors: JSON.stringify([{ error: errorMessage }]),
           completedAt: new Date(),
         })
         .where(eq(syncLogs.id, syncLog.id))
+
+      // Update integration sync status to failed
+      await db
+        .update(crmIntegrations)
+        .set({
+          syncStatus: 'failed',
+          lastSyncError: errorMessage,
+          syncStartedAt: null,
+        })
+        .where(eq(crmIntegrations.id, integrationId))
 
       throw error
     }

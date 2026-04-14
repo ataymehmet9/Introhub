@@ -20,6 +20,9 @@ export const insertCrmIntegrationSchema = createInsertSchema(crmIntegrations, {
   refreshToken: z.string().optional().nullable(),
   status: z.enum(['active', 'inactive', 'error']).default('active'),
   syncFrequency: z.enum(['6h', '12h', '24h', 'weekly']).default('24h'),
+  syncStatus: z
+    .enum(['idle', 'syncing', 'completed', 'failed'])
+    .default('idle'),
 })
 
 /**
@@ -31,8 +34,12 @@ export const updateCrmIntegrationSchema = createUpdateSchema(crmIntegrations, {
   refreshToken: z.string().optional().nullable(),
   status: z.enum(['active', 'inactive', 'error']).optional(),
   syncFrequency: z.enum(['6h', '12h', '24h', 'weekly']).optional(),
+  syncStatus: z.enum(['idle', 'syncing', 'completed', 'failed']).optional(),
   expiresAt: z.date().optional().nullable(),
   lastSyncedAt: z.date().optional().nullable(),
+  lastSyncError: z.string().optional().nullable(),
+  syncStartedAt: z.date().optional().nullable(),
+  nextSyncAt: z.date().optional().nullable(),
 })
 
 /**

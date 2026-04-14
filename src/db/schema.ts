@@ -145,6 +145,14 @@ export const crmIntegrationStatusEnum = pgEnum('crm_integration_status', [
   'error',
 ])
 
+// CRM Sync status enum - tracks current sync state
+export const crmSyncStatusEnum = pgEnum('crm_sync_status', [
+  'idle',
+  'syncing',
+  'completed',
+  'failed',
+])
+
 // CRM Integrations table - stores OAuth tokens and connection info
 export const crmIntegrations = pgTable(
   'crm_integrations',
@@ -161,7 +169,11 @@ export const crmIntegrations = pgTable(
     syncFrequency: varchar('sync_frequency', { length: 20 })
       .default('24h')
       .notNull(), // Options: 6h, 12h, 24h, weekly
+    syncStatus: crmSyncStatusEnum('sync_status').default('idle').notNull(),
     lastSyncedAt: timestamp('last_synced_at'),
+    lastSyncError: text('last_sync_error'),
+    syncStartedAt: timestamp('sync_started_at'),
+    nextSyncAt: timestamp('next_sync_at'),
     connectedAt: timestamp('connected_at').defaultNow().notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
