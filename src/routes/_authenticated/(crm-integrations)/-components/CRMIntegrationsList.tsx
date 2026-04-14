@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { SiHubspot } from 'react-icons/si'
 import { HiCheckCircle, HiClock } from 'react-icons/hi2'
 import HubSpotConnectDialog from './HubSpotConnectDialog'
+import CRMSettingsDialog from './CRMSettingsDialog'
+import CRMDisconnectDialog from './CRMDisconnectDialog'
 import type { CrmIntegration } from '@/schemas'
 import { AdaptiveCard } from '@/components/shared'
 import { Badge, Button, Notification, toast } from '@/components/ui'
@@ -34,6 +36,10 @@ export default function CRMIntegrationsList() {
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(
     null,
   )
+  const [settingsIntegration, setSettingsIntegration] =
+    useState<CrmIntegration | null>(null)
+  const [disconnectIntegration, setDisconnectIntegration] =
+    useState<CrmIntegration | null>(null)
 
   // Fetch connected integrations
   const trpc = useTRPC()
@@ -181,8 +187,24 @@ export default function CRMIntegrationsList() {
                           ? 'Syncing...'
                           : 'Sync Now'}
                       </Button>
-                      <Button variant="plain" className="flex-1">
+                      <Button
+                        variant="plain"
+                        className="flex-1"
+                        onClick={() => setSettingsIntegration(integration!)}
+                      >
                         Settings
+                      </Button>
+                    </div>
+
+                    {/* Disconnect Button */}
+                    <div className="mt-2">
+                      <Button
+                        variant="plain"
+                        className="w-full text-red-600 hover:text-red-700"
+                        size="sm"
+                        onClick={() => setDisconnectIntegration(integration!)}
+                      >
+                        Disconnect
                       </Button>
                     </div>
                   </div>
@@ -253,6 +275,28 @@ export default function CRMIntegrationsList() {
           isOpen={true}
           onClose={handleCloseDialog}
           onSuccess={handleCloseDialog}
+        />
+      )}
+
+      {/* Settings Dialog */}
+      {settingsIntegration && (
+        <CRMSettingsDialog
+          isOpen={true}
+          onClose={() => setSettingsIntegration(null)}
+          integration={settingsIntegration}
+        />
+      )}
+
+      {/* Disconnect Dialog */}
+      {disconnectIntegration && (
+        <CRMDisconnectDialog
+          isOpen={true}
+          onClose={() => setDisconnectIntegration(null)}
+          integration={disconnectIntegration}
+          onSuccess={() => {
+            setDisconnectIntegration(null)
+            integrationsQuery.refetch()
+          }}
         />
       )}
     </>

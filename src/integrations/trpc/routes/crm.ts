@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../init'
-import { crmIntegrations } from '@/db/schema'
+import { contacts, crmIntegrations } from '@/db/schema'
 import { queueHubSpotSync } from '@/services/sync-queue.service'
 
 export const crmRouter = createTRPCRouter({
@@ -132,6 +132,27 @@ export const crmRouter = createTRPCRouter({
       }
     }),
 
+  // Get contact count for a CRM integration
+  getContactCount: protectedProcedure
+    .input(
+      z.object({
+        provider: z.enum(['hubspot']),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const [result] = await ctx.db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(contacts)
+        .where(
+          and(
+            eq(contacts.userId, ctx.user!.id),
+            eq(contacts.source, input.provider),
+          ),
+        )
+
+      return { count: result?.count || 0 }
+    }),
+
   // Disconnect integration
   disconnect: protectedProcedure
     .input(
@@ -149,16 +170,28 @@ export const crmRouter = createTRPCRouter({
       })
 
       if (!integration) {
-        throw new Error('Integration not found')
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Integration not found',
+        })
+      }
+
+      // If deleteContacts is true, delete all contacts from this CRM
+      if (input.deleteContacts) {
+        await ctx.db
+          .delete(contacts)
+          .where(
+            and(
+              eq(contacts.userId, ctx.user!.id),
+              eq(contacts.source, input.provider),
+            ),
+          )
       }
 
       // Delete the integration
       await ctx.db
         .delete(crmIntegrations)
         .where(eq(crmIntegrations.id, integration.id))
-
-      // TODO: If deleteContacts is true, delete all contacts with this CRM source
-      // This will be implemented in Phase 8
 
       return { success: true }
     }),
