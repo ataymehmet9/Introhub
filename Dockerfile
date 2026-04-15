@@ -27,6 +27,7 @@ ARG VITE_SENTRY_PROJECT
 ARG VITE_PUBLIC_POSTHOG_KEY
 ARG VITE_PUBLIC_POSTHOG_HOST
 ARG VITE_PUBLIC_POSTHOG_DEFAULTS
+ARG VITE_HUBSPOT_CLIENT_ID
 
 # Set environment variables for build
 ENV VITE_BETTER_AUTH_URL=$VITE_BETTER_AUTH_URL
@@ -38,6 +39,7 @@ ENV VITE_SENTRY_PROJECT=$VITE_SENTRY_PROJECT
 ENV VITE_PUBLIC_POSTHOG_KEY=$VITE_PUBLIC_POSTHOG_KEY
 ENV VITE_PUBLIC_POSTHOG_HOST=$VITE_PUBLIC_POSTHOG_HOST
 ENV VITE_PUBLIC_POSTHOG_DEFAULTS=$VITE_PUBLIC_POSTHOG_DEFAULTS
+ENV VITE_HUBSPOT_CLIENT_ID=$VITE_HUBSPOT_CLIENT_ID
 
 # Increase Node.js heap size to prevent OOM during Nitro/Vite build
 ENV NODE_OPTIONS=--max-old-space-size=8192
@@ -71,6 +73,12 @@ COPY --from=builder /app/instrument.server.mjs ./instrument.server.mjs
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/src/db ./src/db
+
+# Copy worker source files (needed for tsx runtime execution)
+COPY --from=builder /app/src/workers ./src/workers
+COPY --from=builder /app/src/services ./src/services
+COPY --from=builder /app/src/schemas ./src/schemas
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 # Expose the application port
 EXPOSE 3000
