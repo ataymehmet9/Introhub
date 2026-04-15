@@ -1,5 +1,4 @@
 import { Redis } from 'ioredis'
-import { notificationEmitter } from './notification-emitter.server'
 import type { NotificationWithMetadata } from '@/schemas'
 
 /**
@@ -132,6 +131,10 @@ export async function publishNotificationEvent(
  */
 export async function initializeNotificationBridge(): Promise<void> {
   try {
+    // Dynamically import the notification emitter to avoid bundling Node.js modules
+    const { notificationEmitter } =
+      await import('./notification-emitter.server')
+
     const subscriber = getSubscriber()
 
     // Subscribe to notification events channel

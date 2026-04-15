@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events'
 import type { NotificationWithMetadata } from '@/schemas'
 
 /**
@@ -21,37 +20,78 @@ export interface NotificationEvents {
 }
 
 /**
- * Typed EventEmitter for notification events
+ * Simple EventEmitter implementation to avoid Node.js imports in build
  */
-class NotificationEventEmitter extends EventEmitter {
-  emit<TKey extends keyof NotificationEvents>(
+class SimpleEventEmitter<
+  TEvents extends Record<string, (...args: Array<unknown>) => void>,
+> {
+  private events: Map<keyof TEvents, Set<(...args: Array<unknown>) => void>> =
+    new Map()
+  private maxListeners = 10
+
+  setMaxListeners(n: number): this {
+    this.maxListeners = n
+    return this
+  }
+
+  on<TKey extends keyof TEvents>(event: TKey, listener: TEvents[TKey]): this {
+    if (!this.events.has(event)) {
+      this.events.set(event, new Set())
+    }
+    this.events.get(event)!.add(listener)
+    return this
+  }
+
+  once<TKey extends keyof TEvents>(event: TKey, listener: TEvents[TKey]): this {
+    const onceWrapper = (...args: Parameters<TEvents[TKey]>) => {
+      this.off(event, onceWrapper as TEvents[TKey])
+      listener(...args)
+    }
+    return this.on(event, onceWrapper as TEvents[TKey])
+  }
+
+  off<TKey extends keyof TEvents>(event: TKey, listener: TEvents[TKey]): this {
+    const listeners = this.events.get(event)
+    if (listeners) {
+      listeners.delete(listener)
+    }
+    return this
+  }
+
+  emit<TKey extends keyof TEvents>(
     event: TKey,
-    ...args: Parameters<NotificationEvents[TKey]>
+    ...args: Parameters<TEvents[TKey]>
   ): boolean {
-    return super.emit(event, ...args)
+    const listeners = this.events.get(event)
+    if (!listeners || listeners.size === 0) {
+      return false
+    }
+    listeners.forEach((listener) => {
+      try {
+        listener(...args)
+      } catch (error) {
+        console.error(`Error in event listener for ${String(event)}:`, error)
+      }
+    })
+    return true
   }
 
-  on<TKey extends keyof NotificationEvents>(
-    event: TKey,
-    listener: NotificationEvents[TKey],
-  ): this {
-    return super.on(event, listener)
-  }
-
-  once<TKey extends keyof NotificationEvents>(
-    event: TKey,
-    listener: NotificationEvents[TKey],
-  ): this {
-    return super.once(event, listener)
-  }
-
-  off<TKey extends keyof NotificationEvents>(
-    event: TKey,
-    listener: NotificationEvents[TKey],
-  ): this {
-    return super.off(event, listener)
+  removeAllListeners(event?: keyof TEvents): this {
+    if (event) {
+      this.events.delete(event)
+    } else {
+      this.events.clear()
+    }
+    return this
   }
 }
+
+/**
+ * Typed EventEmitter for notification events
+ */
+export class NotificationEventEmitter extends SimpleEventEmitter<
+  NotificationEvents & Record<string, (...args: Array<unknown>) => void>
+> {}
 
 /**
  * Singleton instance of the notification event emitter

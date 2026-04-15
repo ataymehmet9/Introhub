@@ -6,13 +6,16 @@ import type {
 } from '@/lib/sse-manager'
 import { auth } from '@/lib/auth'
 import { sseManager } from '@/lib/sse-manager'
-import { notificationEmitter } from '@/lib/notification-emitter.server'
 
 /**
  * SSE endpoint for real-time notifications
  * GET /api/notifications/stream
  */
 async function handler({ request }: { request: Request }) {
+  // Dynamically import the notification emitter to avoid bundling Node.js modules
+  const { notificationEmitter } =
+    await import('@/lib/notification-emitter.server')
+
   // Authenticate the user using Better Auth session
   const session = await auth.api.getSession({
     headers: request.headers,
