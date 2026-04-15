@@ -13,9 +13,14 @@ import { mapHubSpotContactsBatch } from './field-mapping.service'
 import { syncContactsBatch } from './contact-sync.service'
 import { sendCRMSyncFailureEmailDirect } from './email.functions'
 import type { Job } from 'bullmq'
-import { publishNotificationEvent } from '@/lib/notification-bridge'
 import { db } from '@/db'
 import { crmIntegrations, notifications, syncLogs, user } from '@/db/schema'
+
+// Dynamic import to avoid bundling server-only code in client bundle
+const getPublishNotificationEvent = async () => {
+  const { publishNotificationEvent } = await import('@/lib/notification-bridge')
+  return publishNotificationEvent
+}
 
 /**
  * Job data for HubSpot contact sync
@@ -274,6 +279,7 @@ export const hubspotSyncWorker = new Worker<
 
       // Publish notification event to Redis for cross-process SSE broadcast
       if (createdNotification) {
+        const publishNotificationEvent = await getPublishNotificationEvent()
         await publishNotificationEvent('notification:created', {
           userId,
           notification: {

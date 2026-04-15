@@ -36,6 +36,10 @@ export const trpcClient = createTRPCClient<TRPCRouter>({
     httpBatchStreamLink({
       transformer: superjson,
       url: getUrl(),
+      // Limit batch size to prevent 431 errors
+      maxURLLength: 2083, // Standard max URL length
+      // Batch requests within 10ms window
+      maxBatchSize: 10,
     }),
   ],
 })

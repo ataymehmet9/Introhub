@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
 import classNames from 'classnames'
 import { formatDistanceToNow } from 'date-fns'
@@ -14,8 +14,7 @@ import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import isLastChild from '@/utils/isLastChild'
 import useResponsive from '@/utils/hooks/useResponsive'
-import { useNotifications } from '@/hooks/useNotifications'
-import { useNotificationSSE } from '@/hooks/useNotificationSSE'
+import { useNotificationContext } from '@/contexts/NotificationContext'
 
 const notificationHeight = 'h-[280px]'
 
@@ -23,7 +22,7 @@ const Notification = ({ className }: { className?: string }) => {
   const { larger } = useResponsive()
   const notificationDropdownRef = useRef<DropdownRef>(null)
 
-  // Use our notification hook with real-time SSE updates
+  // Use notification context - hooks are called once at provider level
   const {
     notifications,
     unreadCount,
@@ -31,8 +30,7 @@ const Notification = ({ className }: { className?: string }) => {
     isLoading,
     markAsRead,
     markAllAsRead,
-  } = useNotifications()
-  useNotificationSSE()
+  } = useNotificationContext()
 
   const onMarkAllAsRead = () => {
     markAllAsRead()
@@ -169,6 +167,7 @@ const Notification = ({ className }: { className?: string }) => {
   )
 }
 
-const _Notification = withHeaderItem(Notification)
+const MemoizedNotification = memo(Notification)
+const _Notification = withHeaderItem(MemoizedNotification)
 
 export default _Notification

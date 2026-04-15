@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   useInfiniteQuery,
   useMutation,
@@ -6,9 +6,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import type { GetNotifications } from '@/schemas'
-import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 import { Notification, toast } from '@/components/ui'
+import { useSession } from '@/lib/auth-client'
 
 type UseNotificationsProps = Omit<GetNotifications, 'page'> & {
   enabled?: boolean
@@ -22,14 +22,27 @@ type UseNotificationsProps = Omit<GetNotifications, 'page'> & {
  * Uses infinite query for pagination support
  */
 export function useNotifications(props?: UseNotificationsProps) {
-  const trpc = useTRPC()
   const queryClient = useQueryClient()
+  const { data: session } = useSession()
+  const currentUserId = session?.user?.id
+
   const {
     pageSize = 5,
     unreadOnly = false,
     enabled = true,
     initialData,
   } = props || {}
+
+  // CRITICAL: Include userId in query keys to prevent cross-user cache pollution
+  // Memoize to prevent infinite re-renders
+  const notificationsQueryKey = useMemo(
+    () => [
+      'notifications',
+      'list',
+      { pageSize, unreadOnly, userId: currentUserId },
+    ],
+    [pageSize, unreadOnly, currentUserId],
+  )
 
   // Fetch notifications list with infinite query (no polling, updated via SSE)
   const {
@@ -39,7 +52,7 @@ export function useNotifications(props?: UseNotificationsProps) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ['notifications', 'list', { pageSize, unreadOnly }],
+    queryKey: notificationsQueryKey,
     queryFn: async ({ pageParam = 1 }) => {
       return trpcClient.notifications.list.query({
         page: pageParam,
@@ -62,17 +75,17 @@ export function useNotifications(props?: UseNotificationsProps) {
       : undefined,
     refetchOnWindowFocus: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled,
+    enabled: enabled && !!currentUserId, // Only fetch if user is authenticated
   })
 
-  // Get the actual query key being used by the query
-  const notificationsQueryKey = [
-    'notifications',
-    'list',
-    { pageSize, unreadOnly },
-  ]
-
-  const unreadCountQueryKey = trpc.notifications.getUnreadCount.queryKey()
+  // CRITICAL: Include userId in unread count query key to prevent cross-user cache pollution
+  // Memoize to prevent infinite re-renders
+  // NOTE: We use a static query key instead of trpc.notifications.getUnreadCount.queryKey()
+  // because the trpc object changes on every render, causing infinite loops
+  const unreadCountQueryKey = useMemo(
+    () => [['notifications', 'getUnreadCount'], { userId: currentUserId }],
+    [currentUserId],
+  )
 
   // Extract and flatten notifications from all pages - memoized to prevent infinite loops
   const notifications = useMemo(
@@ -80,16 +93,21 @@ export function useNotifications(props?: UseNotificationsProps) {
     [data],
   )
 
-  // Get pagination info from the last page
-  const lastPage = data ? data.pages[data.pages.length - 1] : undefined
-  const pagination = lastPage?.pagination
+  // Get pagination info from the last page - memoized to prevent new object references
+  const pagination = useMemo(() => {
+    const lastPage = data ? data.pages[data.pages.length - 1] : undefined
+    return lastPage?.pagination
+  }, [data])
 
   // Fetch unread count (no polling, updated via SSE)
-  // IMPORTANT: This query must be invalidated on logout to prevent cross-user data leaks
+  // IMPORTANT: userId is included in query key to prevent cross-user data leaks
+  // SECURITY: Only fetch if we have a current user
   const { data: unreadData } = useQuery({
-    ...trpc.notifications.getUnreadCount.queryOptions(),
+    queryKey: unreadCountQueryKey,
+    queryFn: () => trpcClient.notifications.getUnreadCount.query(),
     refetchOnWindowFocus: true,
     staleTime: 0, // Always refetch to ensure fresh data for current user
+    enabled: enabled && !!currentUserId, // Only fetch if user is authenticated
   })
 
   // Mark as read mutation
@@ -135,22 +153,18 @@ export function useNotifications(props?: UseNotificationsProps) {
       )
 
       // Optimistically update unread count
-      queryClient.setQueryData(
-        unreadCountQueryKey,
-        (
-          oldData:
-            | { count: number; hasUnread: boolean; userId: string }
-            | undefined,
-        ) => {
-          const currentCount = oldData?.count || 0
-          const newCount = Math.max(0, currentCount - 1)
-          return {
-            count: newCount,
-            hasUnread: newCount > 0,
-            userId: oldData?.userId || '', // Preserve userId
-          }
-        },
-      )
+      queryClient.setQueryData(unreadCountQueryKey, (oldData: unknown) => {
+        const data = oldData as
+          | { count: number; hasUnread: boolean; userId?: string }
+          | undefined
+        const currentCount = data?.count || 0
+        const newCount = Math.max(0, currentCount - 1)
+        return {
+          count: newCount,
+          hasUnread: newCount > 0,
+          userId: data?.userId || currentUserId || '',
+        }
+      })
 
       return { previousNotifications, previousUnreadCount }
     },
@@ -228,11 +242,14 @@ export function useNotifications(props?: UseNotificationsProps) {
       )
 
       // Optimistically update unread count
-      queryClient.setQueryData(unreadCountQueryKey, (oldData) => ({
-        count: 0,
-        hasUnread: false,
-        userId: oldData?.userId || '', // Preserve userId
-      }))
+      queryClient.setQueryData(unreadCountQueryKey, (oldData: unknown) => {
+        const data = oldData as { userId?: string } | undefined
+        return {
+          count: 0,
+          hasUnread: false,
+          userId: data?.userId || currentUserId || '',
+        }
+      })
 
       return { previousNotifications, previousUnreadCount }
     },
@@ -311,22 +328,67 @@ export function useNotifications(props?: UseNotificationsProps) {
     },
   })
 
-  return {
-    notifications,
-    pagination,
-    unreadCount: unreadData?.count || 0,
-    hasUnread: unreadData?.hasUnread || false,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    markAsRead: (id: number) => markAsReadMutation.mutate(id),
-    markAllAsRead: () => markAllAsReadMutation.mutate(),
-    deleteNotification: (id: number) => deleteNotificationMutation.mutate(id),
-    deleteAllRead: () => deleteAllReadMutation.mutate(),
-    refetch: () => {
-      queryClient.invalidateQueries({ queryKey: notificationsQueryKey })
-      queryClient.invalidateQueries({ queryKey: unreadCountQueryKey })
-    },
-  }
+  // Use refs to create stable callbacks and prevent infinite re-renders
+  // Mutation objects are recreated on every render, so we can't use them as dependencies
+  const markAsReadRef = useRef<(id: number) => void>(() => {})
+  const markAllAsReadRef = useRef<() => void>(() => {})
+  const deleteNotificationRef = useRef<(id: number) => void>(() => {})
+  const deleteAllReadRef = useRef<() => void>(() => {})
+
+  useEffect(() => {
+    markAsReadRef.current = (id: number) => markAsReadMutation.mutate(id)
+    markAllAsReadRef.current = () => markAllAsReadMutation.mutate()
+    deleteNotificationRef.current = (id: number) =>
+      deleteNotificationMutation.mutate(id)
+    deleteAllReadRef.current = () => deleteAllReadMutation.mutate()
+  })
+
+  const markAsRead = useCallback(
+    (id: number) => markAsReadRef.current?.(id),
+    [],
+  )
+  const markAllAsRead = useCallback(() => markAllAsReadRef.current?.(), [])
+  const deleteNotification = useCallback(
+    (id: number) => deleteNotificationRef.current?.(id),
+    [],
+  )
+  const deleteAllRead = useCallback(() => deleteAllReadRef.current?.(), [])
+
+  const refetch = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: notificationsQueryKey })
+    queryClient.invalidateQueries({ queryKey: unreadCountQueryKey })
+  }, [queryClient, notificationsQueryKey, unreadCountQueryKey])
+
+  return useMemo(
+    () => ({
+      notifications,
+      pagination,
+      unreadCount: unreadData?.count || 0,
+      hasUnread: unreadData?.hasUnread || false,
+      isLoading,
+      isFetchingNextPage,
+      hasNextPage,
+      fetchNextPage,
+      markAsRead,
+      markAllAsRead,
+      deleteNotification,
+      deleteAllRead,
+      refetch,
+    }),
+    [
+      notifications,
+      pagination,
+      unreadData?.count,
+      unreadData?.hasUnread,
+      isLoading,
+      isFetchingNextPage,
+      hasNextPage,
+      fetchNextPage,
+      markAsRead,
+      markAllAsRead,
+      deleteNotification,
+      deleteAllRead,
+      refetch,
+    ],
+  )
 }

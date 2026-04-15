@@ -1,7 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { NotificationWithMetadata } from '@/schemas'
-import { useTRPC } from '@/integrations/trpc/react'
+import { useSession } from '@/lib/auth-client'
+
+// Debounce helper to prevent duplicate invalidations
+const debounceMap = new Map<string, ReturnType<typeof setTimeout>>()
+
+function debounceInvalidation(key: string, fn: () => void, delay = 100) {
+  const existing = debounceMap.get(key)
+  if (existing) {
+    clearTimeout(existing)
+  }
+  const timeout = setTimeout(() => {
+    fn()
+    debounceMap.delete(key)
+  }, delay)
+  debounceMap.set(key, timeout)
+}
 
 /**
  * SSE connection status
@@ -44,7 +59,8 @@ const RETRY_DELAYS = [1000, 2000, 4000, 8000, 16000, 30000]
  */
 export function useNotificationSSE() {
   const queryClient = useQueryClient()
-  const trpc = useTRPC()
+  const { data: session } = useSession()
+  const currentUserId = session?.user?.id
   const eventSourceRef = useRef<EventSource | null>(null)
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const retryCountRef = useRef(0)
@@ -53,12 +69,21 @@ export function useNotificationSSE() {
   const [connectionStatus, setConnectionStatus] =
     useState<SSEConnectionStatus>('disconnected')
 
-  // Query keys for cache invalidation
-  const unreadCountQueryKey = trpc.notifications.getUnreadCount.queryKey()
+  // Query keys for cache invalidation - include userId to match useNotifications
+  // Memoize to prevent infinite re-renders
+  // NOTE: We use a static query key instead of trpc.notifications.getUnreadCount.queryKey()
+  // because the trpc object changes on every render, causing infinite loops
+  const unreadCountQueryKey = useMemo(
+    () => [['notifications', 'getUnreadCount'], { userId: currentUserId }],
+    [currentUserId],
+  )
 
   // Introduction requests query key - for invalidating when new requests arrive
-  const introductionRequestsQueryKey =
-    trpc.introductionRequests.listByUser.queryKey()
+  // NOTE: We use a static query key to prevent infinite re-renders
+  const introductionRequestsQueryKey = useMemo(
+    () => [['introductionRequests', 'listByUser']],
+    [],
+  )
 
   // ─── Cache update helpers ────────────────────────────────────────────────
   // Instead of trying to update specific query keys, we invalidate ALL notification queries
@@ -66,121 +91,130 @@ export function useNotificationSSE() {
 
   const handleNotificationCreated = useCallback(
     (notification: NotificationWithMetadata) => {
-      // Update unread count optimistically
-      if (!notification.read) {
-        queryClient.setQueryData(
-          unreadCountQueryKey,
-          (
-            oldData:
-              | { count: number; hasUnread: boolean; userId: string }
-              | undefined,
-          ) => {
-            const currentCount = oldData?.count || 0
-            return {
-              count: currentCount + 1,
-              hasUnread: true,
-              userId: oldData?.userId || '', // Preserve userId
-            }
-          },
-        )
-      }
+      // Debounce invalidations to prevent duplicate requests
+      debounceInvalidation('unreadCount', () => {
+        queryClient.invalidateQueries({
+          queryKey: unreadCountQueryKey,
+          refetchType: 'active',
+        })
+      })
 
-      // Invalidate ALL notification list queries to refetch with new data
-      queryClient.invalidateQueries({
-        queryKey: ['notifications', 'list'],
-        refetchType: 'active',
+      debounceInvalidation('notificationList', () => {
+        queryClient.invalidateQueries({
+          queryKey: ['notifications', 'list'],
+          refetchType: 'active',
+        })
       })
 
       // Invalidate introduction requests cache when a new introduction request notification arrives
       if (notification.type === 'introduction_request') {
-        queryClient.invalidateQueries({
-          queryKey: introductionRequestsQueryKey,
-          refetchType: 'active',
+        debounceInvalidation('introRequests', () => {
+          queryClient.invalidateQueries({
+            queryKey: introductionRequestsQueryKey,
+            refetchType: 'active',
+          })
         })
       }
 
       // Invalidate contacts cache when a CRM sync completes successfully
       if (notification.type === 'crm_sync_completed') {
-        queryClient.invalidateQueries({
-          predicate: (query) => {
-            // Query key structure: [['contacts', 'list'], {...}]
-            const firstKey = query.queryKey[0]
-            return (
-              Array.isArray(firstKey) &&
-              firstKey[0] === 'contacts' &&
-              firstKey[1] === 'list'
-            )
-          },
+        debounceInvalidation('contacts', () => {
+          queryClient.invalidateQueries({
+            predicate: (query) => {
+              // Query key structure: [['contacts', 'list'], {...}]
+              const firstKey = query.queryKey[0]
+              return (
+                Array.isArray(firstKey) &&
+                firstKey[0] === 'contacts' &&
+                firstKey[1] === 'list'
+              )
+            },
+            refetchType: 'active',
+          })
         })
       }
     },
-    [queryClient, unreadCountQueryKey, introductionRequestsQueryKey],
+    [
+      queryClient,
+      unreadCountQueryKey,
+      introductionRequestsQueryKey,
+      currentUserId,
+    ],
   )
 
   const handleNotificationRead = useCallback(
     (_notificationId: number) => {
       // Update unread count optimistically
-      queryClient.setQueryData(
-        unreadCountQueryKey,
-        (
-          oldData:
-            | { count: number; hasUnread: boolean; userId: string }
-            | undefined,
-        ) => {
-          const currentCount = oldData?.count || 0
-          const newCount = Math.max(0, currentCount - 1)
-          return {
-            count: newCount,
-            hasUnread: newCount > 0,
-            userId: oldData?.userId || '', // Preserve userId
-          }
-        },
-      )
-
-      // Invalidate ALL notification list queries to refetch with updated read status
-      queryClient.invalidateQueries({
-        queryKey: ['notifications', 'list'],
-        refetchType: 'active',
+      queryClient.setQueryData(unreadCountQueryKey, (oldData: unknown) => {
+        const data = oldData as
+          | { count: number; hasUnread: boolean; userId?: string }
+          | undefined
+        const currentCount = data?.count || 0
+        const newCount = Math.max(0, currentCount - 1)
+        return {
+          count: newCount,
+          hasUnread: newCount > 0,
+          userId: data?.userId || currentUserId || '',
+        }
       })
 
-      // Invalidate introduction requests when approval/decline notifications are read
-      queryClient.invalidateQueries({
-        queryKey: introductionRequestsQueryKey,
-        refetchType: 'active',
+      // Debounce invalidations to prevent duplicate requests
+      debounceInvalidation('notificationList', () => {
+        queryClient.invalidateQueries({
+          queryKey: ['notifications', 'list'],
+          refetchType: 'active',
+        })
+      })
+
+      debounceInvalidation('introRequests', () => {
+        queryClient.invalidateQueries({
+          queryKey: introductionRequestsQueryKey,
+          refetchType: 'active',
+        })
       })
     },
-    [queryClient, unreadCountQueryKey, introductionRequestsQueryKey],
+    [
+      queryClient,
+      unreadCountQueryKey,
+      introductionRequestsQueryKey,
+      currentUserId,
+    ],
   )
 
   const handleNotificationDeleted = useCallback(
     (_notificationId: number) => {
-      // Invalidate ALL notification queries to refetch
-      queryClient.invalidateQueries({
-        queryKey: ['notifications', 'list'],
-        refetchType: 'active',
+      // Debounce invalidations to prevent duplicate requests
+      debounceInvalidation('notificationList', () => {
+        queryClient.invalidateQueries({
+          queryKey: ['notifications', 'list'],
+          refetchType: 'active',
+        })
       })
 
-      // Also invalidate unread count
+      debounceInvalidation('unreadCount', () => {
+        queryClient.invalidateQueries({
+          queryKey: unreadCountQueryKey,
+          refetchType: 'active',
+        })
+      })
+    },
+    [queryClient, unreadCountQueryKey, currentUserId],
+  )
+
+  const handleAllRead = useCallback(() => {
+    // Debounce invalidations to prevent duplicate requests
+    debounceInvalidation('unreadCount', () => {
       queryClient.invalidateQueries({
         queryKey: unreadCountQueryKey,
         refetchType: 'active',
       })
-    },
-    [queryClient, unreadCountQueryKey],
-  )
+    })
 
-  const handleAllRead = useCallback(() => {
-    // Update unread count immediately
-    queryClient.setQueryData(unreadCountQueryKey, (oldData) => ({
-      count: 0,
-      hasUnread: false,
-      userId: oldData?.userId || '', // Preserve userId
-    }))
-
-    // Invalidate ALL notification list queries to refetch with updated read status
-    queryClient.invalidateQueries({
-      queryKey: ['notifications', 'list'],
-      refetchType: 'active',
+    debounceInvalidation('notificationList', () => {
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'list'],
+        refetchType: 'active',
+      })
     })
   }, [queryClient, unreadCountQueryKey])
 

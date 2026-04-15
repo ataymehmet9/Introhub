@@ -149,37 +149,39 @@ export const useClearCacheOnAuth = () => {
       const userId = session.data.user.id
       const lastClearedSession = sessionStorage.getItem('lastClearedSession')
 
-      // Always clear if this is a different session OR if no session was tracked
-      if (!lastClearedSession || lastClearedSession !== sessionId) {
+      // Only clear if this is a DIFFERENT session (not just first load)
+      if (lastClearedSession && lastClearedSession !== sessionId) {
         console.log(
-          `[Auth] New session detected (${sessionId}), clearing all caches for user ${userId}`,
+          `[Auth] Session changed from ${lastClearedSession} to ${sessionId}, clearing caches for user ${userId}`,
         )
 
-        // Clear ALL query cache
-        queryClient.clear()
-        queryClient.removeQueries()
-        queryClient.getMutationCache().clear()
-
-        // Clear TanStack Router loader cache - THIS IS CRITICAL FOR SSR DATA
-        router.invalidate()
-
-        // Specifically invalidate notification queries to ensure fresh data
-        queryClient.invalidateQueries({
-          queryKey: ['notifications'],
-          refetchType: 'all',
+        // CRITICAL: Remove ALL notification queries regardless of userId
+        // This prevents cached data from previous users
+        queryClient.removeQueries({
+          predicate: (query) => {
+            const key = query.queryKey
+            // Remove any query that has 'notifications' in its key path
+            return (
+              Array.isArray(key) &&
+              (key.includes('notifications') ||
+                (Array.isArray(key[0]) && key[0].includes('notifications')) ||
+                (Array.isArray(key[1]) && key[1] === 'notifications'))
+            )
+          },
         })
 
-        // Force refetch of unread count for the new user
-        queryClient.refetchQueries({
-          queryKey: ['trpc', 'notifications', 'getUnreadCount'],
-          type: 'active',
-        })
-
-        sessionStorage.setItem('lastClearedSession', sessionId)
         console.log(
-          `[Auth] Cache cleared and notification queries invalidated for session: ${sessionId}`,
+          `[Auth] Notification queries cleared for session change: ${sessionId}, user: ${userId}`,
         )
       }
+
+      // Always update the session tracker
+      if (!lastClearedSession) {
+        console.log(
+          `[Auth] First session detected: ${sessionId}, user: ${userId}`,
+        )
+      }
+      sessionStorage.setItem('lastClearedSession', sessionId)
     }
   }, [
     session.data?.session.id,

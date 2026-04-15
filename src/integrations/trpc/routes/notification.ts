@@ -9,7 +9,13 @@ import {
   markAsReadSchema,
 } from '@/schemas'
 import { notifications } from '@/db/schema'
-import { notificationEmitter } from '@/lib/notification-emitter.server'
+
+// Dynamic import to avoid bundling server-only code in client bundle
+const getNotificationEmitter = async () => {
+  const { notificationEmitter } =
+    await import('@/lib/notification-emitter.server')
+  return notificationEmitter
+}
 
 export const notificationRouter = {
   /**
@@ -142,7 +148,8 @@ export const notificationRouter = {
       }
 
       // Emit SSE event for real-time update
-      notificationEmitter.emit('notification:read', {
+      const emitter = await getNotificationEmitter()
+      emitter.emit('notification:read', {
         userId: currentUser.id,
         notificationId: id,
       })
@@ -171,7 +178,8 @@ export const notificationRouter = {
       )
 
     // Emit SSE event for real-time update
-    notificationEmitter.emit('notification:all-read', {
+    const emitter = await getNotificationEmitter()
+    emitter.emit('notification:all-read', {
       userId: currentUser.id,
     })
 
@@ -209,7 +217,8 @@ export const notificationRouter = {
       }
 
       // Emit SSE event for real-time notification delivery
-      notificationEmitter.emit('notification:created', {
+      const emitter = await getNotificationEmitter()
+      emitter.emit('notification:created', {
         userId,
         notification: parsedNotification,
       })
@@ -251,7 +260,8 @@ export const notificationRouter = {
       }
 
       // Emit SSE event for real-time update
-      notificationEmitter.emit('notification:deleted', {
+      const emitter = await getNotificationEmitter()
+      emitter.emit('notification:deleted', {
         userId: currentUser.id,
         notificationId: id,
       })

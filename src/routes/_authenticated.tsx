@@ -8,6 +8,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useSession } from '@/lib/auth-client'
 import { usePostHogIdentify } from '@/hooks/usePostHogIdentify'
 import { useClearCacheOnAuth } from '@/lib/auth-wrapper'
+import { NotificationProvider } from '@/contexts/NotificationContext'
 
 export const Route = createFileRoute('/_authenticated')({
   component: RouteComponent,
@@ -37,12 +38,14 @@ function RouteComponent() {
   }
 
   return (
-    <Suspense fallback={<RoutePendingComponent />}>
-      <PostLoginLayout layoutType={layoutType}>
-        <PageContainer>
-          <Outlet />
-        </PageContainer>
-      </PostLoginLayout>
-    </Suspense>
+    <NotificationProvider>
+      <Suspense fallback={<RoutePendingComponent />}>
+        <PostLoginLayout layoutType={layoutType}>
+          <PageContainer>
+            <Outlet />
+          </PageContainer>
+        </PostLoginLayout>
+      </Suspense>
+    </NotificationProvider>
   )
 }

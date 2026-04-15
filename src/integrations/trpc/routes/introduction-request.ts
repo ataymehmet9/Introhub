@@ -19,7 +19,6 @@ import {
   sendIntroductionRequestEmail,
   sendIntroductionResponseEmail,
 } from '@/services/email.functions'
-import { notificationEmitter } from '@/lib/notification-emitter.server'
 import { trackServerEvent } from '@/integrations/posthog'
 import { extractEmailBodyContent } from '@/utils/extractEmailBodyContent'
 import {
@@ -28,6 +27,13 @@ import {
   incrementRequestCount,
 } from '@/services/subscription.service'
 import { SUBSCRIPTION_CONFIG } from '@/configs/subscription.config'
+
+// Dynamic import to avoid bundling server-only code in client bundle
+const getNotificationEmitter = async () => {
+  const { notificationEmitter } =
+    await import('@/lib/notification-emitter.server')
+  return notificationEmitter
+}
 
 const createIntroductionRequestSchema = insertIntroductionRequestSchema
   .omit({
@@ -240,7 +246,8 @@ export const introductionRequestRouter = {
 
           // Emit SSE event for real-time notification delivery
           if (newNotification.length > 0) {
-            notificationEmitter.emit('notification:created', {
+            const emitter = await getNotificationEmitter()
+            emitter.emit('notification:created', {
               userId: approver[0].id,
               notification: {
                 ...newNotification[0],
@@ -546,7 +553,8 @@ export const introductionRequestRouter = {
 
           // Emit SSE event for real-time notification delivery
           if (newNotification.length > 0) {
-            notificationEmitter.emit('notification:created', {
+            const emitter = await getNotificationEmitter()
+            emitter.emit('notification:created', {
               userId: requester[0].id,
               notification: {
                 ...newNotification[0],
