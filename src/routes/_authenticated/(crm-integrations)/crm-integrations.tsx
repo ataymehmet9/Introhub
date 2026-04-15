@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
 import CRMIntegrationsList from './-components/CRMIntegrationsList'
 import { Container } from '@/components/shared'
-import { toast } from '@/components/ui'
+import { Notification, toast } from '@/components/ui'
 
 const crmIntegrationsSearchSchema = z.object({
   success: z.string().optional(),
@@ -25,15 +25,14 @@ function RouteComponent() {
   useEffect(() => {
     if (success === 'connected') {
       toast.push(
-        <div>
-          <h6 className="font-semibold">HubSpot Connected!</h6>
-          <p className="text-sm">
-            Your HubSpot account has been successfully connected.
-          </p>
-        </div>,
-        {
-          type: 'success',
-        },
+        <Notification
+          type="success"
+          title="HubSpot Connected!"
+          duration={4000}
+          closable
+        >
+          Your HubSpot account has been successfully connected.
+        </Notification>,
       )
       // Clear the query parameter
       navigate({
@@ -49,15 +48,14 @@ function RouteComponent() {
       }
 
       toast.push(
-        <div>
-          <h6 className="font-semibold">Connection Failed</h6>
-          <p className="text-sm">
-            {errorMessages[error] || 'An unexpected error occurred.'}
-          </p>
-        </div>,
-        {
-          type: 'error',
-        },
+        <Notification
+          type="danger"
+          title="Connection Failed"
+          duration={5000}
+          closable
+        >
+          {errorMessages[error] || 'An unexpected error occurred.'}
+        </Notification>,
       )
       // Clear the query parameter
       navigate({
