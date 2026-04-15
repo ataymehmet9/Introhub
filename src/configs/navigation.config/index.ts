@@ -42,6 +42,16 @@ const navigationConfig: Array<NavigationTree> = [
     authority: [],
     subMenu: [],
   },
+  {
+    key: 'crm-integrations',
+    path: '/crm-integrations',
+    title: 'CRM Integrations',
+    translateKey: 'nav.crmIntegrations',
+    icon: 'integration',
+    type: NAV_ITEM_TYPE_ITEM,
+    authority: [],
+    subMenu: [],
+  },
 ]
 
 export default navigationConfig

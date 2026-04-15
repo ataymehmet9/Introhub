@@ -1,16 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import {
   HiCheckCircle,
+  HiClock,
   HiCloudArrowUp,
   HiDocumentArrowDown,
   HiXCircle,
 } from 'react-icons/hi2'
+import { SiHubspot } from 'react-icons/si'
 import type { InsertContact } from '@/schemas'
 import type { ContactFormHandle } from '@/components/shared/common/ContactForm'
-import { Alert, Button, Card, Dialog, Progress, Tabs } from '@/components/ui'
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Dialog,
+  Notification,
+  Progress,
+  Spinner,
+  Tabs,
+  toast,
+} from '@/components/ui'
 import ContactForm from '@/components/shared/common/ContactForm'
 import { validateCSVFile } from '@/utils/fileUtils'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
+import { useTRPC } from '@/integrations/trpc/react'
+import { useCRMSyncStatus } from '@/routes/_authenticated/(crm-integrations)/-hooks/useCRMSyncStatus'
 
 interface ImportResult {
   imported: number
@@ -55,7 +72,9 @@ export default function ContactImportModal({
   onContactAdded,
   onBulkImportComplete,
 }: ContactImportModalProps) {
-  const [activeTab, setActiveTab] = useState<'single' | 'bulk'>('single')
+  const [activeTab, setActiveTab] = useState<'single' | 'bulk' | 'crm'>(
+    'single',
+  )
   const [file, setFile] = useState<File | null>(null)
   const [importing, setImporting] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
@@ -67,6 +86,93 @@ export default function ContactImportModal({
   const formRef = useRef<ContactFormHandle>(null)
 
   const isMobile = useMediaQuery('(max-width: 1023px)')
+
+  // CRM integrations data
+  const trpc = useTRPC()
+  const integrationsQuery = useQuery({
+    ...trpc.crm.list.queryOptions(),
+  })
+  const integrations = integrationsQuery.data ?? []
+
+  // Real-time sync status via SSE
+  const { syncStatus } = useCRMSyncStatus()
+
+  // Track previous sync status to detect completion
+  const previousSyncStatusRef = useRef<Record<string, string>>({})
+  const isInitializedRef = useRef(false)
+
+  // Detect sync completion and close modal
+  useEffect(() => {
+    // Initialize previous status on first run
+    if (!isInitializedRef.current && Object.keys(syncStatus).length > 0) {
+      Object.entries(syncStatus).forEach(([provider, status]) => {
+        previousSyncStatusRef.current[provider] = status.syncStatus
+      })
+      isInitializedRef.current = true
+      return
+    }
+
+    // Check for status changes
+    Object.entries(syncStatus).forEach(([provider, status]) => {
+      const currentStatus = status.syncStatus
+      const prevStatus = previousSyncStatusRef.current[provider]
+
+      // If sync just completed, close modal
+      if (currentStatus === 'completed' && prevStatus === 'syncing') {
+        console.log('[CRM Modal] Sync completed, closing modal...')
+        toast.push(
+          <Notification type="success" title="Sync Complete">
+            Contacts have been synced successfully!
+          </Notification>,
+        )
+        setTimeout(() => {
+          onClose()
+        }, 1000)
+      }
+
+      // Update previous status
+      previousSyncStatusRef.current[provider] = currentStatus
+    })
+  }, [syncStatus, onClose])
+
+  // Sync Now mutation
+  const syncNowMutation = useMutation({
+    mutationFn: (provider: 'hubspot') =>
+      trpcClient.crm.syncNow.mutate({ provider }),
+    onSuccess: () => {
+      toast.push(
+        <Notification type="success" title="Sync Started">
+          Contact sync has been initiated.
+        </Notification>,
+      )
+      // Refetch integrations to show updated sync status
+      integrationsQuery.refetch()
+      // Refresh contacts list
+      onBulkImportComplete()
+      // Close modal after a short delay to allow sync to complete
+      setTimeout(() => {
+        toast.push(
+          <Notification type="success" title="Sync Complete">
+            Contacts have been synced successfully!
+          </Notification>,
+        )
+        onClose()
+      }, 2000)
+    },
+    onError: (error: Error) => {
+      const errorMessage =
+        error?.message || 'Failed to start sync. Please try again.'
+      toast.push(
+        <Notification type="danger" title="Sync Failed">
+          {errorMessage}
+        </Notification>,
+      )
+    },
+  })
+
+  const handleSyncNow = (provider: 'hubspot') => {
+    syncNowMutation.mutate(provider)
+  }
 
   // Reset state when modal closes
   useEffect(() => {
@@ -201,6 +307,194 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
     link.click()
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+  }
+  const renderCRMSyncSection = () => {
+    // Get integration with real-time sync status
+    const getIntegrationWithStatus = (provider: string) => {
+      const integration = integrations.find((int) => int.provider === provider)
+      if (!integration) return null
+
+      const realtimeStatus = syncStatus[provider]
+      if (realtimeStatus) {
+        return {
+          ...integration,
+          syncStatus: realtimeStatus.syncStatus as
+            | 'idle'
+            | 'syncing'
+            | 'completed'
+            | 'failed',
+          lastSyncError: realtimeStatus.lastSyncError,
+          syncStartedAt: realtimeStatus.syncStartedAt,
+        }
+      }
+
+      return integration
+    }
+
+    // Empty state - no CRM integrations connected
+    if (integrations.length === 0) {
+      return (
+        <div className="space-y-4 sm:space-y-6">
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-2">
+              CRM Sync
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Sync contacts directly from your CRM platforms
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+              <SiHubspot className="w-8 h-8 text-gray-400" />
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              No CRM Integrations
+            </h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6 max-w-md">
+              Connect your CRM platform to automatically sync contacts into
+              IntroHub
+            </p>
+            <Link to="/crm-integrations">
+              <Button variant="solid">Connect CRM</Button>
+            </Link>
+          </div>
+        </div>
+      )
+    }
+
+    // Show connected CRM integrations
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div>
+          <h3 className="text-base sm:text-lg font-semibold mb-2">CRM Sync</h3>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            Sync contacts from your connected CRM platforms
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {integrations.map((integration) => {
+            const integrationWithStatus = getIntegrationWithStatus(
+              integration.provider,
+            )
+            if (!integrationWithStatus) return null
+
+            const isSyncing =
+              integrationWithStatus.syncStatus === 'syncing' ||
+              syncNowMutation.isPending
+
+            const providerName =
+              integration.provider === 'hubspot'
+                ? 'HubSpot'
+                : integration.provider
+
+            // Determine status badge
+            let statusBadgeContent = 'Connected'
+            let statusBadgeClass = 'bg-green-500 text-white'
+            let showSpinner = false
+
+            if (integrationWithStatus.syncStatus === 'syncing') {
+              statusBadgeContent = 'Syncing'
+              statusBadgeClass = 'bg-blue-500 text-white'
+              showSpinner = true
+            } else if (integrationWithStatus.syncStatus === 'failed') {
+              statusBadgeContent = 'Error'
+              statusBadgeClass = 'bg-red-500 text-white'
+            }
+
+            return (
+              <Card
+                key={integration.id}
+                bodyClass="p-4"
+                header={{
+                  content: (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+                      <div className="flex items-center gap-3">
+                        <div className="text-orange-500">
+                          <SiHubspot className="text-3xl" />
+                        </div>
+                        <h4 className="font-semibold">{providerName}</h4>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {showSpinner && <Spinner size={14} />}
+                        <Badge
+                          className={statusBadgeClass}
+                          innerClass={statusBadgeClass}
+                          content={statusBadgeContent}
+                        />
+                      </div>
+                    </div>
+                  ),
+                  bordered: true,
+                }}
+                footer={{
+                  content: (
+                    <Button
+                      variant="solid"
+                      className="w-full"
+                      onClick={() =>
+                        handleSyncNow(integration.provider as 'hubspot')
+                      }
+                      loading={isSyncing}
+                      disabled={isSyncing}
+                    >
+                      {isSyncing ? 'Syncing...' : 'Sync Now'}
+                    </Button>
+                  ),
+                  bordered: true,
+                }}
+              >
+                {/* Last Sync Time */}
+                {integration.lastSyncedAt && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <HiClock className="text-base flex-shrink-0" />
+                    <span>
+                      Last synced:{' '}
+                      <span className="font-medium text-foreground">
+                        {new Date(integration.lastSyncedAt).toLocaleDateString(
+                          'en-US',
+                          {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          },
+                        )}
+                      </span>
+                    </span>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {integrationWithStatus.lastSyncError && (
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                    Error: {integrationWithStatus.lastSyncError}
+                  </p>
+                )}
+
+                {/* Sync Progress */}
+                {isSyncing && (
+                  <div className="mt-3">
+                    <Progress percent={100} showInfo={false} />
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      Syncing contacts from {providerName}...
+                    </p>
+                  </div>
+                )}
+              </Card>
+            )
+          })}
+        </div>
+
+        {/* Info Alert */}
+        <Alert type="info" showIcon>
+          Syncing will import all contacts from your CRM into IntroHub. Existing
+          contacts will be updated with the latest information.
+        </Alert>
+      </div>
+    )
   }
 
   const renderBulkUploadSection = () => (
@@ -414,11 +708,14 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
             <div className="space-y-4">
               <Tabs
                 value={activeTab}
-                onChange={(value) => setActiveTab(value as 'single' | 'bulk')}
+                onChange={(value) =>
+                  setActiveTab(value as 'single' | 'bulk' | 'crm')
+                }
               >
                 <Tabs.TabList className="mb-6">
                   <Tabs.TabNav value="single">Single Contact</Tabs.TabNav>
                   <Tabs.TabNav value="bulk">Bulk Upload</Tabs.TabNav>
+                  <Tabs.TabNav value="crm">CRM Sync</Tabs.TabNav>
                 </Tabs.TabList>
 
                 <Tabs.TabContent value="single">
@@ -443,11 +740,15 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
                     {renderBulkUploadSection()}
                   </Card>
                 </Tabs.TabContent>
+
+                <Tabs.TabContent value="crm">
+                  <Card className="p-2 sm:p-6">{renderCRMSyncSection()}</Card>
+                </Tabs.TabContent>
               </Tabs>
             </div>
           ) : (
-            // Desktop: Side-by-side layout
-            <div className="grid grid-cols-2 gap-6">
+            // Desktop: Three-column layout
+            <div className="grid grid-cols-3 gap-6">
               {/* Left: Single Contact Form */}
               <Card className="p-6">
                 <div>
@@ -462,8 +763,11 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
                 </div>
               </Card>
 
-              {/* Right: Bulk Upload */}
+              {/* Middle: Bulk Upload */}
               <Card className="p-6">{renderBulkUploadSection()}</Card>
+
+              {/* Right: CRM Sync */}
+              <Card className="p-6">{renderCRMSyncSection()}</Card>
             </div>
           )}
         </div>
@@ -474,7 +778,8 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
             <Button variant="default" onClick={onClose}>
               Cancel
             </Button>
-            {(!isMobile || activeTab === 'single') && (
+            {((!isMobile && activeTab !== 'crm') ||
+              (isMobile && activeTab === 'single')) && (
               <Button
                 variant="solid"
                 onClick={handleAddContact}

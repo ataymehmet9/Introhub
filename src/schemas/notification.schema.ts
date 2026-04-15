@@ -9,6 +9,10 @@ export const notificationTypeEnum = z.enum([
   'introduction_request',
   'introduction_approved',
   'introduction_declined',
+  'crm_sync_started',
+  'crm_sync_completed',
+  'crm_sync_failed',
+  'crm_oauth_expired',
 ])
 
 /**
@@ -55,11 +59,21 @@ export const markAllAsReadSchema = z.object({
  * Notification metadata schema for type safety
  */
 export const notificationMetadataSchema = z.object({
+  // Introduction request metadata
   requesterName: z.string().optional(),
   requesterEmail: z.string().optional(),
   contactName: z.string().optional(),
   contactEmail: z.string().optional(),
   requestId: z.number().optional(),
+  // CRM sync metadata
+  provider: z.string().optional(),
+  syncLogId: z.number().optional(),
+  integrationId: z.number().optional(),
+  totalContacts: z.number().optional(),
+  createdCount: z.number().optional(),
+  updatedCount: z.number().optional(),
+  errorCount: z.number().optional(),
+  skippedCount: z.number().optional(),
 })
 
 /**

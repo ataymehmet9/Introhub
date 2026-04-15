@@ -31,8 +31,11 @@ import { Route as AuthenticateduserMeRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedsearchSearchRouteImport } from './routes/_authenticated/(search)/search'
 import { Route as AuthenticatedrequestsRequestsRouteImport } from './routes/_authenticated/(requests)/requests'
 import { Route as AuthenticateddashboardDashboardRouteImport } from './routes/_authenticated/(dashboard)/dashboard'
+import { Route as AuthenticatedcrmIntegrationsCrmIntegrationsRouteImport } from './routes/_authenticated/(crm-integrations)/crm-integrations'
 import { Route as AuthenticatedcontactsContactsRouteImport } from './routes/_authenticated/(contacts)/contacts'
 import { Route as AuthenticateduserMeIndexRouteImport } from './routes/_authenticated/(user)/me/index'
+import { Route as ApiCrmSyncStatusStreamRouteImport } from './routes/api/crm/sync-status/stream'
+import { Route as ApiCrmHubspotCallbackRouteImport } from './routes/api/crm/hubspot/callback'
 import { Route as AuthenticateduserMeSecurityRouteImport } from './routes/_authenticated/(user)/me/security'
 import { Route as AuthenticateduserMeNotificationsRouteImport } from './routes/_authenticated/(user)/me/notifications'
 import { Route as AuthenticateduserMeBillingRouteImport } from './routes/_authenticated/(user)/me/billing'
@@ -150,6 +153,12 @@ const AuthenticateddashboardDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedcrmIntegrationsCrmIntegrationsRoute =
+  AuthenticatedcrmIntegrationsCrmIntegrationsRouteImport.update({
+    id: '/(crm-integrations)/crm-integrations',
+    path: '/crm-integrations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedcontactsContactsRoute =
   AuthenticatedcontactsContactsRouteImport.update({
     id: '/(contacts)/contacts',
@@ -162,6 +171,16 @@ const AuthenticateduserMeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticateduserMeRoute,
   } as any)
+const ApiCrmSyncStatusStreamRoute = ApiCrmSyncStatusStreamRouteImport.update({
+  id: '/api/crm/sync-status/stream',
+  path: '/api/crm/sync-status/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCrmHubspotCallbackRoute = ApiCrmHubspotCallbackRouteImport.update({
+  id: '/api/crm/hubspot/callback',
+  path: '/api/crm/hubspot/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticateduserMeSecurityRoute =
   AuthenticateduserMeSecurityRouteImport.update({
     id: '/security',
@@ -188,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/what-is-introhub': typeof PublicWhatIsIntrohubRoute
   '/api/upload': typeof ApiUploadRoute
   '/contacts': typeof AuthenticatedcontactsContactsRoute
+  '/crm-integrations': typeof AuthenticatedcrmIntegrationsCrmIntegrationsRoute
   '/dashboard': typeof AuthenticateddashboardDashboardRoute
   '/requests': typeof AuthenticatedrequestsRequestsRoute
   '/search': typeof AuthenticatedsearchSearchRoute
@@ -205,6 +225,8 @@ export interface FileRoutesByFullPath {
   '/me/billing': typeof AuthenticateduserMeBillingRoute
   '/me/notifications': typeof AuthenticateduserMeNotificationsRoute
   '/me/security': typeof AuthenticateduserMeSecurityRoute
+  '/api/crm/hubspot/callback': typeof ApiCrmHubspotCallbackRoute
+  '/api/crm/sync-status/stream': typeof ApiCrmSyncStatusStreamRoute
   '/me/': typeof AuthenticateduserMeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -214,6 +236,7 @@ export interface FileRoutesByTo {
   '/what-is-introhub': typeof PublicWhatIsIntrohubRoute
   '/api/upload': typeof ApiUploadRoute
   '/contacts': typeof AuthenticatedcontactsContactsRoute
+  '/crm-integrations': typeof AuthenticatedcrmIntegrationsCrmIntegrationsRoute
   '/dashboard': typeof AuthenticateddashboardDashboardRoute
   '/requests': typeof AuthenticatedrequestsRequestsRoute
   '/search': typeof AuthenticatedsearchSearchRoute
@@ -230,6 +253,8 @@ export interface FileRoutesByTo {
   '/me/billing': typeof AuthenticateduserMeBillingRoute
   '/me/notifications': typeof AuthenticateduserMeNotificationsRoute
   '/me/security': typeof AuthenticateduserMeSecurityRoute
+  '/api/crm/hubspot/callback': typeof ApiCrmHubspotCallbackRoute
+  '/api/crm/sync-status/stream': typeof ApiCrmSyncStatusStreamRoute
   '/me': typeof AuthenticateduserMeIndexRoute
 }
 export interface FileRoutesById {
@@ -243,6 +268,7 @@ export interface FileRoutesById {
   '/api/upload': typeof ApiUploadRoute
   '/_public/': typeof PublicIndexRoute
   '/_authenticated/(contacts)/contacts': typeof AuthenticatedcontactsContactsRoute
+  '/_authenticated/(crm-integrations)/crm-integrations': typeof AuthenticatedcrmIntegrationsCrmIntegrationsRoute
   '/_authenticated/(dashboard)/dashboard': typeof AuthenticateddashboardDashboardRoute
   '/_authenticated/(requests)/requests': typeof AuthenticatedrequestsRequestsRoute
   '/_authenticated/(search)/search': typeof AuthenticatedsearchSearchRoute
@@ -260,6 +286,8 @@ export interface FileRoutesById {
   '/_authenticated/(user)/me/billing': typeof AuthenticateduserMeBillingRoute
   '/_authenticated/(user)/me/notifications': typeof AuthenticateduserMeNotificationsRoute
   '/_authenticated/(user)/me/security': typeof AuthenticateduserMeSecurityRoute
+  '/api/crm/hubspot/callback': typeof ApiCrmHubspotCallbackRoute
+  '/api/crm/sync-status/stream': typeof ApiCrmSyncStatusStreamRoute
   '/_authenticated/(user)/me/': typeof AuthenticateduserMeIndexRoute
 }
 export interface FileRouteTypes {
@@ -271,6 +299,7 @@ export interface FileRouteTypes {
     | '/what-is-introhub'
     | '/api/upload'
     | '/contacts'
+    | '/crm-integrations'
     | '/dashboard'
     | '/requests'
     | '/search'
@@ -288,6 +317,8 @@ export interface FileRouteTypes {
     | '/me/billing'
     | '/me/notifications'
     | '/me/security'
+    | '/api/crm/hubspot/callback'
+    | '/api/crm/sync-status/stream'
     | '/me/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -297,6 +328,7 @@ export interface FileRouteTypes {
     | '/what-is-introhub'
     | '/api/upload'
     | '/contacts'
+    | '/crm-integrations'
     | '/dashboard'
     | '/requests'
     | '/search'
@@ -313,6 +345,8 @@ export interface FileRouteTypes {
     | '/me/billing'
     | '/me/notifications'
     | '/me/security'
+    | '/api/crm/hubspot/callback'
+    | '/api/crm/sync-status/stream'
     | '/me'
   id:
     | '__root__'
@@ -325,6 +359,7 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/_public/'
     | '/_authenticated/(contacts)/contacts'
+    | '/_authenticated/(crm-integrations)/crm-integrations'
     | '/_authenticated/(dashboard)/dashboard'
     | '/_authenticated/(requests)/requests'
     | '/_authenticated/(search)/search'
@@ -342,6 +377,8 @@ export interface FileRouteTypes {
     | '/_authenticated/(user)/me/billing'
     | '/_authenticated/(user)/me/notifications'
     | '/_authenticated/(user)/me/security'
+    | '/api/crm/hubspot/callback'
+    | '/api/crm/sync-status/stream'
     | '/_authenticated/(user)/me/'
   fileRoutesById: FileRoutesById
 }
@@ -353,6 +390,8 @@ export interface RootRouteChildren {
   ApiBillingWebhookRoute: typeof ApiBillingWebhookRoute
   ApiNotificationsStreamRoute: typeof ApiNotificationsStreamRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
+  ApiCrmHubspotCallbackRoute: typeof ApiCrmHubspotCallbackRoute
+  ApiCrmSyncStatusStreamRoute: typeof ApiCrmSyncStatusStreamRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -511,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticateddashboardDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/(crm-integrations)/crm-integrations': {
+      id: '/_authenticated/(crm-integrations)/crm-integrations'
+      path: '/crm-integrations'
+      fullPath: '/crm-integrations'
+      preLoaderRoute: typeof AuthenticatedcrmIntegrationsCrmIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/(contacts)/contacts': {
       id: '/_authenticated/(contacts)/contacts'
       path: '/contacts'
@@ -524,6 +570,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/me/'
       preLoaderRoute: typeof AuthenticateduserMeIndexRouteImport
       parentRoute: typeof AuthenticateduserMeRoute
+    }
+    '/api/crm/sync-status/stream': {
+      id: '/api/crm/sync-status/stream'
+      path: '/api/crm/sync-status/stream'
+      fullPath: '/api/crm/sync-status/stream'
+      preLoaderRoute: typeof ApiCrmSyncStatusStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/crm/hubspot/callback': {
+      id: '/api/crm/hubspot/callback'
+      path: '/api/crm/hubspot/callback'
+      fullPath: '/api/crm/hubspot/callback'
+      preLoaderRoute: typeof ApiCrmHubspotCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/(user)/me/security': {
       id: '/_authenticated/(user)/me/security'
@@ -583,6 +643,7 @@ const AuthenticateduserMeRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRouteWithChildren
   AuthenticatedcontactsContactsRoute: typeof AuthenticatedcontactsContactsRoute
+  AuthenticatedcrmIntegrationsCrmIntegrationsRoute: typeof AuthenticatedcrmIntegrationsCrmIntegrationsRoute
   AuthenticateddashboardDashboardRoute: typeof AuthenticateddashboardDashboardRoute
   AuthenticatedrequestsRequestsRoute: typeof AuthenticatedrequestsRequestsRoute
   AuthenticatedsearchSearchRoute: typeof AuthenticatedsearchSearchRoute
@@ -592,6 +653,8 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHelpRoute: AuthenticatedHelpRouteWithChildren,
   AuthenticatedcontactsContactsRoute: AuthenticatedcontactsContactsRoute,
+  AuthenticatedcrmIntegrationsCrmIntegrationsRoute:
+    AuthenticatedcrmIntegrationsCrmIntegrationsRoute,
   AuthenticateddashboardDashboardRoute: AuthenticateddashboardDashboardRoute,
   AuthenticatedrequestsRequestsRoute: AuthenticatedrequestsRequestsRoute,
   AuthenticatedsearchSearchRoute: AuthenticatedsearchSearchRoute,
@@ -635,6 +698,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBillingWebhookRoute: ApiBillingWebhookRoute,
   ApiNotificationsStreamRoute: ApiNotificationsStreamRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
+  ApiCrmHubspotCallbackRoute: ApiCrmHubspotCallbackRoute,
+  ApiCrmSyncStatusStreamRoute: ApiCrmSyncStatusStreamRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

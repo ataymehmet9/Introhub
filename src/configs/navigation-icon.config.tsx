@@ -2,6 +2,7 @@ import {
   PiArrowsLeftRightBold,
   PiHouseLineDuotone,
   PiMagnifyingGlassBold,
+  PiPlugs,
   PiUsersDuotone,
 } from 'react-icons/pi'
 import type { JSX } from 'react'
@@ -13,6 +14,7 @@ const navigationIcon: NavigationIcons = {
   contacts: <PiUsersDuotone />,
   search: <PiMagnifyingGlassBold />,
   requests: <PiArrowsLeftRightBold />,
+  integration: <PiPlugs />,
 }
 
 export default navigationIcon

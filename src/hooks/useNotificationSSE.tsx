@@ -90,6 +90,21 @@ export function useNotificationSSE() {
           refetchType: 'active',
         })
       }
+
+      // Invalidate contacts cache when a CRM sync completes successfully
+      if (notification.type === 'crm_sync_completed') {
+        queryClient.invalidateQueries({
+          predicate: (query) => {
+            // Query key structure: [['contacts', 'list'], {...}]
+            const firstKey = query.queryKey[0]
+            return (
+              Array.isArray(firstKey) &&
+              firstKey[0] === 'contacts' &&
+              firstKey[1] === 'list'
+            )
+          },
+        })
+      }
     },
     [queryClient, unreadCountQueryKey, introductionRequestsQueryKey],
   )

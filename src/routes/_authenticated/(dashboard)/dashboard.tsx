@@ -14,9 +14,11 @@ import { StatCard } from './-components/StatCard'
 import { TrendChart } from './-components/TrendChart'
 import { StatusDonutChart } from './-components/StatusDonutChart'
 import { TopContactsTable } from './-components/TopContactsTable'
+import { CRMSyncAnalyticsCard } from './-components/CRMSyncAnalyticsCard'
 import { useDashboardStats } from './-hooks/useDashboardStats'
 import { useDashboardTrends } from './-hooks/useDashboardTrends'
 import { useTopContacts } from './-hooks/useTopContacts'
+import { useCRMIntegrations } from './-hooks/useCRMIntegrations'
 import { useDashboardStore } from './-store/dashboardStore'
 import {
   downloadCSV,
@@ -96,6 +98,8 @@ function RouteComponent() {
   )
   const { data: topContactsData, isLoading: topContactsLoading } =
     useTopContacts(10, isDefaultDateRange ? loaderData.topContacts : undefined)
+  const { data: crmIntegrations, isLoading: crmIntegrationsLoading } =
+    useCRMIntegrations()
 
   const stats = statsData?.data?.stats
   const statusBreakdown = statsData?.data?.statusBreakdown
@@ -231,6 +235,16 @@ function RouteComponent() {
           }
         >
           <TrendChart data={trendsData?.data} loading={trendsLoading} />
+        </Suspense>
+      </div>
+
+      {/* CRM Sync Analytics - Full Width (only shown if user has CRM integrations) */}
+      <div className="mb-4 sm:mb-6">
+        <Suspense fallback={null}>
+          <CRMSyncAnalyticsCard
+            integrations={crmIntegrations || []}
+            loading={crmIntegrationsLoading}
+          />
         </Suspense>
       </div>
 

@@ -99,21 +99,136 @@ export const verification = pgTable(
 // APPLICATION TABLES (Custom schema)
 // ============================================================================
 
-export const contacts = pgTable('contacts', {
-  id: serial('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  email: varchar('email', { length: 255 }).notNull(),
-  name: varchar('name', { length: 255 }).notNull(),
-  company: varchar('company', { length: 255 }),
-  position: varchar('position', { length: 255 }),
-  notes: text('notes'),
-  phone: varchar('phone', { length: 50 }),
-  linkedinUrl: varchar('linkedin_url', { length: 255 }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+// Contact source enum
+export const contactSourceEnum = pgEnum('contact_source', [
+  'manual',
+  'csv',
+  'hubspot',
+  'salesforce',
+])
+
+export const contacts = pgTable(
+  'contacts',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    email: varchar('email', { length: 255 }).notNull(),
+    name: varchar('name', { length: 255 }).notNull(),
+    company: varchar('company', { length: 255 }),
+    position: varchar('position', { length: 255 }),
+    notes: text('notes'),
+    phone: varchar('phone', { length: 50 }),
+    linkedinUrl: varchar('linkedin_url', { length: 255 }),
+    // CRM Integration fields
+    source: contactSourceEnum('source').default('manual').notNull(),
+    crmContactId: varchar('crm_contact_id', { length: 255 }), // External CRM ID
+    metadata: text('metadata'), // JSONB for additional CRM fields
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('contacts_userId_idx').on(table.userId),
+    index('contacts_email_idx').on(table.email),
+    index('contacts_crmContactId_idx').on(table.crmContactId),
+  ],
+)
+
+// CRM Provider enum
+export const crmProviderEnum = pgEnum('crm_provider', ['hubspot', 'salesforce'])
+
+// CRM Integration status enum
+export const crmIntegrationStatusEnum = pgEnum('crm_integration_status', [
+  'active',
+  'inactive',
+  'error',
+])
+
+// CRM Sync status enum - tracks current sync state
+export const crmSyncStatusEnum = pgEnum('crm_sync_status', [
+  'idle',
+  'syncing',
+  'completed',
+  'failed',
+])
+
+// CRM Integrations table - stores OAuth tokens and connection info
+export const crmIntegrations = pgTable(
+  'crm_integrations',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    provider: crmProviderEnum('provider').notNull(),
+    accessToken: text('access_token').notNull(), // Encrypted
+    refreshToken: text('refresh_token'), // Encrypted
+    expiresAt: timestamp('expires_at'),
+    status: crmIntegrationStatusEnum('status').default('active').notNull(),
+    syncFrequency: varchar('sync_frequency', { length: 20 })
+      .default('24h')
+      .notNull(), // Options: 6h, 12h, 24h, weekly
+    syncStatus: crmSyncStatusEnum('sync_status').default('idle').notNull(),
+    lastSyncedAt: timestamp('last_synced_at'),
+    lastSyncError: text('last_sync_error'),
+    syncStartedAt: timestamp('sync_started_at'),
+    nextSyncAt: timestamp('next_sync_at'),
+    connectedAt: timestamp('connected_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('crm_integrations_userId_idx').on(table.userId),
+    index('crm_integrations_provider_idx').on(table.provider),
+    // Ensure one integration per user per provider
+    index('crm_integrations_userId_provider_unique').on(
+      table.userId,
+      table.provider,
+    ),
+  ],
+)
+
+// Sync Log status enum
+export const syncLogStatusEnum = pgEnum('sync_log_status', [
+  'in_progress',
+  'completed',
+  'failed',
+  'partial',
+])
+
+// Sync Logs table - tracks sync history and errors
+export const syncLogs = pgTable(
+  'sync_logs',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    integrationId: integer('integration_id')
+      .notNull()
+      .references(() => crmIntegrations.id, { onDelete: 'cascade' }),
+    provider: crmProviderEnum('provider').notNull(),
+    status: syncLogStatusEnum('status').default('in_progress').notNull(),
+    totalContacts: integer('total_contacts').default(0).notNull(),
+    successCount: integer('success_count').default(0).notNull(),
+    errorCount: integer('error_count').default(0).notNull(),
+    skippedCount: integer('skipped_count').default(0).notNull(),
+    updatedCount: integer('updated_count').default(0).notNull(),
+    errors: text('errors'), // JSONB array of error details
+    startedAt: timestamp('started_at').defaultNow().notNull(),
+    completedAt: timestamp('completed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('sync_logs_userId_idx').on(table.userId),
+    index('sync_logs_integrationId_idx').on(table.integrationId),
+    index('sync_logs_status_idx').on(table.status),
+  ],
+)
 
 export const requestStatusEnum = pgEnum('request_status', [
   'pending',
@@ -144,6 +259,10 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'introduction_request',
   'introduction_approved',
   'introduction_declined',
+  'crm_sync_started',
+  'crm_sync_completed',
+  'crm_sync_failed',
+  'crm_oauth_expired',
   'unknown',
 ])
 
@@ -239,8 +358,34 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }))
 
+export const crmIntegrationsRelations = relations(
+  crmIntegrations,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [crmIntegrations.userId],
+      references: [user.id],
+    }),
+    syncLogs: many(syncLogs),
+  }),
+)
+
+export const syncLogsRelations = relations(syncLogs, ({ one }) => ({
+  user: one(user, {
+    fields: [syncLogs.userId],
+    references: [user.id],
+  }),
+  integration: one(crmIntegrations, {
+    fields: [syncLogs.integrationId],
+    references: [crmIntegrations.id],
+  }),
+}))
+
 export type RequestStatus = 'pending' | 'approved' | 'declined'
 export type NotificationType =
   | 'introduction_request'
   | 'introduction_approved'
   | 'introduction_declined'
+export type ContactSource = 'manual' | 'csv' | 'hubspot' | 'salesforce'
+export type CrmProvider = 'hubspot' | 'salesforce'
+export type CrmIntegrationStatus = 'active' | 'inactive' | 'error'
+export type SyncLogStatus = 'in_progress' | 'completed' | 'failed' | 'partial'
