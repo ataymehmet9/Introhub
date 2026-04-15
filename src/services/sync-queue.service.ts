@@ -11,10 +11,11 @@ import { eq } from 'drizzle-orm'
 import { hubspotService } from './hubspot.service'
 import { mapHubSpotContactsBatch } from './field-mapping.service'
 import { syncContactsBatch } from './contact-sync.service'
-import { sendCRMSyncFailureEmail } from './email.functions'
+import { sendCRMSyncFailureEmailDirect } from './email.functions'
 import type { Job } from 'bullmq'
+import { notificationEmitter } from '@/lib/notification-emitter'
 import { db } from '@/db'
-import { crmIntegrations, syncLogs, user } from '@/db/schema'
+import { crmIntegrations, notifications, syncLogs, user } from '@/db/schema'
 
 /**
  * Job data for HubSpot contact sync
@@ -197,10 +198,10 @@ export const hubspotSyncWorker = new Worker<
             stage: 'syncing',
             totalContacts: total,
             processedContacts: current,
-            createdCount: syncResult.created,
-            updatedCount: syncResult.updated,
-            skippedCount: syncResult.skipped,
-            errorCount: syncResult.errors,
+            createdCount: 0, // Will be updated after sync completes
+            updatedCount: 0,
+            skippedCount: 0,
+            errorCount: 0,
             percentage: basePercentage + syncPercentage,
           } satisfies SyncJobProgress)
         },
@@ -250,6 +251,47 @@ export const hubspotSyncWorker = new Worker<
         percentage: 100,
       } satisfies SyncJobProgress)
 
+      // Create success notification
+      const [createdNotification] = await db
+        .insert(notifications)
+        .values({
+          userId,
+          type: 'crm_sync_completed',
+          title: 'CRM Sync Completed',
+          message: `Successfully synced ${syncResult.created + syncResult.updated} contacts from ${provider === 'hubspot' ? 'HubSpot' : provider}`,
+          metadata: JSON.stringify({
+            provider,
+            syncLogId: syncLog.id,
+            integrationId,
+            totalContacts: syncResult.total,
+            createdCount: syncResult.created,
+            updatedCount: syncResult.updated,
+            errorCount: syncResult.errors,
+            skippedCount: syncResult.skipped,
+          }),
+        })
+        .returning()
+
+      // Emit notification event for SSE broadcast
+      if (createdNotification) {
+        notificationEmitter.emit('notification:created', {
+          userId,
+          notification: {
+            ...createdNotification,
+            parsedMetadata: {
+              provider,
+              syncLogId: syncLog.id,
+              integrationId,
+              totalContacts: syncResult.total,
+              createdCount: syncResult.created,
+              updatedCount: syncResult.updated,
+              errorCount: syncResult.errors,
+              skippedCount: syncResult.skipped,
+            },
+          },
+        })
+      }
+
       return {
         success: true,
         syncLogId: syncLog.id,
@@ -291,23 +333,43 @@ export const hubspotSyncWorker = new Worker<
         })
 
         if (userRecord?.email && userRecord?.name) {
-          await sendCRMSyncFailureEmail({
-            data: {
-              to: userRecord.email,
-              userName: userRecord.name,
-              provider: provider,
-              errorMessage,
-              syncStartedAt: syncLog.startedAt.toLocaleString('en-US', {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              }),
-              crmIntegrationsUrl: `${process.env.VITE_APP_URL}/crm-integrations`,
-            },
+          await sendCRMSyncFailureEmailDirect({
+            to: userRecord.email,
+            userName: userRecord.name,
+            provider: provider,
+            errorMessage,
+            syncStartedAt: syncLog.startedAt.toLocaleString('en-US', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            }),
+            crmIntegrationsUrl: `${process.env.VITE_APP_URL}/crm-integrations`,
           })
         }
       } catch (emailError) {
         // Log email error but don't fail the job
         console.error('Failed to send sync failure email:', emailError)
+      }
+
+      // Create failure notification
+      try {
+        await db.insert(notifications).values({
+          userId,
+          type: 'crm_sync_failed',
+          title: 'CRM Sync Failed',
+          message: `Failed to sync contacts from ${provider === 'hubspot' ? 'HubSpot' : provider}: ${errorMessage}`,
+          metadata: JSON.stringify({
+            provider,
+            syncLogId: syncLog.id,
+            integrationId,
+            errorMessage,
+          }),
+        })
+      } catch (notificationError) {
+        // Log notification error but don't fail the job
+        console.error(
+          'Failed to create sync failure notification:',
+          notificationError,
+        )
       }
 
       throw error

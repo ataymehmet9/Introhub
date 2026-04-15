@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import {
   HiCheckCircle,
+  HiClock,
   HiCloudArrowUp,
   HiDocumentArrowDown,
   HiXCircle,
@@ -18,6 +19,7 @@ import {
   Dialog,
   Notification,
   Progress,
+  Spinner,
   Tabs,
   toast,
 } from '@/components/ui'
@@ -95,6 +97,44 @@ export default function ContactImportModal({
   // Real-time sync status via SSE
   const { syncStatus } = useCRMSyncStatus()
 
+  // Track previous sync status to detect completion
+  const previousSyncStatusRef = useRef<Record<string, string>>({})
+  const isInitializedRef = useRef(false)
+
+  // Detect sync completion and close modal
+  useEffect(() => {
+    // Initialize previous status on first run
+    if (!isInitializedRef.current && Object.keys(syncStatus).length > 0) {
+      Object.entries(syncStatus).forEach(([provider, status]) => {
+        previousSyncStatusRef.current[provider] = status.syncStatus
+      })
+      isInitializedRef.current = true
+      return
+    }
+
+    // Check for status changes
+    Object.entries(syncStatus).forEach(([provider, status]) => {
+      const currentStatus = status.syncStatus
+      const prevStatus = previousSyncStatusRef.current[provider]
+
+      // If sync just completed, close modal
+      if (currentStatus === 'completed' && prevStatus === 'syncing') {
+        console.log('[CRM Modal] Sync completed, closing modal...')
+        toast.push(
+          <Notification type="success" title="Sync Complete">
+            Contacts have been synced successfully!
+          </Notification>,
+        )
+        setTimeout(() => {
+          onClose()
+        }, 1000)
+      }
+
+      // Update previous status
+      previousSyncStatusRef.current[provider] = currentStatus
+    })
+  }, [syncStatus, onClose])
+
   // Sync Now mutation
   const syncNowMutation = useMutation({
     mutationFn: (provider: 'hubspot') =>
@@ -102,11 +142,22 @@ export default function ContactImportModal({
     onSuccess: () => {
       toast.push(
         <Notification type="success" title="Sync Started">
-          Contact sync has been initiated. You'll see the progress below.
+          Contact sync has been initiated.
         </Notification>,
       )
       // Refetch integrations to show updated sync status
       integrationsQuery.refetch()
+      // Refresh contacts list
+      onBulkImportComplete()
+      // Close modal after a short delay to allow sync to complete
+      setTimeout(() => {
+        toast.push(
+          <Notification type="success" title="Sync Complete">
+            Contacts have been synced successfully!
+          </Notification>,
+        )
+        onClose()
+      }, 2000)
     },
     onError: (error: Error) => {
       const errorMessage =
@@ -259,11 +310,11 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
   }
   const renderCRMSyncSection = () => {
     // Get integration with real-time sync status
-    const getIntegrationWithStatus = (integrationId: number) => {
-      const integration = integrations.find((int) => int.id === integrationId)
+    const getIntegrationWithStatus = (provider: string) => {
+      const integration = integrations.find((int) => int.provider === provider)
       if (!integration) return null
 
-      const realtimeStatus = syncStatus[integrationId]
+      const realtimeStatus = syncStatus[provider]
       if (realtimeStatus) {
         return {
           ...integration,
@@ -325,7 +376,7 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
         <div className="space-y-4">
           {integrations.map((integration) => {
             const integrationWithStatus = getIntegrationWithStatus(
-              integration.id,
+              integration.provider,
             )
             if (!integrationWithStatus) return null
 
@@ -338,77 +389,50 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
                 ? 'HubSpot'
                 : integration.provider
 
+            // Determine status badge
+            let statusBadgeContent = 'Connected'
+            let statusBadgeClass = 'bg-green-500 text-white'
+            let showSpinner = false
+
+            if (integrationWithStatus.syncStatus === 'syncing') {
+              statusBadgeContent = 'Syncing'
+              statusBadgeClass = 'bg-blue-500 text-white'
+              showSpinner = true
+            } else if (integrationWithStatus.syncStatus === 'failed') {
+              statusBadgeContent = 'Error'
+              statusBadgeClass = 'bg-red-500 text-white'
+            }
+
             return (
               <Card
                 key={integration.id}
-                className="p-4 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-start gap-4">
-                  {/* Provider Icon */}
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
-                      <SiHubspot className="w-6 h-6 text-orange-500" />
-                    </div>
-                  </div>
-
-                  {/* Provider Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                        {providerName}
-                      </h4>
-                      <Badge
-                        className={
-                          integrationWithStatus.syncStatus === 'syncing'
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                            : integrationWithStatus.syncStatus === 'completed'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                              : integrationWithStatus.syncStatus === 'failed'
-                                ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                        }
-                      >
-                        {integrationWithStatus.syncStatus === 'syncing'
-                          ? 'Syncing...'
-                          : integrationWithStatus.syncStatus === 'completed'
-                            ? 'Synced'
-                            : integrationWithStatus.syncStatus === 'failed'
-                              ? 'Failed'
-                              : 'Ready'}
-                      </Badge>
-                    </div>
-
-                    {/* Last Sync Time */}
-                    {integration.lastSyncedAt && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        Last synced:{' '}
-                        {new Date(integration.lastSyncedAt).toLocaleString()}
-                      </p>
-                    )}
-
-                    {/* Error Message */}
-                    {integrationWithStatus.lastSyncError && (
-                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-                        Error: {integrationWithStatus.lastSyncError}
-                      </p>
-                    )}
-
-                    {/* Sync Progress */}
-                    {isSyncing && (
-                      <div className="mt-3">
-                        <Progress percent={100} showInfo={false} />
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          Syncing contacts from {providerName}...
-                        </p>
+                bodyClass="p-4"
+                header={{
+                  content: (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+                      <div className="flex items-center gap-3">
+                        <div className="text-orange-500">
+                          <SiHubspot className="text-3xl" />
+                        </div>
+                        <h4 className="font-semibold">{providerName}</h4>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Sync Button */}
-                  <div className="flex-shrink-0">
+                      <div className="flex items-center gap-2">
+                        {showSpinner && <Spinner size={14} />}
+                        <Badge
+                          className={statusBadgeClass}
+                          innerClass={statusBadgeClass}
+                          content={statusBadgeContent}
+                        />
+                      </div>
+                    </div>
+                  ),
+                  bordered: true,
+                }}
+                footer={{
+                  content: (
                     <Button
                       variant="solid"
-                      size="sm"
+                      className="w-full"
                       onClick={() =>
                         handleSyncNow(integration.provider as 'hubspot')
                       }
@@ -417,8 +441,48 @@ bob.jones@example.com,Bob Jones,StartupXYZ,Developer,Referred by John,,https://l
                     >
                       {isSyncing ? 'Syncing...' : 'Sync Now'}
                     </Button>
+                  ),
+                  bordered: true,
+                }}
+              >
+                {/* Last Sync Time */}
+                {integration.lastSyncedAt && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <HiClock className="text-base flex-shrink-0" />
+                    <span>
+                      Last synced:{' '}
+                      <span className="font-medium text-foreground">
+                        {new Date(integration.lastSyncedAt).toLocaleDateString(
+                          'en-US',
+                          {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          },
+                        )}
+                      </span>
+                    </span>
                   </div>
-                </div>
+                )}
+
+                {/* Error Message */}
+                {integrationWithStatus.lastSyncError && (
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                    Error: {integrationWithStatus.lastSyncError}
+                  </p>
+                )}
+
+                {/* Sync Progress */}
+                {isSyncing && (
+                  <div className="mt-3">
+                    <Progress percent={100} showInfo={false} />
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      Syncing contacts from {providerName}...
+                    </p>
+                  </div>
+                )}
               </Card>
             )
           })}

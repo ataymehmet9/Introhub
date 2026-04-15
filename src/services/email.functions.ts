@@ -422,72 +422,55 @@ export const sendWelcomeEmail = createServerFn({ method: 'POST' })
   })
 
 /**
- * Send CRM sync failure email to user
- * Used when a CRM contact sync fails
+ * Direct email sending function for CRM sync failures
+ * Used by BullMQ worker (doesn't require TanStack Start context)
  */
-export const sendCRMSyncFailureEmail = createServerFn({ method: 'POST' })
-  .inputValidator(crmSyncFailureEmailSchema)
-  .handler(async ({ data }) => {
-    const {
-      to,
-      userName,
-      provider,
-      errorMessage,
-      syncStartedAt,
-      crmIntegrationsUrl,
-      from,
-    } = data
+export async function sendCRMSyncFailureEmailDirect(params: {
+  to: string
+  userName: string
+  provider: string
+  errorMessage: string
+  syncStartedAt: string
+  crmIntegrationsUrl: string
+  from?: string
+}) {
+  const {
+    to,
+    userName,
+    provider,
+    errorMessage,
+    syncStartedAt,
+    crmIntegrationsUrl,
+    from,
+  } = params
 
-    const resend = getResendInstance()
+  const resend = getResendInstance()
 
-    try {
-      const emailHtml = await pretty(
-        await render(
-          CRMSyncFailureEmail({
-            userName,
-            provider,
-            errorMessage,
-            syncStartedAt,
-            crmIntegrationsUrl,
-          }),
-        ),
-      )
-      const plainText = toPlainText(emailHtml)
-
-      const providerName = provider === 'hubspot' ? 'HubSpot' : provider
-
-      const { data: emailData, error } = await resend.emails.send({
-        from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
-        to: [to],
-        subject: `${providerName} Sync Failed`,
-        html: emailHtml,
-        text: plainText,
-      })
-
-      if (error) {
-        console.error('Error sending CRM sync failure email:', {
-          error,
-          to,
+  try {
+    const emailHtml = await pretty(
+      await render(
+        CRMSyncFailureEmail({
+          userName,
           provider,
-          timestamp: new Date().toISOString(),
-        })
+          errorMessage,
+          syncStartedAt,
+          crmIntegrationsUrl,
+        }),
+      ),
+    )
+    const plainText = toPlainText(emailHtml)
 
-        return { success: false, message: 'Failed to send email', error }
-      }
+    const providerName = provider === 'hubspot' ? 'HubSpot' : provider
 
-      console.log('CRM sync failure email sent successfully:', {
-        emailId: emailData.id,
-        to,
-        provider,
-        timestamp: new Date().toISOString(),
-      })
+    const { data: emailData, error } = await resend.emails.send({
+      from: from ?? 'Intro Hub <no-reply@intro-hub.com>',
+      to: [to],
+      subject: `${providerName} Sync Failed`,
+      html: emailHtml,
+      text: plainText,
+    })
 
-      return {
-        success: true,
-        message: 'Email sent successfully',
-        emailId: emailData.id,
-      }
-    } catch (error) {
+    if (error) {
       console.error('Error sending CRM sync failure email:', {
         error,
         to,
@@ -495,10 +478,37 @@ export const sendCRMSyncFailureEmail = createServerFn({ method: 'POST' })
         timestamp: new Date().toISOString(),
       })
 
-      return {
-        success: false,
-        message: 'Unknown error sending email',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }
+      return { success: false, message: 'Failed to send email', error }
     }
+
+    console.log('CRM sync failure email sent successfully:', {
+      emailId: emailData.id,
+      to,
+      provider,
+      timestamp: new Date().toISOString(),
+    })
+
+    return {
+      success: true,
+      message: 'Email sent successfully',
+      emailId: emailData.id,
+    }
+  } catch (error) {
+    console.error('Exception sending CRM sync failure email:', error)
+    return {
+      success: false,
+      message: 'Failed to send email',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Send CRM sync failure email to user (Server Function wrapper)
+ * Used when a CRM contact sync fails from client-side
+ */
+export const sendCRMSyncFailureEmail = createServerFn({ method: 'POST' })
+  .inputValidator(crmSyncFailureEmailSchema)
+  .handler(async ({ data }) => {
+    return sendCRMSyncFailureEmailDirect(data)
   })

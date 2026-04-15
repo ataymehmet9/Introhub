@@ -1,20 +1,87 @@
-Welcome to your new TanStack app!
+# IntroHub - TanStack Start Application
 
-# Getting Started
+A modern contact management and introduction platform built with TanStack Start, featuring CRM integrations, real-time notifications, and subscription management.
 
-To run this application:
+## Features
+
+- 🔐 **Authentication**: Secure auth with Better Auth (OAuth, email/password)
+- 👥 **Contact Management**: Add, import, and manage contacts with bulk operations
+- 🔄 **CRM Integrations**: Sync contacts from HubSpot (more CRMs coming soon)
+- 📊 **Analytics Dashboard**: Real-time metrics and sync analytics
+- 💳 **Subscription Management**: Stripe-powered subscription tiers
+- 🔔 **Real-time Notifications**: Server-Sent Events (SSE) for live updates
+- 📧 **Email Notifications**: Automated notifications for key events
+- 🎨 **Modern UI**: Responsive design with Tailwind CSS and Ecme components
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- PostgreSQL 14+
+- Redis 6+ (for background jobs)
+
+### Installation
 
 ```bash
+# Install dependencies
 pnpm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your configuration
+
+# Run database migrations
+pnpm db:push
+
+# Start development server
 pnpm dev
 ```
 
-# Building For Production
+## Environment Variables
 
-To build this application for production:
+Create a `.env.local` file with the following variables:
+
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/introhub
+
+# Authentication
+BETTER_AUTH_SECRET=your_secret_here # Generate with: npx @better-auth/cli secret
+
+# HubSpot CRM Integration
+HUBSPOT_CLIENT_ID=your_hubspot_client_id
+HUBSPOT_CLIENT_SECRET=your_hubspot_client_secret
+HUBSPOT_REDIRECT_URI=http://localhost:3000/api/crm/hubspot/callback
+
+# Token Encryption
+ENCRYPTION_KEY=your_32_byte_encryption_key # Generate with: openssl rand -base64 32
+
+# Redis (for background jobs)
+REDIS_URL=redis://localhost:6379
+
+# Email (optional)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your_smtp_user
+SMTP_PASSWORD=your_smtp_password
+SMTP_FROM=noreply@yourdomain.com
+
+# Stripe (optional)
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
+
+# PostHog Analytics (optional)
+NEXT_PUBLIC_POSTHOG_KEY=your_posthog_key
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+```
+
+## Building For Production
 
 ```bash
 pnpm build
+pnpm start
 ```
 
 ## Testing
@@ -321,10 +388,122 @@ Once we've created the derived store we can use it in the `App` component just l
 
 You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
 
-# Demo files
+## CRM Integration
 
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
+IntroHub supports syncing contacts from CRM platforms. Currently supported:
 
-# Learn More
+- ✅ **HubSpot** - Full contact sync with automatic updates
 
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+### Setting Up HubSpot Integration
+
+1. Create a HubSpot app in the [Developer Portal](https://developers.hubspot.com/)
+2. Configure OAuth with redirect URI: `http://localhost:3000/api/crm/hubspot/callback`
+3. Add required scopes: `crm.objects.contacts.read`, `crm.objects.contacts.write`
+4. Add credentials to `.env.local`
+5. Users can connect via **CRM Integrations** page in the app
+
+For detailed setup and usage instructions, see:
+
+- [CRM Integration Guide](./documentation/crm-integration-guide.md)
+- [CRM Deployment Guide](./documentation/crm-deployment-guide.md)
+
+## Documentation
+
+Comprehensive documentation is available in the `/documentation` folder:
+
+- **CRM Integration**
+  - [Complete Integration Guide](./documentation/crm-integration-guide.md)
+  - [Production Deployment Guide](./documentation/crm-deployment-guide.md)
+- **Features**
+  - [Subscription System](./documentation/subscription-system-prd.md)
+  - [Notification System](./documentation/notification-system.md)
+  - [Email Notifications](./documentation/email-notifications.md)
+  - [Dashboard Implementation](./documentation/dashboard-implementation-plan.md)
+- **Development**
+  - [Docker Setup](./documentation/docker-setup.md)
+  - [Testing Guide](./documentation/subscription-testing-guide.md)
+  - [SSE Architecture](./documentation/SSE_ARCHITECTURE.md)
+
+## Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── auth/           # Authentication forms
+│   ├── layouts/        # Layout components
+│   ├── shared/         # Shared/common components
+│   └── ui/             # UI library components (Ecme)
+├── db/                 # Database schema and migrations
+├── integrations/       # Third-party integrations
+│   └── trpc/          # tRPC API routes
+├── routes/            # File-based routing
+│   ├── api/           # API endpoints
+│   └── _authenticated/ # Protected routes
+├── services/          # Business logic services
+├── schemas/           # Zod validation schemas
+└── jobs/              # Background jobs
+```
+
+## Tech Stack
+
+- **Framework**: [TanStack Start](https://tanstack.com/start)
+- **Routing**: [TanStack Router](https://tanstack.com/router)
+- **Data Fetching**: [TanStack Query](https://tanstack.com/query)
+- **API Layer**: [tRPC](https://trpc.io)
+- **Database**: PostgreSQL with [Drizzle ORM](https://orm.drizzle.team)
+- **Authentication**: [Better Auth](https://better-auth.com)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com)
+- **UI Components**: [Ecme](https://ecme-react.themenate.net)
+- **Background Jobs**: [BullMQ](https://docs.bullmq.io)
+- **Payments**: [Stripe](https://stripe.com)
+- **Analytics**: [PostHog](https://posthog.com)
+
+## Testing
+
+```bash
+# Run all tests
+pnpm test
+
+# Run specific test suite
+pnpm test src/__tests__/crm
+
+# Run with coverage
+pnpm test:coverage
+
+# Watch mode
+pnpm test:watch
+```
+
+## Deployment
+
+See the [Production Deployment Guide](./documentation/PRODUCTION_DEPLOYMENT.md) for detailed deployment instructions.
+
+Quick deployment checklist:
+
+- [ ] Configure environment variables
+- [ ] Set up PostgreSQL database
+- [ ] Set up Redis instance
+- [ ] Run database migrations
+- [ ] Configure HubSpot OAuth app
+- [ ] Set up email service (optional)
+- [ ] Configure Stripe webhooks (optional)
+- [ ] Deploy application
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Learn More
+
+- [TanStack Documentation](https://tanstack.com)
+- [TanStack Start Guide](https://tanstack.com/start/latest)
+- [Better Auth Documentation](https://better-auth.com)
+- [Drizzle ORM Documentation](https://orm.drizzle.team)

@@ -117,8 +117,9 @@ export default function CRMDisconnectDialog({
                   setDeleteContacts(value === 'delete')
                   setConfirmText('')
                 }}
+                className="flex flex-col gap-3"
               >
-                <Radio value="keep">
+                <Radio value="keep" className="w-full">
                   <div className="ml-2">
                     <p className="font-medium">Keep contacts in IntroHub</p>
                     <p className="text-xs text-muted-foreground">
@@ -127,7 +128,7 @@ export default function CRMDisconnectDialog({
                     </p>
                   </div>
                 </Radio>
-                <Radio value="delete">
+                <Radio value="delete" className="w-full">
                   <div className="ml-2">
                     <p className="font-medium text-red-600">
                       Delete all synced contacts

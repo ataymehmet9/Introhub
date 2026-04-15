@@ -1,14 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { SiHubspot } from 'react-icons/si'
-import { HiCheckCircle, HiClock } from 'react-icons/hi2'
+import { HiClock, HiCog6Tooth } from 'react-icons/hi2'
 import { useCRMSyncStatus } from '../-hooks/useCRMSyncStatus'
 import HubSpotConnectDialog from './HubSpotConnectDialog'
 import CRMSettingsDialog from './CRMSettingsDialog'
 import CRMDisconnectDialog from './CRMDisconnectDialog'
 import type { CrmIntegration } from '@/schemas'
-import { AdaptiveCard } from '@/components/shared'
-import { Badge, Button, Notification, toast } from '@/components/ui'
+import {
+  Badge,
+  Button,
+  Card,
+  Notification,
+  Spinner,
+  toast,
+} from '@/components/ui'
 import { useTRPC } from '@/integrations/trpc/react'
 import { trpcClient } from '@/integrations/tanstack-query/root-provider'
 
@@ -47,6 +53,8 @@ export default function CRMIntegrationsList() {
   const queryClient = useQueryClient()
   const integrationsQuery = useQuery({
     ...trpc.crm.list.queryOptions(),
+    staleTime: 0, // Always refetch on mount to avoid stale sync status
+    refetchOnMount: 'always',
   })
 
   // Type for integration with real-time sync status
@@ -60,29 +68,45 @@ export default function CRMIntegrationsList() {
   // Real-time sync status via SSE
   const { syncStatus } = useCRMSyncStatus()
 
-  // Refetch integrations when sync completes or fails
-  useEffect(() => {
-    Object.values(syncStatus).forEach((status) => {
-      if (status.syncStatus === 'completed' || status.syncStatus === 'failed') {
-        // Refetch to get updated lastSyncedAt
-        queryClient.invalidateQueries({ queryKey: trpc.crm.list.queryKey() })
+  // Track previous sync status to detect transitions (using ref to avoid re-renders)
+  const previousSyncStatusRef = useRef<Record<string, string>>({})
+  const isInitializedRef = useRef(false)
 
-        // Show notification
-        if (status.syncStatus === 'completed') {
-          toast.push(
-            <Notification type="success" title="Sync Completed">
-              {status.provider === 'hubspot' ? 'HubSpot' : status.provider}{' '}
-              contacts synced successfully
-            </Notification>,
-          )
-        } else if (status.syncStatus === 'failed') {
-          toast.push(
-            <Notification type="danger" title="Sync Failed">
-              {status.lastSyncError || 'Failed to sync contacts'}
-            </Notification>,
-          )
-        }
+  // Detect sync status transitions and show toasts only on actual changes
+  useEffect(() => {
+    // Mark as initialized on first run with data
+    if (!isInitializedRef.current && Object.keys(syncStatus).length > 0) {
+      // Initialize previous status with current status (don't show toasts for initial state)
+      Object.entries(syncStatus).forEach(([provider, status]) => {
+        previousSyncStatusRef.current[provider] = status.syncStatus
+      })
+      isInitializedRef.current = true
+      return
+    }
+
+    // Process status changes
+    Object.entries(syncStatus).forEach(([provider, status]) => {
+      const currentStatus = status.syncStatus
+      const prevStatus = previousSyncStatusRef.current[provider]
+
+      // Only invalidate cache if status actually changed from syncing to completed/failed
+      if (currentStatus === 'completed' && prevStatus === 'syncing') {
+        // Refetch to get updated lastSyncedAt and contacts
+        queryClient.invalidateQueries({ queryKey: trpc.crm.list.queryKey() })
+        // Invalidate all contacts queries (including those with different parameters)
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            query.queryKey[0] === 'trpc' &&
+            query.queryKey[1] === 'contacts' &&
+            query.queryKey[2] === 'list',
+        })
+      } else if (currentStatus === 'failed' && prevStatus === 'syncing') {
+        // Refetch to get updated lastSyncedAt (don't refetch contacts on failure)
+        queryClient.invalidateQueries({ queryKey: trpc.crm.list.queryKey() })
       }
+
+      // Update previous status for next comparison
+      previousSyncStatusRef.current[provider] = currentStatus
     })
   }, [syncStatus, queryClient, trpc.crm.list])
 
@@ -100,13 +124,8 @@ export default function CRMIntegrationsList() {
       queryClient.invalidateQueries({ queryKey: trpc.crm.list.queryKey() })
     },
     onError: (error: Error) => {
-      const errorMessage =
-        error?.message || 'Failed to start sync. Please try again.'
-      toast.push(
-        <Notification type="danger" title="Sync Failed">
-          {errorMessage}
-        </Notification>,
-      )
+      // Notification will be created by the background worker if sync fails
+      console.error('[CRM] Failed to start sync:', error)
     },
   })
   const handleSyncNow = (platformId: string) => {
@@ -138,8 +157,21 @@ export default function CRMIntegrationsList() {
       (int: CrmIntegration) => int.provider === platformId,
     )
 
-    // Merge with real-time sync status if available
-    if (integration && syncStatus[platformId]) {
+    if (!integration) return undefined
+
+    // If there's no active sync (syncStartedAt is null in DB), use DB state
+    // This prevents SSE from showing stale "syncing" status on page load
+    if (!integration.syncStartedAt) {
+      return {
+        ...integration,
+        syncStatus: integration.syncStatus,
+        lastSyncError: integration.lastSyncError,
+        syncStartedAt: integration.syncStartedAt,
+      }
+    }
+
+    // If there's an active sync, merge with real-time SSE status
+    if (syncStatus[platformId]) {
       return {
         ...integration,
         syncStatus: syncStatus[platformId].syncStatus as
@@ -152,19 +184,30 @@ export default function CRMIntegrationsList() {
       }
     }
 
-    return integration
-      ? {
-          ...integration,
-          syncStatus: integration.syncStatus,
-          lastSyncError: integration.lastSyncError,
-          syncStartedAt: integration.syncStartedAt,
-        }
-      : undefined
+    // Fallback to DB state
+    return {
+      ...integration,
+      syncStatus: integration.syncStatus,
+      lastSyncError: integration.lastSyncError,
+      syncStartedAt: integration.syncStartedAt,
+    }
   }
 
   // Separate connected and available platforms
   const connectedPlatforms = CRM_PLATFORMS.filter((p) => isConnected(p.id))
   const availablePlatforms = CRM_PLATFORMS.filter((p) => !isConnected(p.id))
+
+  // Show loading state while fetching to prevent flash of stale data
+  if (integrationsQuery.isLoading || integrationsQuery.isFetching) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Spinner size={32} className="mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading integrations...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -172,105 +215,124 @@ export default function CRMIntegrationsList() {
       {connectedPlatforms.length > 0 && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Connected Integrations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {connectedPlatforms.map((platform) => {
               const integration = getIntegration(platform.id)
+
+              // Determine status badge content
+              let statusBadgeContent = 'Connected'
+              let statusBadgeClass = 'bg-green-500 text-white'
+              let showSpinner = false
+
+              if (integration?.syncStatus === 'syncing') {
+                statusBadgeContent = 'Syncing'
+                statusBadgeClass = 'bg-blue-500 text-white'
+                showSpinner = true
+              } else if (integration?.syncStatus === 'failed') {
+                statusBadgeContent = 'Error'
+                statusBadgeClass = 'bg-red-500 text-white'
+              }
+
               return (
-                <AdaptiveCard key={platform.id} className="h-full">
-                  <div className="flex flex-col h-full">
-                    {/* Platform Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`${platform.color}`}>{platform.icon}</div>
-                      <div className="flex gap-2">
-                        {integration?.syncStatus === 'syncing' && (
-                          <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1 animate-pulse">
-                            <HiClock />
-                            Syncing...
-                          </Badge>
-                        )}
-                        {integration?.syncStatus === 'failed' && (
-                          <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
-                            Error
-                          </Badge>
-                        )}
-                        <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
-                          <HiCheckCircle />
-                          Connected
-                        </Badge>
+                <Card
+                  key={platform.id}
+                  className="h-full"
+                  bodyClass="p-6"
+                  header={{
+                    content: (
+                      <div className="flex items-center gap-3">
+                        <div className={platform.color}>{platform.icon}</div>
+                        <h3 className="text-lg font-semibold">
+                          {platform.name}
+                        </h3>
+                      </div>
+                    ),
+                    extra: (
+                      <div className="flex items-center gap-2">
+                        {showSpinner && <Spinner size={14} />}
+                        <Badge
+                          className={statusBadgeClass}
+                          innerClass={statusBadgeClass}
+                          content={statusBadgeContent}
+                        />
+                        <button
+                          onClick={() => setSettingsIntegration(integration!)}
+                          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                          aria-label="Settings"
+                        >
+                          <HiCog6Tooth className="text-xl" />
+                        </button>
+                      </div>
+                    ),
+                    bordered: true,
+                  }}
+                  footer={{
+                    content: (
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="solid"
+                          onClick={() => handleSyncNow(platform.id)}
+                          loading={
+                            syncNowMutation.isPending ||
+                            integration?.syncStatus === 'syncing'
+                          }
+                          disabled={
+                            syncNowMutation.isPending ||
+                            integration?.syncStatus === 'syncing'
+                          }
+                        >
+                          {integration?.syncStatus === 'syncing'
+                            ? 'Syncing...'
+                            : 'Sync Now'}
+                        </Button>
+                        <Button
+                          variant="plain"
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                          onClick={() => setDisconnectIntegration(integration!)}
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
+                    ),
+                    bordered: true,
+                  }}
+                >
+                  {/* Platform Info */}
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {platform.description}
+                  </p>
+
+                  {/* Connection Details */}
+                  {integration && (
+                    <div className="space-y-2 text-sm bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <HiClock className="text-base flex-shrink-0" />
+                        <span>
+                          Last synced:{' '}
+                          <span className="font-medium text-foreground">
+                            {integration.lastSyncedAt
+                              ? new Date(
+                                  integration.lastSyncedAt,
+                                ).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : 'Never'}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="text-muted-foreground">
+                        Sync frequency:{' '}
+                        <span className="font-medium text-foreground capitalize">
+                          {integration.syncFrequency}
+                        </span>
                       </div>
                     </div>
-
-                    {/* Platform Info */}
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2">
-                        {platform.name}
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-3">
-                        {platform.description}
-                      </p>
-
-                      {/* Connection Details */}
-                      {integration && (
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <HiClock className="text-base" />
-                            <span>
-                              Last synced:{' '}
-                              {integration.lastSyncedAt
-                                ? new Date(
-                                    integration.lastSyncedAt,
-                                  ).toLocaleDateString()
-                                : 'Never'}
-                            </span>
-                          </div>
-                          <div className="text-muted-foreground">
-                            Sync frequency: {integration.syncFrequency}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-6 flex gap-2">
-                      <Button
-                        variant="solid"
-                        className="flex-1"
-                        onClick={() => handleSyncNow(platform.id)}
-                        loading={
-                          syncNowMutation.isPending ||
-                          integration?.syncStatus === 'syncing'
-                        }
-                        disabled={
-                          syncNowMutation.isPending ||
-                          integration?.syncStatus === 'syncing'
-                        }
-                      >
-                        {integration?.syncStatus === 'syncing'
-                          ? 'Syncing...'
-                          : 'Sync Now'}
-                      </Button>
-                      <Button
-                        variant="plain"
-                        className="flex-1"
-                        onClick={() => setSettingsIntegration(integration!)}
-                      >
-                        Settings
-                      </Button>
-                    </div>
-
-                    {/* Disconnect Button */}
-                    <div className="mt-2">
-                      <Button
-                        variant="plain"
-                        className="w-full text-red-600 hover:text-red-700"
-                        size="sm"
-                        onClick={() => setDisconnectIntegration(integration!)}
-                      >
-                        Disconnect
-                      </Button>
-                    </div>
-                  </div>
-                </AdaptiveCard>
+                  )}
+                </Card>
               )
             })}
           </div>
@@ -280,41 +342,37 @@ export default function CRMIntegrationsList() {
       {/* Available Integrations Section */}
       {availablePlatforms.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold my-4">
             {connectedPlatforms.length > 0
               ? 'Available Integrations'
               : 'CRM Integrations'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {availablePlatforms.map((platform) => (
-              <AdaptiveCard key={platform.id} className="h-full">
-                <div className="flex flex-col h-full">
-                  {/* Platform Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`${platform.color}`}>{platform.icon}</div>
-                    {platform.available ? (
-                      <Badge className="bg-blue-100 text-blue-800">
-                        Available
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-gray-100 text-gray-800">
-                        Coming Soon
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Platform Info */}
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold mb-2">
-                      {platform.name}
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      {platform.description}
-                    </p>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="mt-6">
+              <Card
+                key={platform.id}
+                className="h-full"
+                bodyClass="p-6"
+                header={{
+                  content: (
+                    <div className="flex items-center gap-3">
+                      <div className={platform.color}>{platform.icon}</div>
+                      <h3 className="text-lg font-semibold">{platform.name}</h3>
+                    </div>
+                  ),
+                  extra: platform.available ? (
+                    <Badge
+                      className="bg-blue-500 text-white"
+                      innerClass="bg-blue-500 text-white"
+                      content="Available"
+                    />
+                  ) : (
+                    <Badge content="Coming Soon" />
+                  ),
+                  bordered: true,
+                }}
+                footer={{
+                  content: (
                     <Button
                       variant="solid"
                       className="w-full"
@@ -323,9 +381,15 @@ export default function CRMIntegrationsList() {
                     >
                       {platform.available ? 'Connect' : 'Coming Soon'}
                     </Button>
-                  </div>
-                </div>
-              </AdaptiveCard>
+                  ),
+                  bordered: true,
+                }}
+              >
+                {/* Platform Info */}
+                <p className="text-muted-foreground text-sm">
+                  {platform.description}
+                </p>
+              </Card>
             ))}
           </div>
         </div>
