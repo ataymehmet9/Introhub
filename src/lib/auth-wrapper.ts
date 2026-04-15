@@ -146,20 +146,48 @@ export const useClearCacheOnAuth = () => {
     // Clear cache when session changes (e.g., after OAuth redirect or any new login)
     if (session.data?.user && !session.isPending) {
       const sessionId = session.data.session.id
+      const userId = session.data.user.id
       const lastClearedSession = sessionStorage.getItem('lastClearedSession')
 
       // Always clear if this is a different session OR if no session was tracked
       if (!lastClearedSession || lastClearedSession !== sessionId) {
+        console.log(
+          `[Auth] New session detected (${sessionId}), clearing all caches for user ${userId}`,
+        )
+
+        // Clear ALL query cache
         queryClient.clear()
         queryClient.removeQueries()
         queryClient.getMutationCache().clear()
+
         // Clear TanStack Router loader cache - THIS IS CRITICAL FOR SSR DATA
         router.invalidate()
+
+        // Specifically invalidate notification queries to ensure fresh data
+        queryClient.invalidateQueries({
+          queryKey: ['notifications'],
+          refetchType: 'all',
+        })
+
+        // Force refetch of unread count for the new user
+        queryClient.refetchQueries({
+          queryKey: ['trpc', 'notifications', 'getUnreadCount'],
+          type: 'active',
+        })
+
         sessionStorage.setItem('lastClearedSession', sessionId)
-        console.log('Cache cleared for session:', sessionId)
+        console.log(
+          `[Auth] Cache cleared and notification queries invalidated for session: ${sessionId}`,
+        )
       }
     }
-  }, [session.data?.session.id, session.isPending, queryClient, router])
+  }, [
+    session.data?.session.id,
+    session.data?.user.id,
+    session.isPending,
+    queryClient,
+    router,
+  ])
 }
 
 // Made with Bob

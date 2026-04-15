@@ -1,11 +1,9 @@
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import * as Sentry from '@sentry/tanstackstart-react'
-import * as TanstackQuery from './integrations/tanstack-query/root-provider'
 import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
 import { NotFound } from './components/NotFound'
-
-// Import the generated route tree
+import * as TanstackQuery from './integrations/tanstack-query/root-provider'
 import { routeTree } from './routeTree.gen'
 
 // Create a new router instance
@@ -40,6 +38,17 @@ export const getRouter = () => {
       tracesSampleRate: 1.0,
       sendDefaultPii: true,
     })
+  } else {
+    // Initialize Redis pub/sub bridge for cross-process notifications on server
+    // This enables the BullMQ worker to send notifications to SSE connections
+    // Lazy import to avoid bundling ioredis on client side
+    import('./lib/notification-bridge')
+      .then(({ initializeNotificationBridge }) => {
+        return initializeNotificationBridge()
+      })
+      .catch((error) => {
+        console.error('Failed to initialize notification bridge:', error)
+      })
   }
 
   return router

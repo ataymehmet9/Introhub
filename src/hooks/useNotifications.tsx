@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useMemo } from 'react'
 import {
   useInfiniteQuery,
@@ -86,9 +85,11 @@ export function useNotifications(props?: UseNotificationsProps) {
   const pagination = lastPage?.pagination
 
   // Fetch unread count (no polling, updated via SSE)
+  // IMPORTANT: This query must be invalidated on logout to prevent cross-user data leaks
   const { data: unreadData } = useQuery({
     ...trpc.notifications.getUnreadCount.queryOptions(),
     refetchOnWindowFocus: true,
+    staleTime: 0, // Always refetch to ensure fresh data for current user
   })
 
   // Mark as read mutation
@@ -136,12 +137,17 @@ export function useNotifications(props?: UseNotificationsProps) {
       // Optimistically update unread count
       queryClient.setQueryData(
         unreadCountQueryKey,
-        (oldData: { count: number; hasUnread: boolean } | undefined) => {
+        (
+          oldData:
+            | { count: number; hasUnread: boolean; userId: string }
+            | undefined,
+        ) => {
           const currentCount = oldData?.count || 0
           const newCount = Math.max(0, currentCount - 1)
           return {
             count: newCount,
             hasUnread: newCount > 0,
+            userId: oldData?.userId || '', // Preserve userId
           }
         },
       )
@@ -222,10 +228,11 @@ export function useNotifications(props?: UseNotificationsProps) {
       )
 
       // Optimistically update unread count
-      queryClient.setQueryData(unreadCountQueryKey, {
+      queryClient.setQueryData(unreadCountQueryKey, (oldData) => ({
         count: 0,
         hasUnread: false,
-      })
+        userId: oldData?.userId || '', // Preserve userId
+      }))
 
       return { previousNotifications, previousUnreadCount }
     },

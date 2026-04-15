@@ -70,9 +70,17 @@ export function useNotificationSSE() {
       if (!notification.read) {
         queryClient.setQueryData(
           unreadCountQueryKey,
-          (oldData: { count: number; hasUnread: boolean } | undefined) => {
+          (
+            oldData:
+              | { count: number; hasUnread: boolean; userId: string }
+              | undefined,
+          ) => {
             const currentCount = oldData?.count || 0
-            return { count: currentCount + 1, hasUnread: true }
+            return {
+              count: currentCount + 1,
+              hasUnread: true,
+              userId: oldData?.userId || '', // Preserve userId
+            }
           },
         )
       }
@@ -114,10 +122,18 @@ export function useNotificationSSE() {
       // Update unread count optimistically
       queryClient.setQueryData(
         unreadCountQueryKey,
-        (oldData: { count: number; hasUnread: boolean } | undefined) => {
+        (
+          oldData:
+            | { count: number; hasUnread: boolean; userId: string }
+            | undefined,
+        ) => {
           const currentCount = oldData?.count || 0
           const newCount = Math.max(0, currentCount - 1)
-          return { count: newCount, hasUnread: newCount > 0 }
+          return {
+            count: newCount,
+            hasUnread: newCount > 0,
+            userId: oldData?.userId || '', // Preserve userId
+          }
         },
       )
 
@@ -155,10 +171,11 @@ export function useNotificationSSE() {
 
   const handleAllRead = useCallback(() => {
     // Update unread count immediately
-    queryClient.setQueryData(unreadCountQueryKey, {
+    queryClient.setQueryData(unreadCountQueryKey, (oldData) => ({
       count: 0,
       hasUnread: false,
-    })
+      userId: oldData?.userId || '', // Preserve userId
+    }))
 
     // Invalidate ALL notification list queries to refetch with updated read status
     queryClient.invalidateQueries({

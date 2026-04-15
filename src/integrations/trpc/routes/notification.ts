@@ -81,6 +81,7 @@ export const notificationRouter = {
 
   /**
    * Get unread notification count
+   * IMPORTANT: This query is user-specific and must be invalidated on logout
    */
   getUnreadCount: protectedProcedure.query(async ({ ctx }) => {
     const { user: currentUser, db } = ctx
@@ -102,6 +103,7 @@ export const notificationRouter = {
     return {
       count: result.length,
       hasUnread: result.length > 0,
+      userId: currentUser.id, // Include userId to help with cache invalidation
     }
   }),
 
