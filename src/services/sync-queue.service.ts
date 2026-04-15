@@ -13,7 +13,7 @@ import { mapHubSpotContactsBatch } from './field-mapping.service'
 import { syncContactsBatch } from './contact-sync.service'
 import { sendCRMSyncFailureEmailDirect } from './email.functions'
 import type { Job } from 'bullmq'
-import { notificationEmitter } from '@/lib/notification-emitter'
+import { publishNotificationEvent } from '@/lib/notification-bridge'
 import { db } from '@/db'
 import { crmIntegrations, notifications, syncLogs, user } from '@/db/schema'
 
@@ -272,9 +272,9 @@ export const hubspotSyncWorker = new Worker<
         })
         .returning()
 
-      // Emit notification event for SSE broadcast
+      // Publish notification event to Redis for cross-process SSE broadcast
       if (createdNotification) {
-        notificationEmitter.emit('notification:created', {
+        await publishNotificationEvent('notification:created', {
           userId,
           notification: {
             ...createdNotification,
