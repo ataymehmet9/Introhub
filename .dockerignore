@@ -58,7 +58,6 @@ docker-compose.yml
 .prettierrc
 .eslintrc
 .editorconfig
-tsconfig.json
 vitest.config.ts
 prettier.config.js
 eslint.config.js
