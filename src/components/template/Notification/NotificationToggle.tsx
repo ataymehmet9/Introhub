@@ -7,12 +7,12 @@ const NotificationToggle = ({
   dot,
 }: {
   className?: string
-  dot: boolean
+  dot?: number
 }) => {
   return (
     <div className={classNames('text-2xl', className)}>
       {dot ? (
-        <Badge badgeStyle={{ top: '3px', right: '6px' }}>
+        <Badge content={dot} maxCount={9}>
           <PiBellDuotone />
         </Badge>
       ) : (

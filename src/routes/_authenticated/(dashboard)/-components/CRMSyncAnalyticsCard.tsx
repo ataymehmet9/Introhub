@@ -1,11 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import {
-  HiCheckCircle,
-  HiClock,
-  HiExclamationCircle,
-  HiRefresh,
-} from 'react-icons/hi'
+import { HiClock } from 'react-icons/hi'
 import { Link } from '@tanstack/react-router'
 import { useDashboardStore } from '../-store/dashboardStore'
 import { Badge, Card, Tabs } from '@/components/ui'
@@ -174,31 +169,15 @@ function SyncMetrics({ provider, startDate, endDate }: SyncMetricsProps) {
     switch (status) {
       case 'completed':
         return (
-          <Badge className="bg-success/10 text-success">
-            <HiCheckCircle className="mr-1" />
-            Completed
-          </Badge>
+          <Badge innerClass="bg-success/10 text-success" content="Completed" />
         )
       case 'failed':
-        return (
-          <Badge className="bg-error/10 text-error">
-            <HiExclamationCircle className="mr-1" />
-            Failed
-          </Badge>
-        )
+        return <Badge innerClass="bg-error/10 text-error" content="Failed" />
       case 'in_progress':
-        return (
-          <Badge className="bg-info/10 text-info">
-            <HiRefresh className="mr-1 animate-spin" />
-            In Progress
-          </Badge>
-        )
+        return <Badge innerClass="bg-info/10 text-info" content="In Progress" />
       case 'partial':
         return (
-          <Badge className="bg-warning/10 text-warning">
-            <HiExclamationCircle className="mr-1" />
-            Partial
-          </Badge>
+          <Badge innerClass="bg-warning/10 text-warning" content="Partial" />
         )
       default:
         return null

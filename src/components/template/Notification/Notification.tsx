@@ -23,14 +23,8 @@ const Notification = ({ className }: { className?: string }) => {
   const notificationDropdownRef = useRef<DropdownRef>(null)
 
   // Use notification context - hooks are called once at provider level
-  const {
-    notifications,
-    unreadCount,
-    hasUnread,
-    isLoading,
-    markAsRead,
-    markAllAsRead,
-  } = useNotificationContext()
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } =
+    useNotificationContext()
 
   const onMarkAllAsRead = () => {
     markAllAsRead()
@@ -51,7 +45,9 @@ const Notification = ({ className }: { className?: string }) => {
   return (
     <Dropdown
       ref={notificationDropdownRef}
-      renderTitle={<NotificationToggle dot={hasUnread} className={className} />}
+      renderTitle={
+        <NotificationToggle dot={unreadCount} className={className} />
+      }
       menuClass="min-w-[280px] md:min-w-[340px]"
       placement={larger.md ? 'bottom-end' : 'bottom'}
     >
