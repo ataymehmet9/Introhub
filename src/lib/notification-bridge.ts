@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis'
-import { notificationEmitter } from './notification-emitter'
+import { notificationEmitter } from './notification-emitter.server'
 import type { NotificationWithMetadata } from '@/schemas'
 
 /**

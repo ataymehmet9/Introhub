@@ -9,7 +9,7 @@ import {
   markAsReadSchema,
 } from '@/schemas'
 import { notifications } from '@/db/schema'
-import { notificationEmitter } from '@/lib/notification-emitter'
+import { notificationEmitter } from '@/lib/notification-emitter.server'
 
 export const notificationRouter = {
   /**

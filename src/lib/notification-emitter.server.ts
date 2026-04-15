@@ -24,30 +24,30 @@ export interface NotificationEvents {
  * Typed EventEmitter for notification events
  */
 class NotificationEventEmitter extends EventEmitter {
-  emit<K extends keyof NotificationEvents>(
-    event: K,
-    ...args: Parameters<NotificationEvents[K]>
+  emit<TKey extends keyof NotificationEvents>(
+    event: TKey,
+    ...args: Parameters<NotificationEvents[TKey]>
   ): boolean {
     return super.emit(event, ...args)
   }
 
-  on<K extends keyof NotificationEvents>(
-    event: K,
-    listener: NotificationEvents[K],
+  on<TKey extends keyof NotificationEvents>(
+    event: TKey,
+    listener: NotificationEvents[TKey],
   ): this {
     return super.on(event, listener)
   }
 
-  once<K extends keyof NotificationEvents>(
-    event: K,
-    listener: NotificationEvents[K],
+  once<TKey extends keyof NotificationEvents>(
+    event: TKey,
+    listener: NotificationEvents[TKey],
   ): this {
     return super.once(event, listener)
   }
 
-  off<K extends keyof NotificationEvents>(
-    event: K,
-    listener: NotificationEvents[K],
+  off<TKey extends keyof NotificationEvents>(
+    event: TKey,
+    listener: NotificationEvents[TKey],
   ): this {
     return super.off(event, listener)
   }

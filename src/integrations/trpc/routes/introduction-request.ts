@@ -19,7 +19,7 @@ import {
   sendIntroductionRequestEmail,
   sendIntroductionResponseEmail,
 } from '@/services/email.functions'
-import { notificationEmitter } from '@/lib/notification-emitter'
+import { notificationEmitter } from '@/lib/notification-emitter.server'
 import { trackServerEvent } from '@/integrations/posthog'
 import { extractEmailBodyContent } from '@/utils/extractEmailBodyContent'
 import {

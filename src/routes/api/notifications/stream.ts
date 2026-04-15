@@ -6,7 +6,7 @@ import type {
 } from '@/lib/sse-manager'
 import { auth } from '@/lib/auth'
 import { sseManager } from '@/lib/sse-manager'
-import { notificationEmitter } from '@/lib/notification-emitter'
+import { notificationEmitter } from '@/lib/notification-emitter.server'
 
 /**
  * SSE endpoint for real-time notifications
