@@ -40,7 +40,7 @@ ENV VITE_PUBLIC_POSTHOG_HOST=$VITE_PUBLIC_POSTHOG_HOST
 ENV VITE_PUBLIC_POSTHOG_DEFAULTS=$VITE_PUBLIC_POSTHOG_DEFAULTS
 
 # Increase Node.js heap size to prevent OOM during Nitro/Vite build
-ENV NODE_OPTIONS=--max-old-space-size=4096
+ENV NODE_OPTIONS=--max-old-space-size=8192
 
 # Build the application
 RUN pnpm run build
