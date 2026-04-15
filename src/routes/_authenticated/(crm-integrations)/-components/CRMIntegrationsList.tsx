@@ -271,6 +271,7 @@ export default function CRMIntegrationsList() {
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="solid"
+                          size="xs"
                           onClick={() => handleSyncNow(platform.id)}
                           loading={
                             syncNowMutation.isPending ||
@@ -286,7 +287,8 @@ export default function CRMIntegrationsList() {
                             : 'Sync Now'}
                         </Button>
                         <Button
-                          variant="plain"
+                          variant="default"
+                          size="xs"
                           className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                           onClick={() => setDisconnectIntegration(integration!)}
                         >
