@@ -72,12 +72,9 @@ COPY --from=builder /app/instrument.server.mjs ./instrument.server.mjs
 # Copy drizzle configuration and migration files
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/drizzle ./drizzle
-COPY --from=builder /app/src/db ./src/db
 
-# Copy worker source files (needed for tsx runtime execution)
-COPY --from=builder /app/src/workers ./src/workers
-COPY --from=builder /app/src/services ./src/services
-COPY --from=builder /app/src/schemas ./src/schemas
+# Copy entire src directory (needed for tsx runtime execution of worker)
+COPY --from=builder /app/src ./src
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 # Expose the application port
