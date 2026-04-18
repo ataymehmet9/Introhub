@@ -107,6 +107,21 @@ export {
   type SearchResult,
   type GlobalSearchResponse,
 } from './search.schema'
+// AI schemas
+export {
+  aiGenerationSchema,
+  insertAiGenerationSchema,
+  generateIntroductionMessageInputSchema,
+  generateIntroductionMessageResponseSchema,
+  aiGenerationMetadataSchema,
+  checkRateLimitResponseSchema,
+  type AiGeneration,
+  type InsertAiGeneration,
+  type GenerateIntroductionMessageInput,
+  type GenerateIntroductionMessageResponse,
+  type AiGenerationMetadata,
+  type CheckRateLimitResponse,
+} from './ai.schema'
 
 // Notification schemas
 export {
