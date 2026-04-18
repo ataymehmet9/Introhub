@@ -5,6 +5,7 @@ import { crmIntegrations } from '@/db/schema'
 import { HubSpotService } from '@/services/hubspot.service'
 import { tokenStorage } from '@/services/token-storage.service'
 import { auth } from '@/lib/auth'
+import { trackServerEvent } from '@/integrations/posthog'
 
 export const Route = createFileRoute('/api/crm/hubspot/callback')({
   server: {
@@ -64,6 +65,18 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
             // Create new integration - this was missing!
             await tokenStorage.storeTokens(session.user.id, 'hubspot', tokens)
           }
+
+          // Track successful CRM connection in PostHog
+          trackServerEvent(session.user.id, 'crm_connected', {
+            provider: 'hubspot',
+            userId: session.user.id,
+            userEmail: session.user.email,
+            userName: session.user.name,
+            userCompany: session.user.company,
+            userPosition: session.user.position,
+            isReconnection: !!existingIntegration,
+            timestamp: new Date().toISOString(),
+          })
 
           // Redirect back to CRM integrations page with success
           return Response.redirect(

@@ -153,6 +153,7 @@ Monitor these log messages:
    - Should show "Status: 200" and "Type: eventsource"
 
 4. **Check Database**:
+
    ```sql
    SELECT * FROM notifications
    WHERE user_id = 'your_user_id'
