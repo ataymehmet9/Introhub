@@ -63,22 +63,27 @@ function RouteComponent() {
   const trpc = useTRPC()
   const search = useSearch({ from: '/_authenticated/(user)/me/billing' })
   const [isUsageExpanded, setIsUsageExpanded] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(search.success === true)
 
   // Get initial data from SSR loader
   const loaderData = Route.useLoaderData()
 
   // Keep queries active for background updates and cache invalidation
-  // initialData prevents refetch on mount since we have fresh data from SSR
+  // After successful checkout, poll more frequently to catch webhook updates
+  const refetchInterval = search.success ? 2000 : false // Poll every 2s after checkout
+
   const { data: subscription } = useQuery({
     ...trpc.billing.getSubscription.queryOptions(),
     initialData: loaderData.subscription,
-    staleTime: 5 * 60 * 1000, // 5 minutes - billing data doesn't change frequently
+    staleTime: search.success ? 0 : 5 * 60 * 1000, // Fresh data after checkout
+    refetchInterval,
   })
 
   const { data: planDetails } = useQuery({
     ...trpc.billing.getPlanDetails.queryOptions(),
     initialData: loaderData.planDetails,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: search.success ? 0 : 5 * 60 * 1000,
+    refetchInterval,
   })
 
   const checkoutMutation = useMutation({
@@ -114,6 +119,11 @@ function RouteComponent() {
   const isFree = !isPro
   const isMutating = checkoutMutation.isPending || portalMutation.isPending
 
+  // Stop processing state once upgrade is detected
+  if (isProcessing && isPro) {
+    setIsProcessing(false)
+  }
+
   // Format date helper
   const formatDate = (date: Date | null) => {
     if (!date) return 'N/A'
@@ -136,10 +146,28 @@ function RouteComponent() {
       <div>
         <h4 className="mb-6">Billing</h4>
 
-        {search.success && (
-          <div className="mb-6 p-4 rounded-lg bg-success-subtle text-success text-sm font-medium">
-            You're now on the Pro plan. Thanks for subscribing!
-          </div>
+        {search.success && !isPro && (
+          <Alert showIcon type="info" className="mb-6">
+            <div className="space-y-2">
+              <p className="font-semibold">Processing your subscription...</p>
+              <p className="text-sm">
+                Your payment was successful! We're activating your Pro plan now.
+                This usually takes a few seconds.
+              </p>
+            </div>
+          </Alert>
+        )}
+
+        {search.success && isPro && (
+          <Alert showIcon type="success" className="mb-6">
+            <div className="space-y-2">
+              <p className="font-semibold">Welcome to Pro! 🎉</p>
+              <p className="text-sm">
+                Your Pro plan is now active with unlimited introduction
+                requests. Thanks for subscribing!
+              </p>
+            </div>
+          </Alert>
         )}
 
         {search.canceled && (

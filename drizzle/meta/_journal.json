@@ -64,6 +64,13 @@
       "when": 1776145582777,
       "tag": "0008_kind_imperial_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1776509045475,
+      "tag": "0009_ordinary_colonel_america",
+      "breakpoints": true
     }
   ]
 }
