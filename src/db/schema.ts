@@ -291,6 +291,42 @@ export const notifications = pgTable(
   ],
 )
 
+// AI Generation type enum
+export const aiGenerationTypeEnum = pgEnum('ai_generation_type', [
+  'introduction_message',
+])
+
+// AI Generations table - tracks all AI generation requests
+export const aiGenerations = pgTable(
+  'ai_generations',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    generationType: aiGenerationTypeEnum('generation_type')
+      .default('introduction_message')
+      .notNull(),
+    targetContactId: integer('target_contact_id').references(
+      () => contacts.id,
+      {
+        onDelete: 'set null',
+      },
+    ),
+    success: boolean('success').notNull(),
+    errorMessage: text('error_message'),
+    tokensUsed: integer('tokens_used'),
+    responseTimeMs: integer('response_time_ms'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    metadata: text('metadata'), // JSONB for additional data
+  },
+  (table) => [
+    index('ai_generations_userId_idx').on(table.userId),
+    index('ai_generations_createdAt_idx').on(table.createdAt),
+    index('ai_generations_user_created_idx').on(table.userId, table.createdAt),
+  ],
+)
+
 // ============================================================================
 // RELATIONS (Drizzle ORM relationships)
 // ============================================================================
@@ -302,6 +338,7 @@ export const userRelations = relations(user, ({ many }) => ({
   sentRequests: many(introductionRequests, { relationName: 'requester' }),
   receivedRequests: many(introductionRequests, { relationName: 'approver' }),
   notifications: many(notifications),
+  aiGenerations: many(aiGenerations),
 }))
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -380,6 +417,17 @@ export const syncLogsRelations = relations(syncLogs, ({ one }) => ({
   }),
 }))
 
+export const aiGenerationsRelations = relations(aiGenerations, ({ one }) => ({
+  user: one(user, {
+    fields: [aiGenerations.userId],
+    references: [user.id],
+  }),
+  targetContact: one(contacts, {
+    fields: [aiGenerations.targetContactId],
+    references: [contacts.id],
+  }),
+}))
+
 export type RequestStatus = 'pending' | 'approved' | 'declined'
 export type NotificationType =
   | 'introduction_request'
@@ -389,3 +437,4 @@ export type ContactSource = 'manual' | 'csv' | 'hubspot' | 'salesforce'
 export type CrmProvider = 'hubspot' | 'salesforce'
 export type CrmIntegrationStatus = 'active' | 'inactive' | 'error'
 export type SyncLogStatus = 'in_progress' | 'completed' | 'failed' | 'partial'
+export type AiGenerationType = 'introduction_message'
