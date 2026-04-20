@@ -33,28 +33,29 @@ const createGroqAdapter = () => {
  * Generate system prompt for introduction messages
  */
 function generateSystemPrompt(): string {
-  return `You are a professional introduction message writer. Your task is to write personalized, professional introduction request messages.
+  return `You are a professional introduction message writer. Your task is to write concise, personalized introduction request messages.
 
-TONE: Professional yet friendly and approachable. Strike a balance between being respectful and personable.
+TONE: Professional yet personable. Be clear and direct while remaining warm and respectful.
 
 Guidelines:
-- Use a warm, conversational tone while maintaining professionalism
-- Be genuine and authentic - avoid overly formal or stiff language
-- Show enthusiasm without being overly casual
-- Keep the message concise (100-200 words for the BODY only)
+- Keep the message concise (80-120 words for the BODY only)
+- Be professional and direct without being overly formal
 - Clearly state who you are and why you want the introduction
 - Be respectful of the recipient's time
-- Include a clear, polite call-to-action
-- Use proper business email etiquette
+- Include a polite call-to-action
 - Do NOT include greetings (like "Hi [name]") or signatures (like "Best regards") - these will be added automatically
 - Do NOT include subject lines or email headers
 - Do NOT use placeholder text like [Your Name] - use the actual provided information
 - Write in first person from the requester's perspective
 - Write ONLY the body content - no greeting, no signature
-- Use proper paragraph breaks for readability
+- Structure your response with 2-3 paragraphs, each separated by a blank line (\\n\\n)
+- First paragraph: Brief intro of who you are (1-2 sentences)
+- Second paragraph: Why you want the introduction and context (2-3 sentences)
+- Optional third paragraph: Simple call-to-action if needed (1 sentence)
 
-Example tone: "I'm reaching out because..." rather than "I am writing to formally request..."
-Be human, be warm, be professional.`
+Example structure: "I'm [name] from [company], working as [position]. I'm reaching out because [reason for introduction]. [Additional context about why this connection matters]. Would you be willing to make an introduction?"
+
+Be professional, clear, and personable.`
 }
 
 /**
@@ -142,7 +143,15 @@ function generateUserPrompt(
 - Signature (no "Best regards", "Sincerely", etc.)
 - Your name at the end
 
-The greeting and signature will be added automatically. Focus on the core message explaining who you are and why you want the introduction.`
+The greeting and signature will be added automatically.
+
+FORMATTING REQUIREMENTS:
+- Keep it concise - aim for 80-120 words total
+- Structure with 2-3 paragraphs separated by blank lines (\\n\\n)
+- Paragraph 1: Who you are (1-2 sentences)
+- Paragraph 2: Why you want the introduction with context (2-3 sentences)
+- Optional Paragraph 3: Simple call-to-action if needed (1 sentence)
+- Be clear and professional without unnecessary elaboration`
 
   return prompt
 }
@@ -168,10 +177,17 @@ function formatEmailMessage(
     '',
   )
 
-  // Ensure proper paragraph spacing (convert single newlines to double for email readability)
-  // But preserve intentional double newlines
-  body = body.replace(/\n{3,}/g, '\n\n') // Normalize multiple newlines to double
-  body = body.replace(/([^\n])\n([^\n])/g, '$1\n\n$2') // Add spacing between paragraphs
+  // Normalize line breaks: ensure paragraphs are separated by exactly one blank line
+  // First, normalize all multiple newlines to double newlines
+  body = body.replace(/\n{3,}/g, '\n\n')
+
+  // Then ensure single newlines within paragraphs are preserved
+  // but paragraphs are properly separated
+  // Split by double newlines to get paragraphs
+  const paragraphs = body.split(/\n\n+/).filter((p) => p.trim().length > 0)
+
+  // Join paragraphs with double newlines for proper spacing
+  body = paragraphs.join('\n\n')
 
   // Trim again after formatting
   body = body.trim()

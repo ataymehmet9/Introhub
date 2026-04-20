@@ -24,13 +24,13 @@ export const billingRouter = {
       }
     }
 
-    const [dbUser] = await db
+    const dbUsers = await db
       .select()
       .from(userTable)
       .where(eq(userTable.id, user.id))
       .limit(1)
 
-    if (!dbUser.stripeSubscriptionId) {
+    if (!dbUsers.length) {
       return {
         plan: 'free' as const,
         status: null,
@@ -39,32 +39,75 @@ export const billingRouter = {
       }
     }
 
-    const subscription: Stripe.Subscription =
-      await stripe.subscriptions.retrieve(dbUser.stripeSubscriptionId, {
-        expand: ['latest_invoice', 'customer'],
-      })
+    const dbUser = dbUsers[0]
 
-    // As of March 31, 2025, current_period_end is accessed via subscription items
-    // See: https://docs.stripe.com/billing/subscriptions/billing-cycle
-    const currentPeriodEnd =
-      subscription.items.data[0]?.current_period_end ?? null
+    // If no subscription ID yet, check database plan type
+    // This handles the case where webhook hasn't fired yet after checkout
+    if (!dbUser.stripeSubscriptionId) {
+      // Check if user has been upgraded to pro in the database
+      const isPro = dbUser.planType === 'pro'
+      return {
+        plan: isPro ? ('pro' as const) : ('free' as const),
+        status: dbUser.stripeSubscriptionStatus as
+          | 'active'
+          | 'past_due'
+          | 'canceled'
+          | 'unpaid'
+          | 'incomplete'
+          | 'incomplete_expired'
+          | 'trialing'
+          | null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      }
+    }
 
-    // User is considered Pro if subscription is active OR trialing
-    // Even if cancel_at_period_end is true, they keep access until period ends
-    const isPro =
-      subscription.status === 'active' || subscription.status === 'trialing'
+    // Fetch subscription details from Stripe
+    try {
+      const subscription: Stripe.Subscription =
+        await stripe.subscriptions.retrieve(dbUser.stripeSubscriptionId, {
+          expand: ['latest_invoice', 'customer'],
+        })
 
-    // Check if subscription is scheduled to cancel
-    // Stripe uses either cancel_at_period_end OR cancel_at (timestamp)
-    const isCanceled =
-      subscription.cancel_at_period_end || subscription.cancel_at !== null
+      // As of March 31, 2025, current_period_end is accessed via subscription items
+      // See: https://docs.stripe.com/billing/subscriptions/billing-cycle
+      const currentPeriodEnd =
+        subscription.items.data[0]?.current_period_end ?? null
 
-    return {
-      plan: isPro ? ('pro' as const) : ('free' as const),
-      status: subscription.status,
-      currentPeriodEnd,
-      cancelAtPeriodEnd: isCanceled,
-      cancelAt: subscription.cancel_at,
+      // User is considered Pro if subscription is active OR trialing
+      // Even if cancel_at_period_end is true, they keep access until period ends
+      const isPro =
+        subscription.status === 'active' || subscription.status === 'trialing'
+
+      // Check if subscription is scheduled to cancel
+      // Stripe uses either cancel_at_period_end OR cancel_at (timestamp)
+      const isCanceled =
+        subscription.cancel_at_period_end || subscription.cancel_at !== null
+
+      return {
+        plan: isPro ? ('pro' as const) : ('free' as const),
+        status: subscription.status,
+        currentPeriodEnd,
+        cancelAtPeriodEnd: isCanceled,
+        cancelAt: subscription.cancel_at,
+      }
+    } catch {
+      // If Stripe API fails, fall back to database values
+      const isPro = dbUser.planType === 'pro'
+      return {
+        plan: isPro ? ('pro' as const) : ('free' as const),
+        status: dbUser.stripeSubscriptionStatus as
+          | 'active'
+          | 'past_due'
+          | 'canceled'
+          | 'unpaid'
+          | 'incomplete'
+          | 'incomplete_expired'
+          | 'trialing'
+          | null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      }
     }
   }),
 
