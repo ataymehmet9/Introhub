@@ -1,3 +1,16 @@
+// Initialize OpenTelemetry first (must be before other instrumentation)
+import { initializeOpenTelemetry } from './src/integrations/opentelemetry/init.ts'
+
+// Initialize OpenTelemetry SDK
+const otelSDK = initializeOpenTelemetry()
+
+if (otelSDK) {
+  console.log('✓ OpenTelemetry logging initialized successfully')
+} else {
+  console.warn('⚠ OpenTelemetry logging is disabled (missing PostHog token)')
+}
+
+// Initialize Sentry after OpenTelemetry
 import * as Sentry from '@sentry/tanstackstart-react'
 
 const sentryDsn =
@@ -15,4 +28,5 @@ if (!sentryDsn) {
     replaysSessionSampleRate: 1.0,
     replaysOnErrorSampleRate: 1.0,
   })
+  console.log('✓ Sentry initialized successfully')
 }

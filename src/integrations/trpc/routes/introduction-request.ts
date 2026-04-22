@@ -27,6 +27,7 @@ import {
   incrementRequestCount,
 } from '@/services/subscription.service'
 import { SUBSCRIPTION_CONFIG } from '@/configs/subscription.config'
+import { introductionLogger } from '@/integrations/opentelemetry'
 
 // Dynamic import to avoid bundling server-only code in client bundle
 const getNotificationEmitter = async () => {
@@ -164,6 +165,14 @@ export const introductionRequestRouter = {
         }
       }
 
+      // Log introduction request creation
+      introductionLogger.requestCreated({
+        posthogDistinctId: currentUser.id,
+        request_id: newRequest[0].id,
+        target_contact_id: targetContactId,
+        approver_id: contact.userId,
+      })
+
       // Track successful request creation
       trackServerEvent(currentUser.id, 'introduction_request_create_success', {
         requestId: newRequest[0].id,
@@ -212,6 +221,16 @@ export const introductionRequestRouter = {
             emailHtmlContent = extractEmailBodyContent(emailResult.emailHtml)
           }
         } catch (error) {
+          // Log email sending error
+          introductionLogger.emailSent({
+            posthogDistinctId: currentUser.id,
+            request_id: newRequest[0].id,
+            email_type: 'request',
+            success: false,
+            error_message:
+              error instanceof Error ? error.message : 'Unknown error',
+          })
+
           // Log error but don't fail the request
           console.error('Failed to send introduction request email:', {
             error,
@@ -430,6 +449,22 @@ export const introductionRequestRouter = {
         })
         .where(eq(introductionRequests.id, id))
         .returning()
+
+      // Log introduction request approval/rejection
+      if (data.status === 'approved') {
+        introductionLogger.requestApproved({
+          posthogDistinctId: currentUser.id,
+          request_id: id,
+          requester_id: request.requesterId,
+        })
+      } else if (data.status === 'declined') {
+        introductionLogger.requestRejected({
+          posthogDistinctId: currentUser.id,
+          request_id: id,
+          requester_id: request.requesterId,
+          reason: data.responseMessage,
+        })
+      }
 
       // Track status update
       trackServerEvent(currentUser.id, `introduction_request_${data.status}`, {

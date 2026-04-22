@@ -15,6 +15,7 @@ import { sendCRMSyncFailureEmailDirect } from './email.functions'
 import type { Job } from 'bullmq'
 import { db } from '@/db'
 import { crmIntegrations, notifications, syncLogs, user } from '@/db/schema'
+import { crmLogger, errorLogger } from '@/integrations/opentelemetry'
 
 // Dynamic import to avoid bundling server-only code in client bundle
 const getPublishNotificationEvent = async () => {
@@ -105,6 +106,15 @@ export const hubspotSyncWorker = new Worker<
   'hubspot-contact-sync',
   async (job: Job<HubSpotSyncJobData>) => {
     const { userId, integrationId, provider, options = {} } = job.data
+    const startTime = Date.now()
+
+    // Log sync started
+    crmLogger.syncStarted({
+      posthogDistinctId: userId,
+      provider: 'hubspot',
+      job_id: job.id,
+      sync_type: options.onlyNew ? 'incremental' : 'full',
+    })
 
     // Create sync log entry
     const [syncLog] = await db
@@ -256,6 +266,21 @@ export const hubspotSyncWorker = new Worker<
         percentage: 100,
       } satisfies SyncJobProgress)
 
+      // Log sync completed
+      const duration = Date.now() - startTime
+      crmLogger.syncCompleted({
+        posthogDistinctId: userId,
+        provider: 'hubspot',
+        job_id: job.id,
+        stage: 'completed',
+        total_contacts: syncResult.total,
+        created_count: syncResult.created,
+        updated_count: syncResult.updated,
+        skipped_count: syncResult.skipped,
+        error_count: syncResult.errors,
+        duration_ms: duration,
+      })
+
       // Create success notification
       const [createdNotification] = await db
         .insert(notifications)
@@ -311,6 +336,19 @@ export const hubspotSyncWorker = new Worker<
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error'
+
+      // Log sync failure
+      errorLogger.externalApi({
+        posthogDistinctId: userId,
+        error_type: 'crm_sync_failed',
+        error_message: errorMessage,
+        stack_trace: error instanceof Error ? error.stack : undefined,
+        context: {
+          provider,
+          jobId: job.id,
+          integrationId,
+        },
+      })
 
       // Update sync log with error
       await db

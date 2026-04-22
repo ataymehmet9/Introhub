@@ -12,6 +12,7 @@ import {
 import { contacts } from '@/db/schema'
 import { parseCSV } from '@/utils/fileUtils'
 import { trackServerEvent } from '@/integrations/posthog'
+import { contactLogger, errorLogger } from '@/integrations/opentelemetry'
 
 const listContactsSchema = contactSchema
   .pick({
@@ -169,6 +170,13 @@ export const contactRouter = {
           })
           .returning()
 
+        // Log contact creation
+        contactLogger.created({
+          posthogDistinctId: user.id,
+          contact_id: newContact[0].id,
+          source: 'manual',
+        })
+
         trackServerEvent(user.id, 'contact_create_success', {
           contactId: newContact[0].id,
           contactName: newContact[0].name,
@@ -181,6 +189,16 @@ export const contactRouter = {
 
         return { success: true, data: newContact[0] }
       } catch (error) {
+        // Log error
+        errorLogger.database({
+          posthogDistinctId: user.id,
+          error_type: 'contact_create_failed',
+          error_message:
+            error instanceof Error ? error.message : 'Unknown error',
+          stack_trace: error instanceof Error ? error.stack : undefined,
+          context: { contactEmail: input.email },
+        })
+
         trackServerEvent(user.id, 'contact_create_error', {
           error: error instanceof Error ? error.message : 'Unknown error',
           contactEmail: input.email,
@@ -228,6 +246,12 @@ export const contactRouter = {
           })
         }
 
+        // Log contact update
+        contactLogger.updated({
+          posthogDistinctId: user.id,
+          contact_id: id,
+        })
+
         trackServerEvent(user.id, 'contact_update_success', {
           contactId: id,
           contactName: updatedContact[0].name,
@@ -241,6 +265,17 @@ export const contactRouter = {
         return { success: true, data: updatedContact[0] }
       } catch (error) {
         if (error instanceof TRPCError) throw error
+
+        // Log error
+        errorLogger.database({
+          posthogDistinctId: user.id,
+          error_type: 'contact_update_failed',
+          error_message:
+            error instanceof Error ? error.message : 'Unknown error',
+          stack_trace: error instanceof Error ? error.stack : undefined,
+          context: { contactId: id },
+        })
+
         trackServerEvent(user.id, 'contact_update_error', {
           contactId: id,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -284,6 +319,12 @@ export const contactRouter = {
           })
         }
 
+        // Log contact deletion
+        contactLogger.deleted({
+          posthogDistinctId: user.id,
+          contact_id: id,
+        })
+
         trackServerEvent(user.id, 'contact_delete_success', {
           contactId: id,
           contactName: deletedContact[0].name,
@@ -296,6 +337,17 @@ export const contactRouter = {
         return { success: true, id }
       } catch (error) {
         if (error instanceof TRPCError) throw error
+
+        // Log error
+        errorLogger.database({
+          posthogDistinctId: user.id,
+          error_type: 'contact_delete_failed',
+          error_message:
+            error instanceof Error ? error.message : 'Unknown error',
+          stack_trace: error instanceof Error ? error.stack : undefined,
+          context: { contactId: id },
+        })
+
         trackServerEvent(user.id, 'contact_delete_error', {
           contactId: id,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -357,6 +409,12 @@ export const contactRouter = {
           )
           .returning()
 
+        // Log batch deletion
+        contactLogger.batchDeleted({
+          posthogDistinctId: user.id,
+          count: deletedContacts.length,
+        })
+
         trackServerEvent(user.id, 'contact_batch_delete_success', {
           requestedCount: ids.length,
           deletedCount: deletedContacts.length,
@@ -376,6 +434,17 @@ export const contactRouter = {
         }
       } catch (error) {
         if (error instanceof TRPCError) throw error
+
+        // Log error
+        errorLogger.database({
+          posthogDistinctId: user.id,
+          error_type: 'contact_batch_delete_failed',
+          error_message:
+            error instanceof Error ? error.message : 'Unknown error',
+          stack_trace: error instanceof Error ? error.stack : undefined,
+          context: { requestedCount: ids.length },
+        })
+
         trackServerEvent(user.id, 'contact_batch_delete_error', {
           requestedCount: ids.length,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -547,6 +616,16 @@ export const contactRouter = {
           updatedCount = contactsToUpdate.length
         }
 
+        // Log batch upload
+        contactLogger.batchUploaded({
+          posthogDistinctId: user.id,
+          total_rows: rows.length,
+          created_count: insertedCount,
+          updated_count: updatedCount,
+          skipped_count: skippedCount,
+          error_count: errors.length,
+        })
+
         trackServerEvent(user.id, 'contact_batch_upload_success', {
           totalRows: rows.length,
           insertedCount,
@@ -579,6 +658,16 @@ export const contactRouter = {
         if (error instanceof TRPCError) {
           throw error
         }
+
+        // Log error
+        errorLogger.database({
+          posthogDistinctId: user.id,
+          error_type: 'contact_batch_upload_failed',
+          error_message:
+            error instanceof Error ? error.message : 'Unknown error',
+          stack_trace: error instanceof Error ? error.stack : undefined,
+        })
+
         trackServerEvent(user.id, 'contact_batch_upload_error', {
           error: error instanceof Error ? error.message : 'Unknown error',
           userId: user.id,

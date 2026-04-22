@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { usePostHog } from '@posthog/react'
 import { useRouter } from '@tanstack/react-router'
 import { authClient, baseSignIn, baseSignUp } from './auth-client'
+import { trackServerEvent } from '@/integrations/posthog'
 
 /**
  * Secure authentication wrapper that ensures complete cache cleanup
@@ -35,6 +36,9 @@ export const useSecureSignIn = () => {
   }
 
   const signIn = async (...args: Parameters<typeof baseSignIn.email>) => {
+    const startTime = Date.now()
+    const email = args[0]?.email
+
     try {
       // Step 1: Clear ALL existing cache BEFORE signing in
       clearAllCaches()
@@ -47,11 +51,41 @@ export const useSecureSignIn = () => {
       if (!result.error) {
         clearAllCaches()
         console.log('Post-login cache cleared - fresh session started')
+
+        // Log successful signin
+        if (result.data?.user?.id) {
+          trackServerEvent(result.data.user.id, 'auth_signin_success', {
+            provider: 'email',
+            duration_ms: Date.now() - startTime,
+            email,
+            userId: result.data.user.id,
+            timestamp: new Date().toISOString(),
+          })
+        }
+      } else {
+        // Log failed signin
+        trackServerEvent('anonymous', 'auth_signin_failed', {
+          provider: 'email',
+          error: result.error?.message || 'Unknown error',
+          duration_ms: Date.now() - startTime,
+          email,
+          timestamp: new Date().toISOString(),
+        })
       }
 
       return result
     } catch (error) {
       console.error('Error during secure sign in:', error)
+
+      // Log signin error
+      trackServerEvent('anonymous', 'auth_signin_error', {
+        provider: 'email',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration_ms: Date.now() - startTime,
+        email,
+        timestamp: new Date().toISOString(),
+      })
+
       // Even on error, ensure cache is cleared
       clearAllCaches()
       throw error
@@ -61,15 +95,33 @@ export const useSecureSignIn = () => {
   const signInSocial = async (
     ...args: Parameters<typeof baseSignIn.social>
   ) => {
+    const startTime = Date.now()
+    const provider = args[0]?.provider
+
     try {
       // Clear cache before OAuth redirect
       clearAllCaches()
       console.log('Pre-OAuth cache cleared')
 
+      // Log OAuth signin attempt
+      trackServerEvent('anonymous', 'auth_oauth_started', {
+        provider,
+        timestamp: new Date().toISOString(),
+      })
+
       // Perform OAuth sign in (this will redirect)
       await baseSignIn.social(...args)
     } catch (error) {
       console.error('Error during secure OAuth sign in:', error)
+
+      // Log OAuth error
+      trackServerEvent('anonymous', 'auth_oauth_error', {
+        provider,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration_ms: Date.now() - startTime,
+        timestamp: new Date().toISOString(),
+      })
+
       clearAllCaches()
       throw error
     }
@@ -99,6 +151,9 @@ export const useSecureSignUp = () => {
   }
 
   const signUp = async (...args: Parameters<typeof baseSignUp.email>) => {
+    const startTime = Date.now()
+    const email = args[0]?.email
+
     try {
       // Step 1: Clear ALL existing cache BEFORE signing up
       clearAllCaches()
@@ -111,11 +166,41 @@ export const useSecureSignUp = () => {
       if (!result.error) {
         clearAllCaches()
         console.log('Post-signup cache cleared - fresh session started')
+
+        // Log successful signup
+        if (result.data?.user?.id) {
+          trackServerEvent(result.data.user.id, 'auth_signup_success', {
+            provider: 'email',
+            duration_ms: Date.now() - startTime,
+            email,
+            userId: result.data.user.id,
+            timestamp: new Date().toISOString(),
+          })
+        }
+      } else {
+        // Log failed signup
+        trackServerEvent('anonymous', 'auth_signup_failed', {
+          provider: 'email',
+          error: result.error?.message || 'Unknown error',
+          duration_ms: Date.now() - startTime,
+          email,
+          timestamp: new Date().toISOString(),
+        })
       }
 
       return result
     } catch (error) {
       console.error('Error during secure sign up:', error)
+
+      // Log signup error
+      trackServerEvent('anonymous', 'auth_signup_error', {
+        provider: 'email',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration_ms: Date.now() - startTime,
+        email,
+        timestamp: new Date().toISOString(),
+      })
+
       // Even on error, ensure cache is cleared
       clearAllCaches()
       throw error
@@ -186,6 +271,7 @@ export const useClearCacheOnAuth = () => {
   }, [
     session.data?.session.id,
     session.data?.user.id,
+    session.data?.user,
     session.isPending,
     queryClient,
     router,

@@ -5,6 +5,7 @@ import { stripe } from '@/integrations/stripe/init'
 import { db } from '@/db'
 import { notifications, user as userTable } from '@/db/schema'
 import { downgradeToFree, upgradeToPro } from '@/services/subscription.service'
+import { billingLogger, errorLogger } from '@/integrations/opentelemetry'
 
 export const Route = createFileRoute('/api/billing/webhook')({
   server: {
@@ -36,6 +37,13 @@ export const Route = createFileRoute('/api/billing/webhook')({
           )
         } catch (err) {
           console.error('Webhook signature verification failed:', err)
+          errorLogger.externalApi({
+            posthogDistinctId: 'system',
+            error_type: 'stripe_webhook_verification_failed',
+            error_message: err instanceof Error ? err.message : 'Unknown error',
+            stack_trace: err instanceof Error ? err.stack : undefined,
+            endpoint: '/api/billing/webhook',
+          })
           return new Response('Webhook signature verification failed', {
             status: 400,
           })
@@ -68,6 +76,13 @@ export const Route = createFileRoute('/api/billing/webhook')({
               if (users.length > 0) {
                 // Upgrade user to Pro
                 await upgradeToPro(users[0].id, subscriptionId)
+
+                // Log subscription activation
+                billingLogger.subscriptionActivated({
+                  posthogDistinctId: users[0].id,
+                  subscription_id: subscriptionId,
+                  plan: 'pro',
+                })
 
                 // Send success notification
                 await db.insert(notifications).values({
@@ -109,6 +124,17 @@ export const Route = createFileRoute('/api/billing/webhook')({
 
             // Handle different subscription status changes
             if (subscription.status === 'past_due') {
+              // Log payment failure
+              billingLogger.paymentFailed({
+                posthogDistinctId: userId,
+                subscription_id:
+                  typeof subscription.id === 'string'
+                    ? subscription.id
+                    : undefined,
+                error_type: 'past_due',
+                error_message: 'Payment is past due',
+              })
+
               await db.insert(notifications).values({
                 userId,
                 type: 'unknown',
@@ -123,6 +149,17 @@ export const Route = createFileRoute('/api/billing/webhook')({
             ) {
               // Subscription is canceled but still active until period end
               // Stripe uses either cancel_at_period_end OR cancel_at (timestamp)
+              billingLogger.subscriptionCanceled({
+                posthogDistinctId: userId,
+                subscription_id:
+                  typeof subscription.id === 'string'
+                    ? subscription.id
+                    : undefined,
+                cancel_at_period_end:
+                  subscription.cancel_at_period_end || false,
+                reason: 'user_initiated',
+              })
+
               await db.insert(notifications).values({
                 userId,
                 type: 'unknown',
@@ -138,6 +175,17 @@ export const Route = createFileRoute('/api/billing/webhook')({
                 previousSubscription &&
                 previousSubscription.cancel_at_period_end === true
               ) {
+                // Log subscription reactivation
+                billingLogger.subscriptionUpdated({
+                  posthogDistinctId: userId,
+                  subscription_id:
+                    typeof subscription.id === 'string'
+                      ? subscription.id
+                      : undefined,
+                  plan: 'pro',
+                  cancel_at_period_end: false,
+                })
+
                 await db.insert(notifications).values({
                   userId,
                   type: 'unknown',
@@ -169,6 +217,17 @@ export const Route = createFileRoute('/api/billing/webhook')({
               // Downgrade user to Free
               await downgradeToFree(users[0].id)
 
+              // Log subscription deletion
+              billingLogger.subscriptionCanceled({
+                posthogDistinctId: users[0].id,
+                subscription_id:
+                  typeof subscription.id === 'string'
+                    ? subscription.id
+                    : undefined,
+                cancel_at_period_end: false,
+                reason: 'subscription_ended',
+              })
+
               // Send downgrade notification
               await db.insert(notifications).values({
                 userId: users[0].id,
@@ -197,6 +256,14 @@ export const Route = createFileRoute('/api/billing/webhook')({
                 .limit(1)
 
               if (users.length > 0) {
+                // Log payment failure
+                billingLogger.paymentFailed({
+                  posthogDistinctId: users[0].id,
+                  error_type: 'invoice_payment_failed',
+                  error_message: 'Invoice payment failed',
+                  attempt_count: invoice.attempt_count || 1,
+                })
+
                 await db.insert(notifications).values({
                   userId: users[0].id,
                   type: 'unknown',

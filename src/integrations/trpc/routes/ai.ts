@@ -18,6 +18,7 @@ import {
   recordGeneration,
 } from '@/services/ai-rate-limit.service'
 import { contacts } from '@/db/schema'
+import { aiLogger, errorLogger } from '@/integrations/opentelemetry'
 
 export const aiRouter = createTRPCRouter({
   /**
@@ -32,7 +33,7 @@ export const aiRouter = createTRPCRouter({
       try {
         // Fetch full user data from database to get planType
         const user = await ctx.db.query.user.findFirst({
-          where: (users, { eq }) => eq(users.id, ctx.user!.id),
+          where: (users, { eq: eqOp }) => eqOp(users.id, ctx.user!.id),
         })
 
         if (!user) {
@@ -57,11 +58,28 @@ export const aiRouter = createTRPCRouter({
         const rateLimitCheck = await checkRateLimit(user.id)
 
         if (!rateLimitCheck.allowed) {
+          // Log rate limit exceeded
+          aiLogger.rateLimitExceeded({
+            posthogDistinctId: user.id,
+            generations_this_hour: rateLimitCheck.generationsThisHour,
+            limit: getRateLimitInfo().limit,
+            reset_at: rateLimitCheck.resetAt.toISOString(),
+          })
+
           throw new TRPCError({
             code: 'TOO_MANY_REQUESTS',
             message: `Rate limit exceeded. You have used ${rateLimitCheck.generationsThisHour} of ${getRateLimitInfo().limit} AI generations this hour. Please try again after ${rateLimitCheck.resetAt.toLocaleTimeString()}.`,
           })
         }
+
+        // Log AI generation requested
+        aiLogger.generationRequested({
+          posthogDistinctId: user.id,
+          target_contact_id: input.targetContactId,
+          model: 'llama-3.3-70b-versatile',
+          rate_limit_remaining:
+            getRateLimitInfo().limit - rateLimitCheck.generationsThisHour,
+        })
 
         // Fetch target contact with owner information
         const targetContact = await ctx.db.query.contacts.findFirst({
@@ -136,6 +154,15 @@ export const aiRouter = createTRPCRouter({
         })
 
         if (!result.success || !result.message) {
+          // Log AI generation failure
+          aiLogger.generationCompleted({
+            posthogDistinctId: user.id,
+            target_contact_id: input.targetContactId,
+            error_type: 'generation_failed',
+            error_message: result.error || 'Failed to generate AI message',
+            duration_ms: responseTimeMs,
+          })
+
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message:
@@ -143,6 +170,14 @@ export const aiRouter = createTRPCRouter({
               'Failed to generate AI message. Please try again or use the template.',
           })
         }
+
+        // Log successful AI generation
+        aiLogger.generationCompleted({
+          posthogDistinctId: user.id,
+          target_contact_id: input.targetContactId,
+          duration_ms: result.responseTimeMs || responseTimeMs,
+          token_count: result.tokensUsed,
+        })
 
         // Sanitize the message
         const sanitizedMessage = sanitizeIntroductionMessage(result.message)
@@ -175,6 +210,18 @@ export const aiRouter = createTRPCRouter({
           responseTimeMs: result.responseTimeMs || responseTimeMs,
         }
       } catch (error) {
+        // Log error
+        errorLogger.system({
+          posthogDistinctId: ctx.user!.id,
+          error_type: 'ai_generation_error',
+          error_message:
+            error instanceof Error ? error.message : 'Unknown error',
+          stack_trace: error instanceof Error ? error.stack : undefined,
+          context: {
+            targetContactId: input.targetContactId,
+          },
+        })
+
         // Record failed generation
         await recordGeneration(ctx.user!.id, {
           generationType: 'introduction_message',

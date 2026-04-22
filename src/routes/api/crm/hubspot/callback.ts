@@ -6,11 +6,13 @@ import { HubSpotService } from '@/services/hubspot.service'
 import { tokenStorage } from '@/services/token-storage.service'
 import { auth } from '@/lib/auth'
 import { trackServerEvent } from '@/integrations/posthog'
+import { crmLogger, errorLogger } from '@/integrations/opentelemetry'
 
 export const Route = createFileRoute('/api/crm/hubspot/callback')({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        const startTime = Date.now()
         try {
           const url = new URL(request.url)
           const code = url.searchParams.get('code')
@@ -19,12 +21,27 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
           // Handle OAuth errors
           if (error) {
             console.error('HubSpot OAuth error:', error)
+
+            crmLogger.connectionFailed({
+              posthogDistinctId: 'unknown',
+              provider: 'hubspot',
+              error_type: 'oauth_error',
+              error_message: error,
+            })
+
             return Response.redirect(
               `${url.origin}/crm-integrations?error=oauth_failed`,
             )
           }
 
           if (!code) {
+            crmLogger.connectionFailed({
+              posthogDistinctId: 'unknown',
+              provider: 'hubspot',
+              error_type: 'missing_code',
+              error_message: 'OAuth code missing from callback',
+            })
+
             return Response.redirect(
               `${url.origin}/crm-integrations?error=missing_code`,
             )
@@ -66,6 +83,16 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
             await tokenStorage.storeTokens(session.user.id, 'hubspot', tokens)
           }
 
+          // Log successful OAuth flow
+          const duration = Date.now() - startTime
+          crmLogger.oauthFlow({
+            posthogDistinctId: session.user.id,
+            provider: 'hubspot',
+            stage: 'completed',
+            is_reconnection: !!existingIntegration,
+            duration_ms: duration,
+          })
+
           // Track successful CRM connection in PostHog
           trackServerEvent(session.user.id, 'crm_connected', {
             provider: 'hubspot',
@@ -84,6 +111,17 @@ export const Route = createFileRoute('/api/crm/hubspot/callback')({
           )
         } catch (error) {
           console.error('Error in HubSpot OAuth callback:', error)
+
+          // Log OAuth failure
+          errorLogger.externalApi({
+            posthogDistinctId: 'unknown',
+            error_type: 'hubspot_oauth_failed',
+            error_message:
+              error instanceof Error ? error.message : 'Unknown error',
+            stack_trace: error instanceof Error ? error.stack : undefined,
+            endpoint: '/api/crm/hubspot/callback',
+          })
+
           const url = new URL(request.url)
           return Response.redirect(
             `${url.origin}/crm-integrations?error=connection_failed`,
