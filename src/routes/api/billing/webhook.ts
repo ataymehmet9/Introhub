@@ -5,7 +5,10 @@ import { stripe } from '@/integrations/stripe/init'
 import { db } from '@/db'
 import { notifications, user as userTable } from '@/db/schema'
 import { downgradeToFree, upgradeToPro } from '@/services/subscription.service'
-import { billingLogger, errorLogger } from '@/integrations/opentelemetry'
+import {
+  billingLogger,
+  errorLogger,
+} from '@/integrations/opentelemetry/logger.server'
 
 export const Route = createFileRoute('/api/billing/webhook')({
   server: {

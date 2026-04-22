@@ -15,7 +15,10 @@ import { sendCRMSyncFailureEmailDirect } from './email.functions'
 import type { Job } from 'bullmq'
 import { db } from '@/db'
 import { crmIntegrations, notifications, syncLogs, user } from '@/db/schema'
-import { crmLogger, errorLogger } from '@/integrations/opentelemetry'
+import {
+  crmLogger,
+  errorLogger,
+} from '@/integrations/opentelemetry/logger.server'
 
 // Dynamic import to avoid bundling server-only code in client bundle
 const getPublishNotificationEvent = async () => {

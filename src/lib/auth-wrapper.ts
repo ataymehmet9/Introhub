@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { usePostHog } from '@posthog/react'
 import { useRouter } from '@tanstack/react-router'
 import { authClient, baseSignIn, baseSignUp } from './auth-client'
-import { trackServerEvent } from '@/integrations/posthog'
 
 /**
  * Secure authentication wrapper that ensures complete cache cleanup
@@ -54,7 +53,7 @@ export const useSecureSignIn = () => {
 
         // Log successful signin
         if (result.data?.user?.id) {
-          trackServerEvent(result.data.user.id, 'auth_signin_success', {
+          posthog.capture('auth_signin_success', {
             provider: 'email',
             duration_ms: Date.now() - startTime,
             email,
@@ -64,7 +63,7 @@ export const useSecureSignIn = () => {
         }
       } else {
         // Log failed signin
-        trackServerEvent('anonymous', 'auth_signin_failed', {
+        posthog.capture('auth_signin_failed', {
           provider: 'email',
           error: result.error?.message || 'Unknown error',
           duration_ms: Date.now() - startTime,
@@ -78,7 +77,7 @@ export const useSecureSignIn = () => {
       console.error('Error during secure sign in:', error)
 
       // Log signin error
-      trackServerEvent('anonymous', 'auth_signin_error', {
+      posthog.capture('auth_signin_error', {
         provider: 'email',
         error: error instanceof Error ? error.message : 'Unknown error',
         duration_ms: Date.now() - startTime,
@@ -104,7 +103,7 @@ export const useSecureSignIn = () => {
       console.log('Pre-OAuth cache cleared')
 
       // Log OAuth signin attempt
-      trackServerEvent('anonymous', 'auth_oauth_started', {
+      posthog.capture('auth_oauth_started', {
         provider,
         timestamp: new Date().toISOString(),
       })
@@ -115,7 +114,7 @@ export const useSecureSignIn = () => {
       console.error('Error during secure OAuth sign in:', error)
 
       // Log OAuth error
-      trackServerEvent('anonymous', 'auth_oauth_error', {
+      posthog.capture('auth_oauth_error', {
         provider,
         error: error instanceof Error ? error.message : 'Unknown error',
         duration_ms: Date.now() - startTime,
@@ -169,7 +168,7 @@ export const useSecureSignUp = () => {
 
         // Log successful signup
         if (result.data?.user?.id) {
-          trackServerEvent(result.data.user.id, 'auth_signup_success', {
+          posthog.capture('auth_signup_success', {
             provider: 'email',
             duration_ms: Date.now() - startTime,
             email,
@@ -179,7 +178,7 @@ export const useSecureSignUp = () => {
         }
       } else {
         // Log failed signup
-        trackServerEvent('anonymous', 'auth_signup_failed', {
+        posthog.capture('auth_signup_failed', {
           provider: 'email',
           error: result.error?.message || 'Unknown error',
           duration_ms: Date.now() - startTime,
@@ -193,7 +192,7 @@ export const useSecureSignUp = () => {
       console.error('Error during secure sign up:', error)
 
       // Log signup error
-      trackServerEvent('anonymous', 'auth_signup_error', {
+      posthog.capture('auth_signup_error', {
         provider: 'email',
         error: error instanceof Error ? error.message : 'Unknown error',
         duration_ms: Date.now() - startTime,

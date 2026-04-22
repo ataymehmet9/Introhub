@@ -27,7 +27,7 @@ import {
   incrementRequestCount,
 } from '@/services/subscription.service'
 import { SUBSCRIPTION_CONFIG } from '@/configs/subscription.config'
-import { introductionLogger } from '@/integrations/opentelemetry'
+import { introductionLogger } from '@/integrations/opentelemetry/logger.server'
 
 // Dynamic import to avoid bundling server-only code in client bundle
 const getNotificationEmitter = async () => {

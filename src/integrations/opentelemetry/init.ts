@@ -19,6 +19,11 @@ let sdk: NodeSDK | null = null
  * Initialize OpenTelemetry SDK with PostHog configuration
  */
 export function initializeOpenTelemetry(): NodeSDK | null {
+  // Only run on server-side
+  if (typeof window !== 'undefined') {
+    return null
+  }
+
   // Only initialize once
   if (sdk) {
     return sdk

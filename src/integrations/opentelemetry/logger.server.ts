@@ -1,7 +1,8 @@
 /**
- * OpenTelemetry Logger
+ * OpenTelemetry Logger - Server Only
  *
- * Provides convenient logging functions for structured logging to PostHog.
+ * This file should only be imported in server-side code.
+ * For client-side code, use the stub functions from logger.ts
  */
 
 import { logs } from '@opentelemetry/api-logs'
@@ -48,9 +49,8 @@ function log(
       },
     })
   } catch (error) {
-    // Fallback to console if logging fails
+    // Silently fail - logging should never break the application
     console.error('Failed to emit log:', error)
-    console.log({ event, severity, message, attributes })
   }
 }
 
@@ -70,11 +70,7 @@ export const authLogger = {
   signin: (attributes: Omit<AuthLogAttributes, 'timestamp' | 'service'>) => {
     log(
       'auth.signin',
-      attributes.status === 'success'
-        ? 'INFO'
-        : attributes.error_type
-          ? 'ERROR'
-          : 'WARN',
+      attributes.status === 'success' ? 'INFO' : 'ERROR',
       `User signin ${attributes.status}`,
       attributes,
     )
@@ -157,14 +153,14 @@ export const billingLogger = {
 }
 
 /**
- * CRM integration logging
+ * CRM logging
  */
 export const crmLogger = {
   oauthFlow: (attributes: Omit<CRMLogAttributes, 'timestamp' | 'service'>) => {
     log(
       'crm.oauth_flow',
-      attributes.error_type ? 'ERROR' : 'INFO',
-      `CRM OAuth flow ${attributes.stage || 'completed'}`,
+      attributes.success ? 'INFO' : 'ERROR',
+      `CRM OAuth ${attributes.success ? 'successful' : 'failed'}`,
       attributes,
     )
   },
@@ -178,25 +174,13 @@ export const crmLogger = {
   syncProgress: (
     attributes: Omit<CRMLogAttributes, 'timestamp' | 'service'>,
   ) => {
-    log(
-      'crm.sync_progress',
-      'INFO',
-      `CRM sync progress: ${attributes.percentage}%`,
-      attributes,
-    )
+    log('crm.sync_progress', 'INFO', 'CRM sync in progress', attributes)
   },
 
   syncCompleted: (
     attributes: Omit<CRMLogAttributes, 'timestamp' | 'service'>,
   ) => {
-    log(
-      'crm.sync_completed',
-      typeof attributes.error_count === 'number' && attributes.error_count > 0
-        ? 'WARN'
-        : 'INFO',
-      'CRM sync completed',
-      attributes,
-    )
+    log('crm.sync_completed', 'INFO', 'CRM sync completed', attributes)
   },
 
   connectionFailed: (
@@ -207,7 +191,7 @@ export const crmLogger = {
 }
 
 /**
- * AI generation logging
+ * AI logging
  */
 export const aiLogger = {
   generationRequested: (
@@ -322,8 +306,8 @@ export const introductionLogger = {
   ) => {
     log(
       'introduction.request_created',
-      attributes.error_type ? 'ERROR' : 'INFO',
-      `Introduction request ${attributes.error_type ? 'failed' : 'created'}`,
+      'INFO',
+      'Introduction request created',
       attributes,
     )
   },
@@ -355,8 +339,8 @@ export const introductionLogger = {
   ) => {
     log(
       'introduction.email_sent',
-      attributes.error_type ? 'ERROR' : 'INFO',
-      `Introduction email ${attributes.error_type ? 'failed' : 'sent'}`,
+      attributes.success ? 'INFO' : 'ERROR',
+      `Introduction email ${attributes.success ? 'sent' : 'failed'}`,
       attributes,
     )
   },
@@ -369,7 +353,7 @@ export const errorLogger = {
   database: (
     attributes: Omit<ErrorLogAttributes, 'timestamp' | 'service' | 'category'>,
   ) => {
-    log('error.database', 'ERROR', String(attributes.error_message), {
+    log('error.database', 'ERROR', 'Database error', {
       ...attributes,
       category: 'database',
     })
@@ -378,7 +362,7 @@ export const errorLogger = {
   externalApi: (
     attributes: Omit<ErrorLogAttributes, 'timestamp' | 'service' | 'category'>,
   ) => {
-    log('error.external_api', 'ERROR', String(attributes.error_message), {
+    log('error.external_api', 'ERROR', 'External API error', {
       ...attributes,
       category: 'external_api',
     })
@@ -387,7 +371,7 @@ export const errorLogger = {
   validation: (
     attributes: Omit<ErrorLogAttributes, 'timestamp' | 'service' | 'category'>,
   ) => {
-    log('error.validation', 'ERROR', String(attributes.error_message), {
+    log('error.validation', 'ERROR', 'Validation error', {
       ...attributes,
       category: 'validation',
     })
@@ -396,7 +380,7 @@ export const errorLogger = {
   authorization: (
     attributes: Omit<ErrorLogAttributes, 'timestamp' | 'service' | 'category'>,
   ) => {
-    log('error.authorization', 'ERROR', String(attributes.error_message), {
+    log('error.authorization', 'ERROR', 'Authorization error', {
       ...attributes,
       category: 'authorization',
     })
@@ -405,7 +389,7 @@ export const errorLogger = {
   rateLimit: (
     attributes: Omit<ErrorLogAttributes, 'timestamp' | 'service' | 'category'>,
   ) => {
-    log('error.rate_limit', 'ERROR', String(attributes.error_message), {
+    log('error.rate_limit', 'ERROR', 'Rate limit error', {
       ...attributes,
       category: 'rate_limit',
     })
@@ -414,23 +398,11 @@ export const errorLogger = {
   system: (
     attributes: Omit<ErrorLogAttributes, 'timestamp' | 'service' | 'category'>,
   ) => {
-    log('error.system', 'ERROR', String(attributes.error_message), {
+    log('error.system', 'ERROR', 'System error', {
       ...attributes,
       category: 'system',
     })
   },
-}
-
-/**
- * Generic log function for custom events
- */
-export function logEvent(
-  event: LogEvent,
-  severity: LogSeverity,
-  message: string,
-  attributes: Attributes,
-): void {
-  log(event, severity, message, attributes)
 }
 
 // Made with Bob

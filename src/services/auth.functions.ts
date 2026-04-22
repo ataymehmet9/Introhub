@@ -2,7 +2,10 @@ import { createServerFn } from '@tanstack/react-start'
 import { userEmailSchema } from '@/schemas'
 import { authClient } from '@/lib/auth-client'
 import appConfig from '@/configs/app.config'
-import { authLogger, errorLogger } from '@/integrations/opentelemetry'
+import {
+  authLogger,
+  errorLogger,
+} from '@/integrations/opentelemetry/logger.server'
 
 export const requestPasswordReset = createServerFn({ method: 'POST' })
   .inputValidator(userEmailSchema)

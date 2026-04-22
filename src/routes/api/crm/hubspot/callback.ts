@@ -6,7 +6,10 @@ import { HubSpotService } from '@/services/hubspot.service'
 import { tokenStorage } from '@/services/token-storage.service'
 import { auth } from '@/lib/auth'
 import { trackServerEvent } from '@/integrations/posthog'
-import { crmLogger, errorLogger } from '@/integrations/opentelemetry'
+import {
+  crmLogger,
+  errorLogger,
+} from '@/integrations/opentelemetry/logger.server'
 
 export const Route = createFileRoute('/api/crm/hubspot/callback')({
   server: {

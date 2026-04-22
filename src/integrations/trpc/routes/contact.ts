@@ -12,7 +12,10 @@ import {
 import { contacts } from '@/db/schema'
 import { parseCSV } from '@/utils/fileUtils'
 import { trackServerEvent } from '@/integrations/posthog'
-import { contactLogger, errorLogger } from '@/integrations/opentelemetry'
+import {
+  contactLogger,
+  errorLogger,
+} from '@/integrations/opentelemetry/logger.server'
 
 const listContactsSchema = contactSchema
   .pick({

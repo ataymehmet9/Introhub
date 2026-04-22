@@ -18,7 +18,10 @@ import {
   recordGeneration,
 } from '@/services/ai-rate-limit.service'
 import { contacts } from '@/db/schema'
-import { aiLogger, errorLogger } from '@/integrations/opentelemetry'
+import {
+  aiLogger,
+  errorLogger,
+} from '@/integrations/opentelemetry/logger.server'
 
 export const aiRouter = createTRPCRouter({
   /**
