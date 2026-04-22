@@ -52,6 +52,14 @@ The build script includes increased Node memory allocation to handle the large b
 }
 ```
 
+**Production Deployment:**
+The `instrument.server.mjs` file automatically detects whether it's running in development or production:
+
+- **Development**: Imports TypeScript files directly from `src/integrations/opentelemetry/init.ts`
+- **Production**: Dynamically finds and imports the compiled `.mjs` file from `.output/server/_ssr/`
+
+If OpenTelemetry initialization fails (e.g., missing environment variables), the server will still start with a warning message, and logging will be disabled.
+
 ## Logged User Flows
 
 ### 1. Billing & Subscriptions
