@@ -3,9 +3,10 @@
  * Initializes OpenTelemetry and Sentry before the application starts
  */
 
-import { NodeSDK } from '@opentelemetry/sdk-node'
+import { LoggerProvider } from '@opentelemetry/sdk-logs'
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http'
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs'
+import { logs } from '@opentelemetry/api-logs'
 import { resourceFromAttributes } from '@opentelemetry/resources'
 import {
   ATTR_SERVICE_NAME,
@@ -13,7 +14,7 @@ import {
 } from '@opentelemetry/semantic-conventions'
 
 // Initialize OpenTelemetry
-let otelSDK = null
+let loggerProvider = null
 
 try {
   const posthogToken =
@@ -35,6 +36,7 @@ try {
       url: `${posthogHost}/i/v1/logs`,
       headers: {
         Authorization: `Bearer ${posthogToken}`,
+        'Content-Type': 'application/json',
       },
     })
 
@@ -46,13 +48,14 @@ try {
       exportTimeoutMillis: 30000,
     })
 
-    // Initialize the SDK
-    otelSDK = new NodeSDK({
+    // Create and register LoggerProvider with processors
+    loggerProvider = new LoggerProvider({
       resource,
-      logRecordProcessor,
+      processors: [logRecordProcessor],
     })
 
-    otelSDK.start()
+    // CRITICAL: Register the logger provider globally
+    logs.setGlobalLoggerProvider(loggerProvider)
 
     console.log('✓ OpenTelemetry logging initialized successfully')
     console.log(`  Service: ${serviceName}`)
@@ -61,10 +64,10 @@ try {
     // Graceful shutdown
     const shutdown = async () => {
       try {
-        await otelSDK?.shutdown()
-        console.log('OpenTelemetry SDK shut down successfully')
+        await loggerProvider?.shutdown()
+        console.log('OpenTelemetry LoggerProvider shut down successfully')
       } catch (error) {
-        console.error('Error shutting down OpenTelemetry SDK:', error)
+        console.error('Error shutting down OpenTelemetry:', error)
       }
     }
 
