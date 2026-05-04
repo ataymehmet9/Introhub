@@ -43,10 +43,16 @@ export default function PublicHeader() {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              to="/what-is-introhub"
+              to="/product"
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
-              What is IntroHub
+              Product
+            </Link>
+            <Link
+              to="/solutions"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              Solutions
             </Link>
             <Link
               to="/pricing"
@@ -55,10 +61,22 @@ export default function PublicHeader() {
               Pricing
             </Link>
             <Link
-              to="/get-demo"
+              to="/about"
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
-              Get a Demo
+              About
+            </Link>
+            <Link
+              to="/faq"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              FAQ
+            </Link>
+            <Link
+              to="/book-demo"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              Book a Demo
             </Link>
           </div>
 
@@ -103,11 +121,18 @@ export default function PublicHeader() {
           <div className="md:hidden py-4 px-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg">
             <div className="flex flex-col gap-4">
               <Link
-                to="/what-is-introhub"
+                to="/product"
                 className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                What is IntroHub
+                Product
+              </Link>
+              <Link
+                to="/solutions"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Solutions
               </Link>
               <Link
                 to="/pricing"
@@ -117,11 +142,25 @@ export default function PublicHeader() {
                 Pricing
               </Link>
               <Link
-                to="/get-demo"
+                to="/about"
                 className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Get a Demo
+                About
+              </Link>
+              <Link
+                to="/faq"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                FAQ
+              </Link>
+              <Link
+                to="/book-demo"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Book a Demo
               </Link>
               <div className="flex flex-col gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <Button

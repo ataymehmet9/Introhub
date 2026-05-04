@@ -12,10 +12,11 @@ function RouteComponent() {
 
   const plans = [
     {
-      name: 'Free',
+      name: 'Starter',
       price: '$0',
       period: 'forever',
-      description: 'Perfect for getting started',
+      description:
+        'For smaller teams and curated networks getting introduction workflows out of inboxes and into one system.',
       features: [
         'Unlimited contacts',
         '5 introduction requests per month',
@@ -26,10 +27,11 @@ function RouteComponent() {
       highlighted: false,
     },
     {
-      name: 'Professional',
-      price: '$29',
+      name: 'Growth',
+      price: '$99',
       period: 'per month',
-      description: 'For active networkers',
+      description:
+        'For scaling sales, partnership, and community teams that need more visibility, coordination, and reporting.',
       features: [
         'Unlimited contacts',
         'Unlimited introduction requests',
@@ -45,9 +47,10 @@ function RouteComponent() {
       name: 'Enterprise',
       price: 'Custom',
       period: 'contact us',
-      description: 'For large organizations',
+      description:
+        'For larger organizations and multi-team environments that need advanced permissions, rollout support, and tailored implementation.',
       features: [
-        'Everything in Professional',
+        'Everything in Growth',
         'Dedicated account manager',
         'Custom integrations',
         'SLA guarantee',
@@ -70,12 +73,19 @@ function RouteComponent() {
           className="text-center mb-16"
         >
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Simple, Transparent Pricing
+            Pricing that scales with your network, not your admin load.
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Choose the plan that's right for you. All plans include a 14-day
-            free trial.
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-6">
+            IntroHub plans are designed for teams and networks that want to
+            create more value from warm introductions, with the workflow clarity
+            and visibility needed to scale confidently.
           </p>
+          <Button
+            variant="solid"
+            onClick={() => navigate({ to: '/book-demo' })}
+          >
+            Book a demo
+          </Button>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -178,6 +188,40 @@ function RouteComponent() {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, translateY: 40 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-20 max-w-4xl mx-auto"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+            Why teams choose IntroHub pricing
+          </h2>
+          <ul className="space-y-4">
+            <li className="flex items-start gap-4 text-lg text-gray-700 dark:text-gray-300">
+              <span className="text-2xl text-green-500 flex-shrink-0">✓</span>
+              <span>
+                Designed for privacy, professionalism, and trust-based
+                workflows.
+              </span>
+            </li>
+            <li className="flex items-start gap-4 text-lg text-gray-700 dark:text-gray-300">
+              <span className="text-2xl text-green-500 flex-shrink-0">✓</span>
+              <span>
+                Built to support repeatable introductions without losing the
+                human element.
+              </span>
+            </li>
+            <li className="flex items-start gap-4 text-lg text-gray-700 dark:text-gray-300">
+              <span className="text-2xl text-green-500 flex-shrink-0">✓</span>
+              <span>
+                Suitable for sales, partnerships, and member-driven network
+                models.
+              </span>
+            </li>
+          </ul>
+        </motion.div>
       </div>
     </div>
   )

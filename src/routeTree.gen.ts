@@ -13,9 +13,12 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
-import { Route as PublicWhatIsIntrohubRouteImport } from './routes/_public/what-is-introhub'
+import { Route as PublicSolutionsRouteImport } from './routes/_public/solutions'
+import { Route as PublicProductRouteImport } from './routes/_public/product'
 import { Route as PublicPricingRouteImport } from './routes/_public/pricing'
-import { Route as PublicGetDemoRouteImport } from './routes/_public/get-demo'
+import { Route as PublicFaqRouteImport } from './routes/_public/faq'
+import { Route as PublicBookDemoRouteImport } from './routes/_public/book-demo'
+import { Route as PublicAboutRouteImport } from './routes/_public/about'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/_help'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
 import { Route as ApiNotificationsStreamRouteImport } from './routes/api/notifications/stream'
@@ -58,9 +61,14 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PublicWhatIsIntrohubRoute = PublicWhatIsIntrohubRouteImport.update({
-  id: '/what-is-introhub',
-  path: '/what-is-introhub',
+const PublicSolutionsRoute = PublicSolutionsRouteImport.update({
+  id: '/solutions',
+  path: '/solutions',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicProductRoute = PublicProductRouteImport.update({
+  id: '/product',
+  path: '/product',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicPricingRoute = PublicPricingRouteImport.update({
@@ -68,9 +76,19 @@ const PublicPricingRoute = PublicPricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => PublicRoute,
 } as any)
-const PublicGetDemoRoute = PublicGetDemoRouteImport.update({
-  id: '/get-demo',
-  path: '/get-demo',
+const PublicFaqRoute = PublicFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicBookDemoRoute = PublicBookDemoRouteImport.update({
+  id: '/book-demo',
+  path: '/book-demo',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicAboutRoute = PublicAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => PublicRoute,
 } as any)
 const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
@@ -202,9 +220,12 @@ const AuthenticateduserMeBillingRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
-  '/get-demo': typeof PublicGetDemoRoute
+  '/about': typeof PublicAboutRoute
+  '/book-demo': typeof PublicBookDemoRoute
+  '/faq': typeof PublicFaqRoute
   '/pricing': typeof PublicPricingRoute
-  '/what-is-introhub': typeof PublicWhatIsIntrohubRoute
+  '/product': typeof PublicProductRoute
+  '/solutions': typeof PublicSolutionsRoute
   '/api/upload': typeof ApiUploadRoute
   '/contacts': typeof AuthenticatedcontactsContactsRoute
   '/crm-integrations': typeof AuthenticatedcrmIntegrationsCrmIntegrationsRoute
@@ -231,9 +252,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
-  '/get-demo': typeof PublicGetDemoRoute
+  '/about': typeof PublicAboutRoute
+  '/book-demo': typeof PublicBookDemoRoute
+  '/faq': typeof PublicFaqRoute
   '/pricing': typeof PublicPricingRoute
-  '/what-is-introhub': typeof PublicWhatIsIntrohubRoute
+  '/product': typeof PublicProductRoute
+  '/solutions': typeof PublicSolutionsRoute
   '/api/upload': typeof ApiUploadRoute
   '/contacts': typeof AuthenticatedcontactsContactsRoute
   '/crm-integrations': typeof AuthenticatedcrmIntegrationsCrmIntegrationsRoute
@@ -262,9 +286,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
   '/_authenticated/_help': typeof AuthenticatedHelpRouteWithChildren
-  '/_public/get-demo': typeof PublicGetDemoRoute
+  '/_public/about': typeof PublicAboutRoute
+  '/_public/book-demo': typeof PublicBookDemoRoute
+  '/_public/faq': typeof PublicFaqRoute
   '/_public/pricing': typeof PublicPricingRoute
-  '/_public/what-is-introhub': typeof PublicWhatIsIntrohubRoute
+  '/_public/product': typeof PublicProductRoute
+  '/_public/solutions': typeof PublicSolutionsRoute
   '/api/upload': typeof ApiUploadRoute
   '/_public/': typeof PublicIndexRoute
   '/_authenticated/(contacts)/contacts': typeof AuthenticatedcontactsContactsRoute
@@ -294,9 +321,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/get-demo'
+    | '/about'
+    | '/book-demo'
+    | '/faq'
     | '/pricing'
-    | '/what-is-introhub'
+    | '/product'
+    | '/solutions'
     | '/api/upload'
     | '/contacts'
     | '/crm-integrations'
@@ -323,9 +353,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/get-demo'
+    | '/about'
+    | '/book-demo'
+    | '/faq'
     | '/pricing'
-    | '/what-is-introhub'
+    | '/product'
+    | '/solutions'
     | '/api/upload'
     | '/contacts'
     | '/crm-integrations'
@@ -353,9 +386,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_public'
     | '/_authenticated/_help'
-    | '/_public/get-demo'
+    | '/_public/about'
+    | '/_public/book-demo'
+    | '/_public/faq'
     | '/_public/pricing'
-    | '/_public/what-is-introhub'
+    | '/_public/product'
+    | '/_public/solutions'
     | '/api/upload'
     | '/_public/'
     | '/_authenticated/(contacts)/contacts'
@@ -424,11 +460,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_public/what-is-introhub': {
-      id: '/_public/what-is-introhub'
-      path: '/what-is-introhub'
-      fullPath: '/what-is-introhub'
-      preLoaderRoute: typeof PublicWhatIsIntrohubRouteImport
+    '/_public/solutions': {
+      id: '/_public/solutions'
+      path: '/solutions'
+      fullPath: '/solutions'
+      preLoaderRoute: typeof PublicSolutionsRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/product': {
+      id: '/_public/product'
+      path: '/product'
+      fullPath: '/product'
+      preLoaderRoute: typeof PublicProductRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/pricing': {
@@ -438,11 +481,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPricingRouteImport
       parentRoute: typeof PublicRoute
     }
-    '/_public/get-demo': {
-      id: '/_public/get-demo'
-      path: '/get-demo'
-      fullPath: '/get-demo'
-      preLoaderRoute: typeof PublicGetDemoRouteImport
+    '/_public/faq': {
+      id: '/_public/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof PublicFaqRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/book-demo': {
+      id: '/_public/book-demo'
+      path: '/book-demo'
+      fullPath: '/book-demo'
+      preLoaderRoute: typeof PublicBookDemoRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/about': {
+      id: '/_public/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof PublicAboutRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_authenticated/_help': {
@@ -666,9 +723,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface PublicRouteChildren {
-  PublicGetDemoRoute: typeof PublicGetDemoRoute
+  PublicAboutRoute: typeof PublicAboutRoute
+  PublicBookDemoRoute: typeof PublicBookDemoRoute
+  PublicFaqRoute: typeof PublicFaqRoute
   PublicPricingRoute: typeof PublicPricingRoute
-  PublicWhatIsIntrohubRoute: typeof PublicWhatIsIntrohubRoute
+  PublicProductRoute: typeof PublicProductRoute
+  PublicSolutionsRoute: typeof PublicSolutionsRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicauthForgotPasswordRoute: typeof PublicauthForgotPasswordRoute
   PublicauthLoginRoute: typeof PublicauthLoginRoute
@@ -677,9 +737,12 @@ interface PublicRouteChildren {
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
-  PublicGetDemoRoute: PublicGetDemoRoute,
+  PublicAboutRoute: PublicAboutRoute,
+  PublicBookDemoRoute: PublicBookDemoRoute,
+  PublicFaqRoute: PublicFaqRoute,
   PublicPricingRoute: PublicPricingRoute,
-  PublicWhatIsIntrohubRoute: PublicWhatIsIntrohubRoute,
+  PublicProductRoute: PublicProductRoute,
+  PublicSolutionsRoute: PublicSolutionsRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicauthForgotPasswordRoute: PublicauthForgotPasswordRoute,
   PublicauthLoginRoute: PublicauthLoginRoute,

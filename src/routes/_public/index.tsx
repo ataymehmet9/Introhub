@@ -45,14 +45,6 @@ const TextGenerateEffect = ({
 function RouteComponent() {
   const navigate = useNavigate()
 
-  const handleGetStarted = () => {
-    navigate({ to: '/dashboard' })
-  }
-
-  const handleLearnMore = () => {
-    navigate({ to: '/contacts' })
-  }
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <PublicHeader />
@@ -61,17 +53,20 @@ function RouteComponent() {
         <div className="flex flex-col min-h-screen pt-20 md:pt-40 relative overflow-hidden">
           <div>
             <TextGenerateEffect
-              wordClassName="text-2xl md:text-4xl lg:text-8xl font-bold max-w-7xl mx-auto text-center mt-6 relative z-10"
-              words="Stop guessing who can help. Start winning with warm intros."
+              wordClassName="text-2xl md:text-4xl lg:text-7xl font-bold max-w-7xl mx-auto text-center mt-6 relative z-10"
+              words="Turn existing relationships into warm introductions, qualified meetings, and faster pipeline."
               wordsCallbackClass={({ word }) => {
                 if (
-                  ['Start', 'winning', 'with', 'warm', 'intros.'].includes(word)
+                  [
+                    'warm',
+                    'introductions,',
+                    'qualified',
+                    'meetings,',
+                    'faster',
+                    'pipeline.',
+                  ].includes(word)
                 ) {
                   return 'bg-gradient-to-r from-[#2feaa8] to-[#0eb9ce] bg-clip-text text-transparent'
-                }
-
-                if (word === 'Network') {
-                  return 'bg-gradient-to-r from-[#02bcca] to-[#028cf3] bg-clip-text text-transparent'
                 }
 
                 return 'text-gray-900 dark:text-white'
@@ -83,9 +78,10 @@ function RouteComponent() {
               transition={{ duration: 0.3, delay: 0.5 }}
               className="text-center mt-6 text-base md:text-xl text-gray-600 dark:text-gray-400 max-w-5xl mx-auto relative z-10 font-normal"
             >
-              IntroHub shows you who can open doors into your target accounts,
-              lets your team send intro requests in one click, and tracks every
-              intro all the way to closed-won revenue.
+              IntroHub helps sales teams, sales reps, partnerships teams,
+              communities, and investor networks find the right path into target
+              accounts, request introductions with context, and track every
+              intro from ask to outcome.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, translateY: 40 }}
@@ -93,11 +89,15 @@ function RouteComponent() {
               transition={{ duration: 0.3, delay: 0.6 }}
               className="flex items-center gap-4 justify-center mt-10 relative z-10"
             >
-              <Button variant="solid" onClick={handleGetStarted} size="lg">
-                Preview
+              <Button
+                variant="solid"
+                onClick={() => navigate({ to: '/book-demo' })}
+                size="lg"
+              >
+                Book a demo
               </Button>
-              <Button onClick={handleLearnMore} size="lg">
-                Get this template
+              <Button onClick={() => navigate({ to: '/product' })} size="lg">
+                See how it works
               </Button>
             </motion.div>
           </div>
@@ -256,7 +256,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      {/* Features Section */}
+      {/* Key Benefits Section */}
       <div className="max-w-7xl mx-auto px-4 py-20">
         <motion.div
           initial={{ opacity: 0, translateY: 40 }}
@@ -266,32 +266,34 @@ function RouteComponent() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Why Choose IntroHub?
+            Built for teams that grow through relationships, not guesswork.
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Everything you need to manage your professional network effectively
+            Ideal for sales teams, partnerships leaders, private communities,
+            membership networks, and founder ecosystems that rely on trusted
+            access to create opportunity.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           {[
             {
-              icon: '🔍',
-              title: 'Smart Contact Search',
+              icon: '🚪',
+              title: 'Open doors into accounts',
               description:
-                'Quickly find and filter contacts based on industry, location, skills, and more.',
+                'Open doors into accounts that ignore cold outreach.',
             },
             {
-              icon: '📬',
-              title: 'Introduction Requests',
+              icon: '🔄',
+              title: 'Clear workflow',
               description:
-                'Send and manage introduction requests with ease. Track status and follow up efficiently.',
+                'Replace scattered intro requests with one clear workflow.',
             },
             {
-              icon: '📊',
-              title: 'Network Analytics',
+              icon: '👁️',
+              title: 'Full visibility',
               description:
-                'Gain insights into your networking activities with comprehensive analytics and reports.',
+                'Give teams visibility into which introductions are pending, sent, accepted, and progressing.',
             },
           ].map((feature, index) => (
             <motion.div
@@ -312,6 +314,231 @@ function RouteComponent() {
             </motion.div>
           ))}
         </div>
+      </div>
+
+      {/* Process Section */}
+      <div className="bg-gray-50 dark:bg-gray-800 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, translateY: 40 }}
+            whileInView={{ opacity: 1, translateY: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              A better way to activate the right relationship.
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              IntroHub gives revenue teams and trusted networks a clear workflow
+              for finding warm paths, making better asks, coordinating
+              introductions, and tracking what happens next.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: '🔍',
+                title: 'Find the right path',
+                description:
+                  'Identify who can credibly open the door based on account relevance, relationship context, industry, or shared trust.',
+              },
+              {
+                icon: '✍️',
+                title: 'Make a better ask',
+                description:
+                  'Submit a structured introduction request with the context a connector needs to act quickly and confidently.',
+              },
+              {
+                icon: '📨',
+                title: 'Send the intro',
+                description:
+                  'Coordinate a warm introduction without rewriting the process every time or losing details across channels.',
+              },
+              {
+                icon: '📊',
+                title: 'Track what happened',
+                description:
+                  'See which intros were sent, accepted, responded to, and progressed so the team can measure what is working.',
+              },
+            ].map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, translateY: 40 }}
+                whileInView={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
+              >
+                <div className="text-5xl mb-4">{step.icon}</div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Why Teams Choose Section */}
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        <motion.div
+          initial={{ opacity: 0, translateY: 40 }}
+          whileInView={{ opacity: 1, translateY: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            Why teams choose IntroHub.
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[
+            {
+              icon: '📈',
+              title: 'More pipeline from warm paths',
+              description:
+                'Create more opportunities by reaching buyers through trusted relationships instead of relying only on cold outbound.',
+            },
+            {
+              icon: '⚡',
+              title: 'Less friction for reps and connectors',
+              description:
+                'Make it easier for both sides to participate with clearer requests, cleaner workflows, and better context.',
+            },
+            {
+              icon: '🤝',
+              title: 'Better cross-functional collaboration',
+              description:
+                'Bring sales, partnerships, communities, and network operators into one shared introduction workflow.',
+            },
+            {
+              icon: '📊',
+              title: 'Measurable relationship value',
+              description:
+                'Track activity and outcomes so introductions become an accountable growth motion rather than an informal side process.',
+            },
+          ].map((benefit, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, translateY: 40 }}
+              whileInView={{ opacity: 1, translateY: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+            >
+              <div className="text-5xl mb-4">{benefit.icon}</div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                {benefit.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {benefit.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Use Cases Section */}
+      <div className="bg-gray-50 dark:bg-gray-800 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, translateY: 40 }}
+            whileInView={{ opacity: 1, translateY: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Designed for every team that grows through trusted access.
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: '👥',
+                title: 'Sales Teams',
+                description:
+                  'Help reps identify warm paths into target accounts and create a repeatable intro motion across the team.',
+              },
+              {
+                icon: '💼',
+                title: 'Sales ICs',
+                description:
+                  'Give AEs, SDRs, and BDRs a faster route to the right buyer through people who already have credibility.',
+              },
+              {
+                icon: '🤝',
+                title: 'Partnerships Teams',
+                description:
+                  'Turn ecosystem relationships into more visible lead flow, shared opportunities, and stronger collaboration with sales.',
+              },
+              {
+                icon: '🌐',
+                title: 'Communities and Networks',
+                description:
+                  'Create more member value by facilitating high-relevance introductions at scale.',
+              },
+              {
+                icon: '💡',
+                title: 'Investors and Founder Networks',
+                description:
+                  'Support portfolio and network companies with timely access to buyers, advisors, talent, and strategic relationships.',
+              },
+            ].map((useCase, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, translateY: 40 }}
+                whileInView={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
+              >
+                <div className="text-5xl mb-4">{useCase.icon}</div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                  {useCase.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {useCase.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Final CTA Section */}
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        <motion.div
+          initial={{ opacity: 0, translateY: 40 }}
+          whileInView={{ opacity: 1, translateY: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl p-12 border border-blue-100 dark:border-blue-800"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            If relationships already drive opportunity, they deserve a system.
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
+            See how IntroHub helps your team turn warm introductions into a
+            repeatable growth channel.
+          </p>
+          <Button
+            variant="solid"
+            onClick={() => navigate({ to: '/book-demo' })}
+            size="lg"
+            className="text-lg px-8 py-4"
+          >
+            Book a demo
+          </Button>
+        </motion.div>
       </div>
     </div>
   )

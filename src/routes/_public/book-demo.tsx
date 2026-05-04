@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import PublicHeader from '@/components/shared/PublicHeader'
 import Button from '@/components/ui/Button'
 
-export const Route = createFileRoute('/_public/get-demo')({
+export const Route = createFileRoute('/_public/book-demo')({
   component: RouteComponent,
 })
 
@@ -43,7 +43,7 @@ function RouteComponent() {
           className="text-center mb-16"
         >
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Request a Demo
+            Book a Demo
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             See IntroHub in action. Schedule a personalized demo with our team.
@@ -202,3 +202,5 @@ function RouteComponent() {
     </div>
   )
 }
+
+// Made with Bob
