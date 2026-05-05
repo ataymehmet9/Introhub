@@ -66,6 +66,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
             defaults: import.meta.env.VITE_PUBLIC_POSTHOG_DEFAULTS,
             capture_exceptions: true,
+            disable_external_dependency_loading: true,
           }}
         >
           <Theme>

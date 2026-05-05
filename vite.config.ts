@@ -26,7 +26,14 @@ const config = defineConfig({
       '@opentelemetry/api-logs',
       '@opentelemetry/resources',
       '@opentelemetry/semantic-conventions',
+      'resend',
+      'safer-buffer',
+      '@react-email/render',
+      '@react-email/components',
     ],
+  },
+  optimizeDeps: {
+    exclude: ['resend', 'safer-buffer', '@react-email/render', '@react-email/components'],
   },
   plugins: [
     devtools(),

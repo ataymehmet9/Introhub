@@ -1,14 +1,25 @@
-import { Resend } from 'resend'
+import type { Resend } from 'resend'
 
 let resendInstance: Resend | null = null
+let ResendClass: typeof Resend | null = null
 
 /**
  * Get singleton instance of Resend client
- * @returns {Resend} Resend client instance
+ * @returns {Promise<Resend>} Resend client instance
  */
-export function getResendInstance(): Resend {
+export async function getResendInstance(): Promise<Resend> {
+  // Only import Resend on the server side to avoid Buffer issues in browser
+  if (typeof window !== 'undefined') {
+    throw new Error('Resend can only be used on the server side')
+  }
+
   if (!resendInstance) {
-    resendInstance = new Resend(import.meta.env.RESEND_API_KEY)
+    // Dynamic import to ensure this only runs on server
+    if (!ResendClass) {
+      const resendModule = await import('resend')
+      ResendClass = resendModule.Resend
+    }
+    resendInstance = new ResendClass(import.meta.env.RESEND_API_KEY)
   }
   return resendInstance
 }

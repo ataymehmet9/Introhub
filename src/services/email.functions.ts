@@ -23,7 +23,7 @@ export const sendForgotPasswordEmail = createServerFn({ method: 'POST' })
   .inputValidator(forgotPasswordEmailSchema)
   .handler(async ({ data }) => {
     const { to, url, from } = data
-    const resend = getResendInstance()
+    const resend = await getResendInstance()
     const emailHtml = await pretty(
       await render(ForgotPasswordEmail({ to, url })),
     )
@@ -76,7 +76,7 @@ export const sendIntroductionRequestEmail = createServerFn({ method: 'POST' })
       from,
     } = data
 
-    const resend = getResendInstance()
+    const resend = await getResendInstance()
 
     try {
       const emailHtml = await pretty(
@@ -163,7 +163,7 @@ export const sendIntroductionResponseEmail = createServerFn({ method: 'POST' })
       from,
     } = data
 
-    const resend = getResendInstance()
+    const resend = await getResendInstance()
 
     try {
       // Render the appropriate template based on status
@@ -276,7 +276,7 @@ export const sendIntroductionEmail = createServerFn({ method: 'POST' })
       from,
     } = data
 
-    const resend = getResendInstance()
+    const resend = await getResendInstance()
 
     try {
       const emailHtml = await pretty(
@@ -360,7 +360,7 @@ export const sendWelcomeEmail = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { to, userName, userEmail, dashboardUrl, from } = data
 
-    const resend = getResendInstance()
+    const resend = await getResendInstance()
 
     try {
       const emailHtml = await pretty(
@@ -444,7 +444,7 @@ export async function sendCRMSyncFailureEmailDirect(params: {
     from,
   } = params
 
-  const resend = getResendInstance()
+  const resend = await getResendInstance()
 
   try {
     const emailHtml = await pretty(

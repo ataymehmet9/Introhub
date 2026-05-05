@@ -203,3 +203,15 @@ export {
   type SyncError,
   type SyncResult,
 } from './sync-log.schema'
+
+// Demo Request schemas
+export {
+  demoRequestFormSchema,
+  demoRequestEmailSchema,
+  recaptchaVerificationSchema,
+  demoRequestResponseSchema,
+  type DemoRequestForm,
+  type DemoRequestEmail,
+  type RecaptchaVerification,
+  type DemoRequestResponse,
+} from './demo-request.schema'
