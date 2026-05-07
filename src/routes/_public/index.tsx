@@ -1,5 +1,20 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import {
+  TbBolt,
+  TbBriefcase,
+  TbBulb,
+  TbChartBar,
+  TbDoorEnter,
+  TbEye,
+  TbMail,
+  TbPencil,
+  TbRefresh,
+  TbSearch,
+  TbTrendingUp,
+  TbUsers,
+  TbWorld,
+} from 'react-icons/tb'
 import Button from '@/components/ui/Button'
 import PublicHeader from '@/components/shared/PublicHeader'
 
@@ -278,41 +293,46 @@ function RouteComponent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           {[
             {
-              icon: '🚪',
+              Icon: TbDoorEnter,
               title: 'Open doors into accounts',
               description:
                 'Open doors into accounts that ignore cold outreach.',
             },
             {
-              icon: '🔄',
+              Icon: TbRefresh,
               title: 'Clear workflow',
               description:
                 'Replace scattered intro requests with one clear workflow.',
             },
             {
-              icon: '👁️',
+              Icon: TbEye,
               title: 'Full visibility',
               description:
                 'Give teams visibility into which introductions are pending, sent, accepted, and progressing.',
             },
-          ].map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, translateY: 40 }}
-              whileInView={{ opacity: 1, translateY: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
-            >
-              <div className="text-5xl mb-4">{feature.icon}</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
+          ].map((feature, index) => {
+            const Icon = feature.Icon
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, translateY: 40 }}
+                whileInView={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+              >
+                <div className="text-primary-600 dark:text-primary-400 mb-4">
+                  <Icon className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {feature.description}
+                </p>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 
@@ -339,47 +359,52 @@ function RouteComponent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: '🔍',
+                Icon: TbSearch,
                 title: 'Find the right path',
                 description:
                   'Identify who can credibly open the door based on account relevance, relationship context, industry, or shared trust.',
               },
               {
-                icon: '✍️',
+                Icon: TbPencil,
                 title: 'Make a better ask',
                 description:
                   'Submit a structured introduction request with the context a connector needs to act quickly and confidently.',
               },
               {
-                icon: '📨',
+                Icon: TbMail,
                 title: 'Send the intro',
                 description:
                   'Coordinate a warm introduction without rewriting the process every time or losing details across channels.',
               },
               {
-                icon: '📊',
+                Icon: TbChartBar,
                 title: 'Track what happened',
                 description:
                   'See which intros were sent, accepted, responded to, and progressed so the team can measure what is working.',
               },
-            ].map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, translateY: 40 }}
-                whileInView={{ opacity: 1, translateY: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="text-5xl mb-4">{step.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
+            ].map((step, index) => {
+              const Icon = step.Icon
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, translateY: 40 }}
+                  whileInView={{ opacity: 1, translateY: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mb-4">
+                    <Icon className="w-12 h-12" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {step.description}
+                  </p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -401,47 +426,52 @@ function RouteComponent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {[
             {
-              icon: '📈',
+              Icon: TbTrendingUp,
               title: 'More pipeline from warm paths',
               description:
                 'Create more opportunities by reaching buyers through trusted relationships instead of relying only on cold outbound.',
             },
             {
-              icon: '⚡',
+              Icon: TbBolt,
               title: 'Less friction for reps and connectors',
               description:
                 'Make it easier for both sides to participate with clearer requests, cleaner workflows, and better context.',
             },
             {
-              icon: '🤝',
+              Icon: TbUsers,
               title: 'Better cross-functional collaboration',
               description:
                 'Bring sales, partnerships, communities, and network operators into one shared introduction workflow.',
             },
             {
-              icon: '📊',
+              Icon: TbChartBar,
               title: 'Measurable relationship value',
               description:
                 'Track activity and outcomes so introductions become an accountable growth motion rather than an informal side process.',
             },
-          ].map((benefit, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, translateY: 40 }}
-              whileInView={{ opacity: 1, translateY: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
-            >
-              <div className="text-5xl mb-4">{benefit.icon}</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                {benefit.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {benefit.description}
-              </p>
-            </motion.div>
-          ))}
+          ].map((benefit, index) => {
+            const Icon = benefit.Icon
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, translateY: 40 }}
+                whileInView={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+              >
+                <div className="text-primary-600 dark:text-primary-400 mb-4">
+                  <Icon className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  {benefit.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {benefit.description}
+                </p>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 
@@ -463,53 +493,58 @@ function RouteComponent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: '👥',
+                Icon: TbUsers,
                 title: 'Sales Teams',
                 description:
                   'Help reps identify warm paths into target accounts and create a repeatable intro motion across the team.',
               },
               {
-                icon: '💼',
+                Icon: TbBriefcase,
                 title: 'Sales ICs',
                 description:
                   'Give AEs, SDRs, and BDRs a faster route to the right buyer through people who already have credibility.',
               },
               {
-                icon: '🤝',
+                Icon: TbUsers,
                 title: 'Partnerships Teams',
                 description:
                   'Turn ecosystem relationships into more visible lead flow, shared opportunities, and stronger collaboration with sales.',
               },
               {
-                icon: '🌐',
+                Icon: TbWorld,
                 title: 'Communities and Networks',
                 description:
                   'Create more member value by facilitating high-relevance introductions at scale.',
               },
               {
-                icon: '💡',
+                Icon: TbBulb,
                 title: 'Investors and Founder Networks',
                 description:
                   'Support portfolio and network companies with timely access to buyers, advisors, talent, and strategic relationships.',
               },
-            ].map((useCase, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, translateY: 40 }}
-                whileInView={{ opacity: 1, translateY: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="text-5xl mb-4">{useCase.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  {useCase.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {useCase.description}
-                </p>
-              </motion.div>
-            ))}
+            ].map((useCase, index) => {
+              const Icon = useCase.Icon
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, translateY: 40 }}
+                  whileInView={{ opacity: 1, translateY: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mb-4">
+                    <Icon className="w-12 h-12" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    {useCase.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {useCase.description}
+                  </p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </div>

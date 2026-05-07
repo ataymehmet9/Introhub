@@ -1,5 +1,24 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import {
+  TbBolt,
+  TbBriefcase,
+  TbBulb,
+  TbChartBar,
+  TbCheck,
+  TbClipboard,
+  TbLink,
+  TbMessage,
+  TbRefresh,
+  TbRocket,
+  TbSearch,
+  TbSettings,
+  TbSparkles,
+  TbTarget,
+  TbTrendingUp,
+  TbUsers,
+  TbWorld,
+} from 'react-icons/tb'
 import PublicHeader from '@/components/shared/PublicHeader'
 import Button from '@/components/ui/Button'
 
@@ -56,7 +75,9 @@ function RouteComponent() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
             <div>
-              <div className="text-5xl mb-6">👥</div>
+              <div className="text-primary-600 dark:text-primary-400 mb-6">
+                <TbUsers className="w-16 h-16" />
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
                 Sales Teams
               </h2>
@@ -82,7 +103,7 @@ function RouteComponent() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">🎯</span>
+                    <TbTarget className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -95,7 +116,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">📈</span>
+                    <TbTrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -109,7 +130,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">✅</span>
+                    <TbCheck className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -139,7 +160,7 @@ function RouteComponent() {
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🔍</span>
+                  <TbSearch className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -152,7 +173,7 @@ function RouteComponent() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">💬</span>
+                  <TbMessage className="w-6 h-6 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -165,7 +186,7 @@ function RouteComponent() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">⚡</span>
+                  <TbBolt className="w-6 h-6 text-pink-600 dark:text-pink-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -179,7 +200,9 @@ function RouteComponent() {
             </div>
           </div>
           <div className="order-1 lg:order-2">
-            <div className="text-5xl mb-6">💼</div>
+            <div className="text-primary-600 dark:text-primary-400 mb-6">
+              <TbBriefcase className="w-16 h-16" />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Sales ICs
             </h2>
@@ -212,7 +235,9 @@ function RouteComponent() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
             <div>
-              <div className="text-5xl mb-6">🤝</div>
+              <div className="text-primary-600 dark:text-primary-400 mb-6">
+                <TbUsers className="w-16 h-16" />
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
                 Partnerships Teams
               </h2>
@@ -237,7 +262,7 @@ function RouteComponent() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">🌐</span>
+                    <TbWorld className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -250,7 +275,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">🔗</span>
+                    <TbLink className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -263,7 +288,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">📊</span>
+                    <TbChartBar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -293,7 +318,7 @@ function RouteComponent() {
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🎯</span>
+                  <TbTarget className="w-6 h-6 text-violet-600 dark:text-violet-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -306,7 +331,7 @@ function RouteComponent() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">⚙️</span>
+                  <TbSettings className="w-6 h-6 text-rose-600 dark:text-rose-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -319,7 +344,7 @@ function RouteComponent() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">✨</span>
+                  <TbSparkles className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -333,7 +358,9 @@ function RouteComponent() {
             </div>
           </div>
           <div className="order-1 lg:order-2">
-            <div className="text-5xl mb-6">🌐</div>
+            <div className="text-primary-600 dark:text-primary-400 mb-6">
+              <TbWorld className="w-16 h-16" />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Communities and Networks
             </h2>
@@ -366,7 +393,9 @@ function RouteComponent() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
             <div>
-              <div className="text-5xl mb-6">💡</div>
+              <div className="text-primary-600 dark:text-primary-400 mb-6">
+                <TbBulb className="w-16 h-16" />
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
                 Investors and Founder Networks
               </h2>
@@ -390,7 +419,7 @@ function RouteComponent() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">🚀</span>
+                    <TbRocket className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -404,7 +433,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">📋</span>
+                    <TbClipboard className="w-6 h-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
@@ -417,7 +446,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">🔄</span>
+                    <TbRefresh className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">

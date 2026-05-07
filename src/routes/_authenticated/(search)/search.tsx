@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
+import { TbSearch } from 'react-icons/tb'
 import SearchBar from './-components/SearchBar'
 import SearchResultsTable from './-components/SearchResultsTable'
 import NoSearchResults from './-components/NoSearchResults'
@@ -140,7 +141,9 @@ function SearchPage() {
       {!showResults && (
         <Card>
           <div className="p-8 sm:p-12 text-center">
-            <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
+            <div className="text-primary-600 dark:text-primary-400 mb-3 sm:mb-4">
+              <TbSearch className="w-16 h-16 sm:w-24 sm:h-24 mx-auto" />
+            </div>
             <h3 className="text-lg sm:text-xl font-semibold mb-2">
               Find New Connections
             </h3>

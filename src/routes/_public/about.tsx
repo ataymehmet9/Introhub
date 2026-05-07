@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import { TbBulb, TbTrendingUp, TbUsers } from 'react-icons/tb'
 import PublicHeader from '@/components/shared/PublicHeader'
 import Button from '@/components/ui/Button'
 
@@ -61,41 +62,46 @@ function RouteComponent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              icon: '🤝',
+              Icon: TbUsers,
               title: 'Trust first',
               description:
                 'Every introduction should feel relevant, respectful, and professionally credible.',
             },
             {
-              icon: '💡',
+              Icon: TbBulb,
               title: 'Clarity matters',
               description:
                 'The easier it is to understand why an introduction is being made, the more likely it is to happen and lead somewhere meaningful.',
             },
             {
-              icon: '📈',
+              Icon: TbTrendingUp,
               title: 'Relationships are assets',
               description:
                 'The value of a network should be activated, not left hidden inside disconnected contact lists and inboxes.',
             },
-          ].map((value, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, translateY: 40 }}
-              whileInView={{ opacity: 1, translateY: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
-            >
-              <div className="text-5xl mb-4">{value.icon}</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                {value.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {value.description}
-              </p>
-            </motion.div>
-          ))}
+          ].map((value, index) => {
+            const Icon = value.Icon
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, translateY: 40 }}
+                whileInView={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+              >
+                <div className="text-primary-600 dark:text-primary-400 mb-4">
+                  <Icon className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  {value.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {value.description}
+                </p>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 

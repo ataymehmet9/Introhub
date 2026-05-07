@@ -1,5 +1,13 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import {
+  TbChartBar,
+  TbPencil,
+  TbRefresh,
+  TbSearch,
+  TbSettings,
+  TbUsers,
+} from 'react-icons/tb'
 import PublicHeader from '@/components/shared/PublicHeader'
 import Button from '@/components/ui/Button'
 
@@ -51,47 +59,52 @@ function RouteComponent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: '🔍',
+                Icon: TbSearch,
                 title: 'Relationship discovery',
                 description:
                   'Find who can credibly introduce your team into the right account or opportunity.',
               },
               {
-                icon: '✍️',
+                Icon: TbPencil,
                 title: 'Structured intro requests',
                 description:
                   'Standardize the ask so people know who needs the intro, why it matters, and what outcome is expected.',
               },
               {
-                icon: '🔄',
+                Icon: TbRefresh,
                 title: 'Workflow coordination',
                 description:
                   'Keep requests, approvals, and introductions moving without depending on memory or inbox follow-up.',
               },
               {
-                icon: '📊',
+                Icon: TbChartBar,
                 title: 'Outcome visibility',
                 description:
                   'Track activity and progress so relationship-driven selling becomes measurable and improvable.',
               },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, translateY: 40 }}
-                whileInView={{ opacity: 1, translateY: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="text-5xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
+            ].map((feature, index) => {
+              const Icon = feature.Icon
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, translateY: 40 }}
+                  whileInView={{ opacity: 1, translateY: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mb-4">
+                    <Icon className="w-12 h-12" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -119,35 +132,40 @@ function RouteComponent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {[
             {
-              icon: '🤝',
+              Icon: TbUsers,
               title: 'Built around trust, context, and control.',
               description:
                 'Good introductions work because they are relevant, timely, and credible. IntroHub supports that by making the request clearer, giving connectors the right context, and preserving the professionalism that makes a warm intro valuable in the first place.',
             },
             {
-              icon: '⚙️',
+              Icon: TbSettings,
               title: 'Operational enough for teams, simple enough for people.',
               description:
                 'The platform is designed to make introductions easier to manage without making them feel robotic. Teams get process, visibility, and accountability, while participants still experience a human, relevant introduction flow.',
             },
-          ].map((benefit, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, translateY: 40 }}
-              whileInView={{ opacity: 1, translateY: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
-            >
-              <div className="text-5xl mb-4">{benefit.icon}</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                {benefit.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {benefit.description}
-              </p>
-            </motion.div>
-          ))}
+          ].map((benefit, index) => {
+            const Icon = benefit.Icon
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, translateY: 40 }}
+                whileInView={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+              >
+                <div className="text-primary-600 dark:text-primary-400 mb-4">
+                  <Icon className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  {benefit.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {benefit.description}
+                </p>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 
