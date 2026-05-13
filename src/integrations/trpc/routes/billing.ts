@@ -81,8 +81,18 @@ export const billingRouter = {
 
       // Check if subscription is scheduled to cancel
       // Stripe uses either cancel_at_period_end OR cancel_at (timestamp)
+      // Only show as "scheduled to cancel" if the cancellation date is in the future
+      const cancelDate = subscription.cancel_at
+        ? new Date(subscription.cancel_at * 1000)
+        : currentPeriodEnd
+          ? new Date(currentPeriodEnd * 1000)
+          : null
+
       const isCanceled =
-        subscription.cancel_at_period_end || subscription.cancel_at !== null
+        (subscription.cancel_at_period_end ||
+          subscription.cancel_at !== null) &&
+        cancelDate !== null &&
+        cancelDate > new Date()
 
       return {
         plan: isPro ? ('pro' as const) : ('free' as const),
