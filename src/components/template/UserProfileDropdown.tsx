@@ -19,10 +19,21 @@ const UserDropdown = () => {
   const trpc = useTRPC()
   const mainUser: User | null = user as User | null
 
-  // Fetch plan details
+  // Fetch subscription status (checks Stripe API for live status)
+  // Using longer staleTime to reduce API calls - data is cached across all pages
+  const { data: subscription } = useQuery({
+    ...trpc.billing.getSubscription.queryOptions(),
+    enabled: !!mainUser,
+    staleTime: 5 * 60 * 1000, // 5 minutes - balance between freshness and performance
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+  })
+
+  // Fetch plan details for usage stats
   const { data: planDetails } = useQuery({
     ...trpc.billing.getPlanDetails.queryOptions(),
     enabled: !!mainUser,
+    staleTime: 5 * 60 * 1000, // 5 minutes - balance between freshness and performance
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
   })
 
   // Handle null user during SSR or before session loads
@@ -31,8 +42,9 @@ const UserDropdown = () => {
   }
 
   const { image: avatar, name: userName, email } = mainUser
-  const isPro = planDetails?.planType === 'pro'
-  const isFree = planDetails?.planType === 'free'
+  // Use subscription.plan which checks Stripe API for accurate status
+  const isPro = subscription?.plan === 'pro'
+  const isFree = subscription?.plan === 'free'
 
   // Get request usage from subscription details
   const requestsUsed = planDetails?.requestsUsed ?? 0
